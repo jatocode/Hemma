@@ -29,22 +29,22 @@
     }
 
 
-function handleMyFeed(feedRoot) {
-    var entries = feedRoot.feed.entry;
-    var first = entries[0];
-    var times = first.getTimes();
-    var startTime = times[0].getStartTime().getDate();
-    var endTime = times[0].getEndTime().getDate();
-    var startString = startTime.getHours() + ":" + startTime.getMinutes();
-    var endString = endTime.getHours() + ":" + endTime.getMinutes();
+function handleMyFeed(result) {
+    var entries = result.feed.entry;
+    txt.innerHTML = "<p>";
+    for (var i = 0; i < entries.length; i++ ) {
+       var eventEntry = entries[i];
+       var eventTitle = eventEntry.getTitle().getText();
+       var eventTimes = eventEntry.getTimes();
 
-    var now = new Date();
-    var txt = document.getElementById("u");
-    if((startTime >= now) && (endTime > now)) {
-	txt.innerHTML = "<p>Motorvärmaren är aktiv tom: " + endString + "</p>";
-    } else {
-        txt.innerHTML = "<p>" + startString + " --> " + endString + " (" + first.getTitle().getText() + ")</p>";
-    }
+       var startTime = eventTimes[0].getStartTime().getDate();
+       var endTime = eventTimes[0].getEndTime().getDate();
+       var startString = startTime.getHours() + ":" + startTime.getMinutes();
+       var endString = endTime.getHours() + ":" + endTime.getMinutes();
+
+       txt.innerHTML += "<p>" + eventTitle + ": " + startString + "->" + endString + "</p>"; 
+    }    
+    txt.innerHTML+ = "</p>";
 }
 
 function handleError(e) {
