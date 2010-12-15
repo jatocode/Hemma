@@ -31,6 +31,7 @@
 
 function handleMyFeed(result) {
     var entries = result.feed.entry;
+    var txt = document.getElementById("u");
     txt.innerHTML = "<p>";
     for (var i = 0; i < entries.length; i++ ) {
        var eventEntry = entries[i];
