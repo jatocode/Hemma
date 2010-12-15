@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<meta content="minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no" name="viewport" />
+<link href="css/style.css" rel="stylesheet" media="screen" type="text/css" />
+<script src="javascript/functions.js" type="text/javascript"></script>
+<title>Tobias webapp</title>
+<meta content="keyword1,keyword2,keyword3" name="keywords" />
+<meta content="To be used for home control" name="description" />
+<link rel="apple-touch-icon" href="homescreen.png"/>
+<link href="startup.png" rel="apple-touch-startup-image" />
+    <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
+    <script type="text/javascript">
+    google.setOnLoadCallback(getMyFeed);
+    google.load("gdata", "1");
+
+    var myService;
+    var feedUrl = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
+
+    function setupMyService() {
+      myService = new google.gdata.calendar.CalendarService('motorvarmare-1');
+    }
+
+    function getMyFeed() {
+      setupMyService();
+      myService.getEventsFeed(feedUrl, handleMyFeed, handleError);
+    }
+
+
+function handleMyFeed(feedRoot) {
+    var entries = feedRoot.feed.entry;
+    var first = entries[0];
+    var times = first.getTimes();
+    var startTime = times[0].getStartTime().getDate();
+    var endTime = times[0].getEndTime().getDate();
+    var startString = startTime.getHours() + ":" + startTime.getMinutes();
+    var endString = endTime.getHours() + ":" + endTime.getMinutes();
+
+    var now = new Date();
+    var txt = document.getElementById("u");
+    if((startTime >= now) && (endTime > now)) {
+	txt.innerHTML = "<p>Motorvärmaren är aktiv tom: " + endString + "</p>";
+    } else {
+        txt.innerHTML = "<p>" + startString + " --> " + endString + " (" + first.getTitle().getText() + ")</p>";
+    }
+}
+
+function handleError(e) {
+  alert(e.cause ? e.cause.statusText : e.message);
+}
+    </script>
+</head>
+
+<body>
+
+<div id="topbar">
+  <div id="title">Hemma</div>
+</div>
+<div id="content">
+<!-- Temperatur från temperatur.nu -->
+<span class="graytitle">Utetemperatur:
+  <script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
+  </script>
+</span>
+<br/>
+<br/>
+<span class="graytitle">Lampor</span>
+<ul class="pageitem">
+  <li class="checkbox">
+    <span class="name">Framsida</span>
+    <input name="framsida" type="checkbox" />
+  </li>
+  <li class="checkbox">
+    <span class="name">Baksida</span>
+    <input name="baksida" type="checkbox" />
+  </li>
+  <li class="checkbox">
+    <span class="name">Balkong</span>
+    <input name="balkong" type="checkbox" />
+  </li>
+  <li class="checkbox">
+    <span class="name">Garage</span>
+    <input name="garage" type="checkbox" />
+  </li>
+</ul>
+<span class="graytitle">Motorvärmaren</span>
+<ul class="pageitem">
+  <li class="textbox">
+    <div id="u">
+       <p>Nästa starttid</p>
+    </div>
+  </li>
+</ul>
+<span class="graytitle">Garaget</span>
+<ul class="pageitem">
+   <li class="checkbox">
+   <span class="name">Portöppnare</span>
+   <input name="garageport" type="checkbox" />
+</ul>
+</div>
+<img src="ali.jpg" style="position:absolute; top: -1000px;"/>
+<div id="footer">
+	<!-- Support iWebKit by sending us traffic; please keep this footer on your page, consider it a thank you for our work :-) -->
+	<a class="noeffect" href="http://iwebkit.net">Powered by iWebKit</a></div>
+
+</body>
+
+</html>

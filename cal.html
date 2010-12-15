@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>Calendar test</title>
+<script type="text/javascript" src="http://www.google.com/jsapi">
+google.load("gdata", "1");
+google.setOnLoadCallback(getMyFeed);
+var myService;
+var feedUrl = "https://www.google.com/calendar/feeds/tobias.jansson@gmail.com/public/full";
+
+function setupMyService() {
+  myService = new google.gdata.calendar.CalendarService('motorvarmar-service');
+  document.write("myService: " + myService);
+}
+
+function getMyFeed() {
+  setupMyService();
+}
+</script>
+</head>
+<body>
+<script type="text/javascript">
+
+// The callback method that will be called when getAllCalendarsFeed() returns feed data
+var callback = function(result) {
+  // Obtain the array of CalendarEntry
+  var entries = result.feed.entry;
+  
+  for (var i = 0; i < entries.length; i++) {
+    var calendarEntry = entries[i];
+    var calendarTitle = calendarEntry.getTitle().getText();
+    document.write('Calendar title = ' + calendarTitle);
+  }
+}
+
+// Error handler to be invoked when getAllCalendarsFeed() produces an error
+var handleError = function(error) {
+  document.write(error);
+}
+</script>
+Nästa kalenderevent:
+<form>
+<input type=button id="login" value="Login" onClick="myService.getEventsFeed(feedUrl, callback, handleError);"> 
+</form>
+<script type="text/javascript">
+  //myService.getEventsFeed(feedUrl, callback, handleError);
+</script>
+</body>
+</html> 
+

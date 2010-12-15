@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>My Google Data API Application</title>
+    <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
+    <script type="text/javascript">
+
+    google.setOnLoadCallback(getMyFeed);
+    google.load("gdata", "1");
+
+    var myService;
+    var feedUrl = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
+
+    function setupMyService() {
+      myService = new google.gdata.calendar.CalendarService('motorvarmare-1');
+    }     
+
+    function getMyFeed() {
+      setupMyService();
+      myService.getEventsFeed(feedUrl, handleMyFeed, handleError);
+    }
+
+function handleMyFeed(feedRoot) {
+    var entries = feedRoot.feed.entry;
+    var first = entries[0];
+    var times = first.getTimes();
+    var startTime = times[0].getStartTime().getDate();
+    var endTime = times[0].getEndTime().getDate();
+    var startString = startTime.getHours() + ":" + startTime.getMinutes();
+    var endString = endTime.getHours() + ":" + endTime.getMinutes();
+
+   var txt=document.getElementById("u")
+   txt.innerHTML = "Nästa värmeperiod mellan " + startString + " och " + endString;
+}
+
+
+function handleError(e) {
+  alert(e.cause ? e.cause.statusText : e.message);
+}
+    </script>
+  </head>
+  <body>
+<p>
+    <div id="u"> 
+     Här kommer det text.
+    </div>
+    <img src="ali.jpg" style="position:absolute; top: -1000px;"/>
+</p>
+  </body>
+</html>
+
