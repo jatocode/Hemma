@@ -15,6 +15,7 @@ if($cmd=="state") {
 			$oo = explode("\t", $line);
 			$d->id = $oo[0];
 			$d->name = $oo[1];
+			// State can be ON/OFF/DIMMED:xx
 			$d->state = $oo[2];
 			$r->devices[] = $d;
 		}
@@ -23,6 +24,7 @@ if($cmd=="state") {
 	$run = "tdtool --$cmd $id";
 	print_r("$run\n<br/>");
 	exec($run, $out);
+	// TODO: Return useful info, Success/Failure + id
 } else if ($cmd == "dim") {
 	// Not implemented
 }

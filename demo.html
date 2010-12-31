@@ -13,7 +13,7 @@
     <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
     <script type="text/javascript">
     google.setOnLoadCallback(finishedLoaded);
-    google.load("gdata", "1");
+    google.load("gdata", "1", {packages:["calendar"]});
 
     var myService;
     var deviceData = null;
@@ -59,6 +59,7 @@ function queryStates() {
 			for(var d in deviceData.devices) {
 			    var id = parseInt(d) + 1;
 		    	var chkbox = document.getElementsByName(id)[0];	
+		    	// State can be ON/OFF/DIMMED:xx
 		    	chkbox.checked = deviceData.devices[d].state=="OFF"?false:true;
 			}
 		}
