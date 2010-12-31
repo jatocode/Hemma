@@ -51,7 +51,7 @@ function handleCalendarFeed(result) {
 
 function queryStates() {
 	var req = new XMLHttpRequest();
-	req.open("GET", "serv.php?cmd=state", true);
+	req.open("GET", "tellstickService.php?cmd=state", true);
 	req.send(null);
 	req.onreadystatechange = function statesResponse() {
 		if(req.readyState == 4) {
@@ -69,7 +69,7 @@ function callService(chkbox) {
 	$cmd = chkbox.checked ? "on" : "off"; 
 	$id = chkbox.name;
 	var xhReq = new XMLHttpRequest();
-	var req = 'serv.php?id=' + $id + '&cmd=' + $cmd;
+	var req = 'tellstickService.php?id=' + $id + '&cmd=' + $cmd;
 	xhReq.open("GET", req, true);
 	xhReq.send(null);
 }
