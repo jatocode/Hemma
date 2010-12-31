@@ -9,7 +9,7 @@
 <title>Hemma</title>
 <meta content="keyword1,keyword2,keyword3" name="keywords" />
 <meta content="To be used for home control" name="description" />
-<link rel="apple-touch-icon" href="homescreen.png"/>
+<link rel="apple-touch-icon" href="icon.png"/>
 <link href="startup.png" rel="apple-touch-startup-image" />
     <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
     <script type="text/javascript">
@@ -62,7 +62,7 @@ function queryStates() {
 			txt.innerHTML += "<ul>";
 			for(var d in deviceData.devices) {
 			    var id = parseInt(d) + 1;
-			   	//txt.innerHTML += "<li>" + deviceData.devices[d] + "," + id + "</li>";
+			   	txt.innerHTML += "<li>" + deviceData.devices[d].name + "</li>";
 		    	var chkbox = document.getElementsByName(id)[0];		    	
 		    	chkbox.checked = deviceData.devices[d].state=="ON"?true:false;
 			}
