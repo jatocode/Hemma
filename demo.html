@@ -7,7 +7,6 @@
 <link href="css/style.css" rel="stylesheet" media="screen" type="text/css" />
 <script src="javascript/functions.js" type="text/javascript"></script>
 <title>Hemma</title>
-<meta content="keyword1,keyword2,keyword3" name="keywords" />
 <meta content="To be used for home control" name="description" />
 <link rel="apple-touch-icon" href="icon.png"/>
 <link href="startup.png" rel="apple-touch-startup-image" />
@@ -20,21 +19,21 @@
     var deviceData = null;
     var feedUrl = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
 
-    function setupMyService() {
-      myService = new google.gdata.calendar.CalendarService('motorvarmare-1');
+    function setupCalendarService() {
+      calendarService = new google.gdata.calendar.CalendarService('motorvarmare-1');
     }
 
     function finishedLoaded() {
-      setupMyService();
-      myService.getEventsFeed(feedUrl, handleMyFeed, handleError);
+      setupCalendarService();
+      calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
       queryStates();
     }
 
-function handleMyFeed(result) {
+function handleCalendarFeed(result) {
     var entries = result.feed.entry;
     var txt = document.getElementById("u");
     txt.innerHTML = "<p>";
-    for (var i = 0; i < entries.length; i++ ) {
+    for(var i in entries) {
        var eventEntry = entries[i];
        var eventTitle = eventEntry.getTitle().getText();
        var eventTimes = eventEntry.getTimes();
@@ -56,17 +55,12 @@ function queryStates() {
 	req.send(null);
 	req.onreadystatechange = function statesResponse() {
 		if(req.readyState == 4) {
-			var txt = document.getElementById("tellstick");
 			deviceData = JSON.parse(req.responseText);
-			txt.innerHTML += "<pre>" + deviceData.numDev + "</pre>"
-			txt.innerHTML += "<ul>";
 			for(var d in deviceData.devices) {
 			    var id = parseInt(d) + 1;
-			   	//txt.innerHTML += "<li>" + deviceData.devices[d].name + "</li>";
 		    	var chkbox = document.getElementsByName(id)[0];	
 		    	chkbox.checked = deviceData.devices[d].state=="OFF"?false:true;
 			}
-			txt.innerHTML += "</ul>";
 		}
 	}
 }
@@ -92,14 +86,14 @@ function handleError(e) {
   <div id="title">Hemma</div>
 </div>
 <div id="content">
-<!-- Temperatur frï¿½n temperatur.nu -->
+<!-- Temperatur från temperatur.nu -->
 <span class="graytitle">Utetemperatur:
   <script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
   </script>
 </span>
 <br/>
 <br/>
-<span class="graytitle">Lampor</span>
+<span class="graytitle">Enheter</span>
 <ul class="pageitem">
   <li class="checkbox">
     <span class="name">Nexa dimmer</span>
@@ -113,28 +107,12 @@ function handleError(e) {
     <span class="name">Nexa inbyggd</span>
     <input name="3" type="checkbox" onClick="callService(this);"/>
   </li>
-  <li class="checkbox">
-    <span class="name">Lukas B1</span>
-    <input name="4" type="checkbox" onClick="callService(this);"/>
-  </li>
-  <li class="checkbox">
-    <span class="name">Lukas B2</span>
-    <input name="5" type="checkbox" onClick="callService(this);"/>
-  </li>
 </ul>
 <span class="graytitle">Motorvärmaren</span>
 <ul class="pageitem">
   <li class="textbox">
     <div id="u">
        <p>Nästa starttid</p>
-    </div>
-  </li>
-</ul>
-<span class="graytitle">Tellstick</span>
-<ul class="pageitem">
-  <li class="textbox">
-    <div id="tellstick">
-       <p>Tellstick info</p>
     </div>
   </li>
 </ul>
