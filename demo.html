@@ -62,22 +62,13 @@ function queryStates() {
 			txt.innerHTML += "<ul>";
 			for(var d in deviceData.devices) {
 			    var id = parseInt(d) + 1;
-			   	txt.innerHTML += "<li>" + deviceData.devices[d].name + "</li>";
-		    	var chkbox = document.getElementsByName(id)[0];		    	
-		    	chkbox.checked = deviceData.devices[d].state=="ON"?true:false;
+			   	//txt.innerHTML += "<li>" + deviceData.devices[d].name + "</li>";
+		    	var chkbox = document.getElementsByName(id)[0];	
+		    	chkbox.checked = deviceData.devices[d].state=="OFF"?false:true;
 			}
 			txt.innerHTML += "</ul>";
 		}
 	}
-}
-
-function queryDevice(chkbox) {
-	$id = chkbox.name;
-	if(deviceData != null) {
-		//alert(deviceData.devices[id][2]);
-		return deviceData.devices[id][2];
-	}
-	return "off";
 }
 
 function callService(chkbox) {
