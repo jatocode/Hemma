@@ -1,7 +1,7 @@
 <?php
 $id = $_GET['id'];
 $cmd = $_GET['cmd'];
-if($cmd=="state") {
+if($cmd=="list") {
 	exec("tdtool --list", $out);
 	$i = 0;
 	$r = new Devices();

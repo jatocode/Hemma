@@ -26,7 +26,7 @@
     function finishedLoaded() {
       setupCalendarService();
       calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
-      queryStates();
+      queryDevices();
     }
 
 function handleCalendarFeed(result) {
@@ -49,9 +49,9 @@ function handleCalendarFeed(result) {
     txt.innerHTML += "</p>";
 }
 
-function queryStates() {
+function queryDevices() {
 	var req = new XMLHttpRequest();
-	req.open("GET", "tellstickService.php?cmd=state", true);
+	req.open("GET", "tellstickService.php?cmd=list", true);
 	req.send(null);
 	req.onreadystatechange = function statesResponse() {
 		if(req.readyState == 4) {
