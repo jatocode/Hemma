@@ -1,6 +1,6 @@
 <?php
 $id = $_GET['id'];
-$cmd = $_GET['cmd'];
+$cmd = strtolower($_GET['cmd']);
 if($cmd=="list") {
 	exec("tdtool --list", $out);
 	$i = 0;

@@ -61,25 +61,35 @@ function queryDevices() {
 			var e = document.getElementById("enheter");
 			for(var d in deviceData.devices) {
 		    	// State can be ON/OFF/DIMMED:xx
-		    	var checked = deviceData.devices[d].state=="OFF"?"":"checked";
+		    	var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
+		    	var id = deviceData.devices[d].id;
   				e.innerHTML += "<li class=\"checkbox\">" +
   					"<span class=\"name\">" + deviceData.devices[d].name + 
-  					"</span><input name=\"" + deviceData.devices[d].id + "\"" + 
-  					" type=\"checkbox\"" + checked + " onClick='callService(this);'/>" +
+  					"</span><input name=\"" + id + "\"" + 
+  					" type=\"checkbox\"" + checked + " onClick='flipState(\"" + id + "\");'/>" +
   					"</li>";
-
 			}
 		}
 	}
 }
 
-function callService(chkbox) {
-	$cmd = chkbox.checked ? "on" : "off"; 
-	$id = chkbox.name;
+function flipState(id) {
+	var device = findDeviceById(id);
+	var newState = ((device.state).toLowerCase()=="off") ? "on" : "off";
 	var xhReq = new XMLHttpRequest();
-	var req = 'tellstickService.php?id=' + $id + '&cmd=' + $cmd;
+	var req = 'tellstickService.php?id=' + id + '&cmd=' + newState;
 	xhReq.open("GET", req, true);
 	xhReq.send(null);
+	device.state = newState;
+}
+
+function findDeviceById(id) {
+	for(var d in deviceData.devices) {
+		if(deviceData.devices[d].id == id) {
+			return deviceData.devices[d];
+		}
+	}
+	return -1;
 }
 
 function handleError(e) {
