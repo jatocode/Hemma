@@ -83,6 +83,20 @@ function flipState(id) {
 	device.state = newState;
 }
 
+function turnOff(idList) {
+	for(var i in idList) {
+		var id = idList[i];
+		var device = findDeviceById(id);
+		var xhReq = new XMLHttpRequest();
+		var req = 'tellstickService.php?id=' + id + '&cmd=off';
+		xhReq.open("GET", req, true);
+		xhReq.send(null);
+		device.state = "off";
+		var chkbox = document.getElementsByName(id)[0];
+		chkbox.checked = false;
+	}
+}
+
 function findDeviceById(id) {
 	for(var d in deviceData.devices) {
 		if(deviceData.devices[d].id == id) {
@@ -129,6 +143,16 @@ function handleError(e) {
    <li class="checkbox">
    <span class="name">Portöppnare</span>
    <input name="garageport" type="checkbox" />
+</ul>
+<span class="graytitle">Debug/test</span>
+<ul class="pageitem">
+  <li class="textbox">
+    <div id="debug">
+    </div>
+  </li>
+  <li class="checkbox">
+   <span class="name">Test av flera</span>
+   <input name="flera" type="checkbox" checked onClick='turnOff(["1","2"]);'/>
 </ul>
 </div>
 <img src="ali.jpg" style="position:absolute; top: -1000px;"/>
