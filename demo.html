@@ -10,12 +10,14 @@
 <meta content="To be used for home control" name="description" />
 <link rel="apple-touch-icon" href="icon.png"/>
 <link href="startup.png" rel="apple-touch-startup-image" />
-    <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
-    <script type="text/javascript">
+    
+   <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
+   
+   <script type="text/javascript">
     google.setOnLoadCallback(finishedLoaded);
     google.load("gdata", "1", {packages:["calendar"]});
 
-    var myService;
+    var calendarService;
     var deviceData = null;
     var feedUrl = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
 
@@ -56,11 +58,16 @@ function queryDevices() {
 	req.onreadystatechange = function statesResponse() {
 		if(req.readyState == 4) {
 			deviceData = JSON.parse(req.responseText);
+			var e = document.getElementById("enheter");
 			for(var d in deviceData.devices) {
-			    var id = parseInt(d) + 1;
-		    	var chkbox = document.getElementsByName(id)[0];	
 		    	// State can be ON/OFF/DIMMED:xx
-		    	chkbox.checked = deviceData.devices[d].state=="OFF"?false:true;
+		    	var checked = deviceData.devices[d].state=="OFF"?"":"checked";
+  				e.innerHTML += "<li class=\"checkbox\">" +
+  					"<span class=\"name\">" + deviceData.devices[d].name + 
+  					"</span><input name=\"" + deviceData.devices[d].id + "\"" + 
+  					" type=\"checkbox\"" + checked + " onClick='callService(this);'/>" +
+  					"</li>";
+
 			}
 		}
 	}
@@ -96,18 +103,8 @@ function handleError(e) {
 <br/>
 <span class="graytitle">Enheter</span>
 <ul class="pageitem">
-  <li class="checkbox">
-    <span class="name">Nexa dimmer</span>
-    <input name="1" type="checkbox" onClick="callService(this);"/>
-  </li>
-  <li class="checkbox">
-    <span class="name">Waveman IP44</span>
-    <input name="2" type="checkbox" onClick="callService(this);"/>
-  </li>
-  <li class="checkbox">
-    <span class="name">Nexa inbyggd</span>
-    <input name="3" type="checkbox" onClick="callService(this);"/>
-  </li>
+<!-- Populated by javascript/php-backend -->
+<div id="enheter"></div>
 </ul>
 <span class="graytitle">Motorvärmaren</span>
 <ul class="pageitem">
