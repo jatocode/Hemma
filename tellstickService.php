@@ -20,7 +20,8 @@ if($cmd=="list") {
 		}
 	}
 } else if ($cmd == "on" || $cmd == "off") {
-	$devices = json_decode($_POST['devices']);
+	$devices = json_decode(stripslashes($_POST['devices']));
+//	die(stripslashes($_POST['devices']));
 	$o = array();
 	foreach($devices as $id) {
 		$run = "tdtool --$cmd $id";
