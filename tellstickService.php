@@ -1,6 +1,5 @@
 <?php
-$id = $_GET['id'];
-$cmd = strtolower($_GET['cmd']);
+$cmd = strtolower($_POST['cmd']);
 if($cmd=="list") {
 	exec("tdtool --list", $out);
 	$i = 0;
@@ -21,9 +20,13 @@ if($cmd=="list") {
 		}
 	}
 } else if ($cmd == "on" || $cmd == "off") {
-	$run = "tdtool --$cmd $id";
-	print_r("$run\n<br/>");
-	exec($run, $out);
+	$devices = json_decode($_POST['devices']);
+	$o = array();
+	foreach($devices as $id) {
+		$run = "tdtool --$cmd $id";
+		exec($run, $o[]);
+	}
+	$r = $o;
 	// TODO: Return useful info, Success/Failure + id
 } else if ($cmd == "dim") {
 	// Not implemented

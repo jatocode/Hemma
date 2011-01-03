@@ -10,9 +10,7 @@
 <meta content="To be used for home control" name="description" />
 <link rel="apple-touch-icon" href="icon.png"/>
 <link href="startup.png" rel="apple-touch-startup-image" />
-    
    <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
-   
    <script type="text/javascript">
     google.setOnLoadCallback(finishedLoaded);
     google.load("gdata", "1", {packages:["calendar"]});
@@ -26,9 +24,9 @@
     }
 
     function finishedLoaded() {
-     // setupCalendarService();
-     // calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
-      queryDevices();
+     setupCalendarService();
+     calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
+     queryDevices();
     }
 
 function handleCalendarFeed(result) {
@@ -53,8 +51,9 @@ function handleCalendarFeed(result) {
 
 function queryDevices() {
 	var req = new XMLHttpRequest();
-	req.open("GET", "tellstickService.php?cmd=list", true);
-	req.send(null);
+	req.open("POST", "tellstickService.php", true);
+	var params = 'cmd=list';
+	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	req.onreadystatechange = function statesResponse() {
 		if(req.readyState == 4) {
 			deviceData = JSON.parse(req.responseText);
@@ -69,32 +68,39 @@ function queryDevices() {
   					" type=\"checkbox\"" + checked + " onClick='flipState(\"" + id + "\");'/>" +
   					"</li>";
 			}
+		
 		}
 	}
+	req.send(params);
 }
 
 function flipState(id) {
 	var device = findDeviceById(id);
 	var newState = ((device.state).toLowerCase()=="off") ? "on" : "off";
 	var xhReq = new XMLHttpRequest();
-	var req = 'tellstickService.php?id=' + id + '&cmd=' + newState;
-	xhReq.open("GET", req, true);
-	xhReq.send(null);
+	var req = 'tellstickService.php';
+	xhReq.open("POST", req, true);
+	var params = 'cmd=' + newState;
+	params += '&devices=["' +id + '"]';
+	xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhReq.send(params);
 	device.state = newState;
 }
 
 function turnOff(idList) {
-	for(var i in idList) {
-		var id = idList[i];
-		var device = findDeviceById(id);
-		var xhReq = new XMLHttpRequest();
-		var req = 'tellstickService.php?id=' + id + '&cmd=off';
-		xhReq.open("GET", req, false);
-		xhReq.send(null);
-		device.state = "off";
-		var chkbox = document.getElementsByName(id)[0];
+	var xhReq = new XMLHttpRequest();
+	var req = 'tellstickService.php';
+	xhReq.open("POST", req, true);
+	var params = 'cmd=off';
+	params += '&devices=' + JSON.stringify(idList);
+	for(var id in idList) {
+		var chkbox = document.getElementsByName(id);
 		chkbox.checked = false;
+		findDeviceById(id).state = "off";
 	}
+	xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhReq.send(params);
+	
 }
 
 function findDeviceById(id) {
@@ -152,7 +158,7 @@ function handleError(e) {
   </li>
   <li class="checkbox">
    <span class="name">Test av flera</span>
-   <input name="flera" type="checkbox" checked onClick='turnOff(["1","2"]);'/>
+   <input name="flera" type="checkbox" checked onClick='turnOff([1,2]);'/>
 </ul>
 </div>
 <img src="ali.jpg" style="position:absolute; top: -1000px;"/>
