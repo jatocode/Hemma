@@ -26,8 +26,8 @@
     }
 
     function finishedLoaded() {
-      setupCalendarService();
-      calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
+     // setupCalendarService();
+     // calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
       queryDevices();
     }
 
@@ -89,7 +89,7 @@ function turnOff(idList) {
 		var device = findDeviceById(id);
 		var xhReq = new XMLHttpRequest();
 		var req = 'tellstickService.php?id=' + id + '&cmd=off';
-		xhReq.open("GET", req, true);
+		xhReq.open("GET", req, false);
 		xhReq.send(null);
 		device.state = "off";
 		var chkbox = document.getElementsByName(id)[0];
