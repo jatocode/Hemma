@@ -29,7 +29,16 @@ if($cmd=="list") {
 	$r = $o;
 	// TODO: Return useful info, Success/Failure + id
 } else if ($cmd == "dim") {
-	// Not implemented
+	$devices = json_decode(stripslashes($_POST['devices']));
+	$power = $_POST['power'];
+	$o = array();
+	foreach($devices as $id) {
+		$run = "tdtool --dim $id --dimlevel $power";
+		// TBD
+		//exec($run, $o[]);
+		$o[] = $run;
+	}
+	$r = $o;
 } else if ($cmd == "nextStarttime") {
 	require_once('Zend/Loader.php');  
 	$classes = array('Zend_Gdata','Zend_Gdata_Query','Zend_Gdata_ClientLogin','Zend_Gdata_Calendar');  
