@@ -93,14 +93,14 @@ function turnOff(idList) {
 	xhReq.open("POST", req, true);
 	var params = 'cmd=off';
 	params += '&devices=' + JSON.stringify(idList);
-	for(var id in idList) {
-		var chkbox = document.getElementsByName(id);
+	for(var i in idList) {
+		var id = idList[i]
+		var chkbox = document.getElementsByName(id)[0];
 		chkbox.checked = false;
 		findDeviceById(id).state = "off";
 	}
 	xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhReq.send(params);
-	
 }
 
 function findDeviceById(id) {
@@ -148,7 +148,7 @@ function handleError(e) {
 <ul class="pageitem">
    <li class="checkbox">
    <span class="name">Portöppnare</span>
-   <input name="garageport" type="checkbox" />
+   <input name="4" type="checkbox" />
 </ul>
 <span class="graytitle">Debug/test</span>
 <ul class="pageitem">
@@ -158,7 +158,7 @@ function handleError(e) {
   </li>
   <li class="checkbox">
    <span class="name">Test av flera</span>
-   <input name="flera" type="checkbox" checked onClick='turnOff(["1","2","3"]);'/>
+   <input name="flera" type="checkbox" checked onClick='turnOff(["4","2","3"]);'/>
 </ul>
 </div>
 <img src="ali.jpg" style="position:absolute; top: -1000px;"/>
