@@ -64,6 +64,7 @@ if($cmd=="list") {
 	$r = array();
 	foreach ($eventFeed as $entry) {
     	$when = $entry->when[0];
+    	$e = new SimpleEntry();
     	$e->title = $entry->title->text;
     	$e->startTime = $when->startTime;
     	$e->endTime = $when->endTime;
@@ -72,6 +73,12 @@ if($cmd=="list") {
 }
 
 print_r(json_encode($r));
+
+class SimpleEntry {
+	public $title;
+	public $startTime;
+	public $endTime;
+}
 
 class Devices {
 	public $numDev;

@@ -1,204 +1,85 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta content="To be used for home control" name="description" />
+<!-- jsapi, jquery and jqtouch js files -->
 <script src="http://www.google.com/jsapi?key=ABQIAAAACwBI89C9mmmJL22hG9-DxBRgMwG0ku0wz6SNxwKKTI7DE1glNRSjgE4qGP4SNlSE-JzutfxwbMAvVg" type="text/javascript"></script>
 <script type="text/javascript"> google.load("jquery", "1.4.2"); </script>
 <script src="jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
 <style type="text/css" media="screen">@import "jqtouch/jqtouch.min.css";</style>
 <style type="text/css" media="screen">@import "themes/apple/theme.min.css";</style>
+<script src="hemma.js"></script>
 <script type="text/javascript">
-  var jQT = $.jQTouch({
-	icon: 'icon.png',
-	startupScreen: 'startup.png'
-      });
+	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
+	google.setOnLoadCallback(finishedLoaded);
 </script>
 <title>Hemma</title>
-<meta content="To be used for home control" name="description" />
-   <script type="text/javascript">
-    google.setOnLoadCallback(finishedLoaded);
-    google.load("gdata", "1", {packages:["calendar"]});
-
-    var calendarService;
-    var deviceData = null;
-    var feedUrl = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
-
-    function setupCalendarService() {
-      calendarService = new google.gdata.calendar.CalendarService('motorvarmare-1');
-    }
-
-    function finishedLoaded() {
-     setupCalendarService();
-     calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
-     queryDevices();
-    }
-
-function handleCalendarFeed(result) {
-    var entries = result.feed.entry;
-    var txt = document.getElementById("u");
-    txt.innerHTML = "<p>";
-    for(var i in entries) {
-       var eventEntry = entries[i];
-       var eventTitle = eventEntry.getTitle().getText();
-       var eventTimes = eventEntry.getTimes();
-
-       var startTime = eventTimes[0].getStartTime().getDate();
-       var endTime = eventTimes[0].getEndTime().getDate();
-       var startString = startTime.getHours() + ":" + startTime.getMinutes();
-       var endString = endTime.getHours() + ":" + endTime.getMinutes();
-       var day = startTime.getDay();
-
-       txt.innerHTML += "<p>" + eventTitle + ": " + startString + "->" + endString + "," + day + "</p>"; 
-    }    
-    txt.innerHTML += "</p>";
-}
-
-function queryDevices() {
-	var req = new XMLHttpRequest();
-	req.open("POST", "tellstickService.php", true);
-	var params = 'cmd=list';
-	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	req.onreadystatechange = function statesResponse() {
-		if(req.readyState == 4) {
-			deviceData = JSON.parse(req.responseText);
-			var e = document.getElementById("enheter");
-			for(var d in deviceData.devices) {
-		    	// State can be ON/OFF/DIMMED:xx
-		    	var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
-		    	var id = deviceData.devices[d].id;
-  				e.innerHTML += "<li>" + deviceData.devices[d].name +
-                                        "<span class=\"toggle\">" +
-  					"<input name=\"" + id + "\"" + 
-  					" type=\"checkbox\"" + checked + " onClick='flipState(\"" + id + "\");'/>" +
-  					"</span></li>";
-			}
-		
-		}
-	}
-	req.send(params);
-}
-
-function flipState(id) {
-	var device = findDeviceById(id);
-	var newState = ((device.state).toLowerCase()=="off") ? "on" : "off";
-	var xhReq = new XMLHttpRequest();
-	var req = 'tellstickService.php';
-	xhReq.open("POST", req, true);
-	var params = 'cmd=' + newState;
-	params += '&devices=["' +id + '"]';
-	xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhReq.send(params);
-	device.state = newState;
-}
-
-function dimDevice(id, power) {
-	var xhReq = new XMLHttpRequest();
-	var req = 'tellstickService.php';
-	xhReq.open("POST", req, true);
-	var params = 'cmd=dim';
-	params += '&devices=["' +id + '"]';
-	params += "&power=" + power;
-	xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhReq.send(params);
-	
-	var device = findDeviceById(id);
-	device.state = "DIMMER:" + power;
-	var chkbox = document.getElementsByName(id)[0];
-	chkbox.checked = true;
-}
-
-function turnOff(idList) {
-	var xhReq = new XMLHttpRequest();
-	var req = 'tellstickService.php';
-	xhReq.open("POST", req, true);
-	var params = 'cmd=off';
-	params += '&devices=' + JSON.stringify(idList);
-	xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhReq.send(params);
-	
-	for(var i in idList) {
-		var id = idList[i]
-		var chkbox = document.getElementsByName(id)[0];
-		chkbox.checked = false;
-		findDeviceById(id).state = "off";
-	}
-}
-
-function findDeviceById(id) {
-	for(var d in deviceData.devices) {
-		if(deviceData.devices[d].id == id) {
-			return deviceData.devices[d];
-		}
-	}
-	return -1;
-}
-
-function handleError(e) {
-  alert(e.cause ? e.cause.statusText : e.message);
-}
-    </script>
 </head>
-
 <body>
+<!-- First page -->
 <div id="startsida">
-<div class="toolbar">
-<h1>Hemma</h1>
+	<div class="toolbar">
+		<h1>Hemma</h1>
+	</div>
+	
+	<h2>Enheter</h2>
+	<ul class="edit rounded">
+		<div id="enheter"></div>
+	</ul>
+	
+	<h2>Genvägar</h2>
+	<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
+	<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
+	
+	<h2>Utetemperatur</h2>
+	<ul class="individual">
+  	<li>
+    	<!-- Temperatur från temperatur.nu -->
+    	<script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
+    	</script>
+  	</li>
+  	<li>
+    	<a href="#testsida">Test</a>
+  	</li>
+	</ul>
 </div>
-<h2>Enheter</h2>
-<ul class="edit rounded">
-<div id="enheter"></div>
-</ul>
-<h2>Genvägar</h2>
-<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
-<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
-<h2>Utetemperatur</h2>
-<ul class="individual">
-  <li>
-    <!-- Temperatur från temperatur.nu -->
-    <script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
-    </script>
-  </li>
-  <li>
-     <a href="#testsida">Test</a>
-  </li>
-</ul>
-</div>
-</div>
+
 <!-- "Debug page" -->
 <div id="testsida">
-<div class="toolbar">
-<h1>Debug/test</h1>
-<a class="button back" href="#">Bakåt</a>
-</div>
-<ul class="pageitem">
-  <li class="textbox">
-    <div id="debug">
-    </div>
-  </li>
-<h2>Motorvärmaren</h2>
-<ul class="edit rounded">
-    <div class="info" id="u">
-       <p>Nästa starttid</p>
-    </div>
-</ul>
-<h2>Garaget</h2>
-  <ul class="pageitem">
-     <li>Portöppnare
-     <span class="toggle">
-     <input name="4" type="checkbox" />
-     </span>
-     </li>
-  </ul>
-  <li class="select">
-  	<select name="Dimmer" onChange='dimDevice("1", options[this.selectedIndex].value);'>
-  	<option value="0">0</option>
-  	<option value="64">25%</option>
-  	<option value="128">50%</option>
-  	<option value="192">75%</option>
-  	<option value="255">100%</option>
-  	</select>
-  	<span class="arrow"></span>
-  </li>
-</ul>
+	<div class="toolbar">
+		<h1>Debug/test</h1>
+		<a class="button back" href="#">Bakåt</a>
+	</div>
+	<h2>Debug and testinfo
+	<ul class="pageitem">
+  		<li class="textbox">
+    		<div class="info" id="debug"></div>
+  		</li>
+  	</ul>
+
+	<h2>Motorvärmaren</h2>
+	<ul class="edit rounded">
+    	<div class="info" id="tider">
+       		<p>Nästa starttid</p>
+    	</div>
+	</ul>
+
+	<h2>Garaget</h2>
+	<ul class="pageitem">
+		<li>Portšppnare
+    		<span class="toggle"><input name="4" type="checkbox" /></span>
+    	</li>
+	  	<li class="select">
+  		<select name="Dimmer" onChange='dimDevice("1", options[this.selectedIndex].value);'>
+  			<option value="0">0</option>
+  			<option value="64">25%</option>
+  			<option value="128">50%</option>
+  			<option value="192">75%</option>
+  			<option value="255">100%</option>
+  		</select>
+  		<span class="arrow"></span>
+  		</li>
+	</ul>
 </div>
 <img src="ali.jpg" style="position:absolute; top: -1000px;"/>
 </body>
