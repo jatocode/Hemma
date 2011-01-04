@@ -7,9 +7,8 @@
 <style type="text/css" media="screen">@import "jqtouch/jqtouch.min.css";</style>
 <style type="text/css" media="screen">@import "themes/apple/theme.min.css";</style>
 <script type="text/javascript">
-  $.jQTouch({
-	icon: 'icon.png',
-        statusBar: 'black'
+  var jQT = $.jQTouch({
+	icon: 'icon.png'
       });
 </script>
 <title>Hemma</title>
@@ -139,38 +138,51 @@ function handleError(e) {
 </head>
 
 <body>
-<div id="content">
+<div id="startsida">
 <div class="toolbar"><h1>Hemma</h1></div>
 <!-- Temperatur från temperatur.nu -->
-<span class="graytitle">Utetemperatur:
+<h2>Utetemperatur</h2>
+<ul class="individual">
+<li>
   <script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
   </script>
-</span>
-<br/>
-<br/>
+</li>
+</ul>
+<h2>Enheter</h2>
 <ul class="edit rounded">
 <div id="enheter"></div>
 </ul>
-<div id="motorv">Motorvärmaren
-    <div id="u">
-       <p>Nästa starttid</p>
-    </div>
-</div>
-<span class="graytitle">Garaget</span>
-<ul class="pageitem">
-   <li class="checkbox">
-   <span class="name">Portöppnare</span>
-   <input name="4" type="checkbox" />
+<h2>Genvägar</h2>
+<ul class="individual rounded">
+  <li>
+     <a href="#" onClick='turnOn(["1","2","3"]);'/>Godmorgon</a>
+  </li>
+  <li>
+     <a href="#" onClick='turnOff(["1","2","3"]);'/>Godnatt</a>
+  </li>
 </ul>
-<span class="graytitle">Debug/test</span>
+</div>
+<div id="testsida">
+<div class="toolbar"><h1>Debug/test</h1></div>
 <ul class="pageitem">
   <li class="textbox">
     <div id="debug">
     </div>
   </li>
-  <li class="button">
-  	<input name="godnatt" type="submit" value="Godnatt" onClick='turnOff(["1","2","3"]);'/>
-  </li>
+<h2>Motorvärmaren</h2>
+<ul class="edit rounded">
+    <div id="u">
+       <p>Nästa starttid</p>
+    </div>
+</ul>
+<h2>Garaget</h2>
+  <ul class="pageitem">
+     <li>Portöppnare
+     <span class="toggle">
+     <input name="4" type="checkbox" />
+     </span>
+     </li>
+  </ul>
   <li class="select">
   	<select name="Dimmer" onChange='dimDevice("1", options[this.selectedIndex].value);'>
   	<option value="0">0</option>
@@ -184,10 +196,5 @@ function handleError(e) {
 </ul>
 </div>
 <img src="ali.jpg" style="position:absolute; top: -1000px;"/>
-<div id="footer">
-Turessons väg 19
-</div>
-
 </body>
-
 </html>
