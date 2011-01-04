@@ -139,14 +139,19 @@ function handleError(e) {
 
 <body>
 <div id="startsida">
-<div class="toolbar"><h1>Hemma</h1></div>
-<!-- Temperatur från temperatur.nu -->
+<div class="toolbar">
+<h1>Hemma</h1>
+</div>
 <h2>Utetemperatur</h2>
 <ul class="individual">
-<li>
-  <script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
-  </script>
-</li>
+  <li>
+    <!-- Temperatur från temperatur.nu -->
+    <script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
+    </script>
+  </li>
+  <li>
+     <a href="#testsida">Test</a>
+  </li>
 </ul>
 <h2>Enheter</h2>
 <ul class="edit rounded">
@@ -161,15 +166,8 @@ function handleError(e) {
      <a href="#" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
   </li>
 </ul>
-<h2>Debug</h2>
-<ul class="individual">
-  <li>
-     <a href="#testsida">Test/debug</a>
-  </li>
-</ul>
 </div>
 </div>
-
 <!-- "Debug page" -->
 <div id="testsida">
 <div class="toolbar">
