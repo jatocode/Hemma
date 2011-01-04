@@ -8,16 +8,11 @@
 <script src="jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
 <style type="text/css" media="screen">@import "jqtouch/jqtouch.min.css";</style>
 <style type="text/css" media="screen">@import "themes/apple/theme.min.css";</style>
-<!-- my scripts -->
 <script src="hemma.js"></script>
-<!-- start jqtouch and my scripts-->
 <script type="text/javascript">
-	var jQT = $.jQTouch({
-		icon: 'icon.png',
-		startupScreen: 'startup.png'
-	});
-    google.setOnLoadCallback(finishedLoaded);
-    google.load("gdata", "1", {packages:["calendar"]});
+	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
+	google.setOnLoadCallback(finishedLoaded);
+	google.load("gdata", "1", {packages:["calendar"]});
 </script>
 <title>Hemma</title>
 </head>

@@ -46,9 +46,10 @@ function queryDevices() {
 		    	var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
 		    	var id = deviceData.devices[d].id;
   				e.innerHTML += "<li>" + deviceData.devices[d].name +
-                                        "<span class=\"toggle\">" +
+                    "<span class=\"toggle\">" +
   					"<input name=\"" + id + "\"" + 
-  					" type=\"checkbox\"" + checked + " onClick='flipState(\"" + id + "\");'/>" +
+  					" type=\"checkbox\"" + checked + 
+  					" onClick='flipState(\"" + id + "\");'/>" +
   					"</span></li>";
 			}
 		
