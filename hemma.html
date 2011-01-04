@@ -153,17 +153,29 @@ function handleError(e) {
 <div id="enheter"></div>
 </ul>
 <h2>Genvägar</h2>
-<ul class="individual rounded">
+<ul class="individual">
   <li>
-     <a href="#" onClick='turnOn(["1","2","3"]);'/>Godmorgon</a>
+     <a href="#" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
   </li>
   <li>
-     <a href="#" onClick='turnOff(["1","2","3"]);'/>Godnatt</a>
+     <a href="#" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
+  </li>
+</ul>
+<h2>Debug</h2>
+<ul class="individual">
+  <li>
+     <a href="#testsida">Test/debug</a>
   </li>
 </ul>
 </div>
+</div>
+
+<!-- "Debug page" -->
 <div id="testsida">
-<div class="toolbar"><h1>Debug/test</h1></div>
+<div class="toolbar">
+<h1>Debug/test</h1>
+<a class="button back" href="#">Bakåt</a>
+</div>
 <ul class="pageitem">
   <li class="textbox">
     <div id="debug">
