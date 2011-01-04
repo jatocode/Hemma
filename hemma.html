@@ -22,66 +22,70 @@
 <title>Hemma</title>
 </head>
 <body>
+<!-- First page -->
 <div id="startsida">
-<div class="toolbar">
-<h1>Hemma</h1>
+	<div class="toolbar">
+		<h1>Hemma</h1>
+	</div>
+	
+	<h2>Enheter</h2>
+	<ul class="edit rounded">
+		<div id="enheter"></div>
+	</ul>
+	
+	<h2>Genvägar</h2>
+	<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
+	<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
+	
+	<h2>Utetemperatur</h2>
+	<ul class="individual">
+  	<li>
+    	<!-- Temperatur från temperatur.nu -->
+    	<script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
+    	</script>
+  	</li>
+  	<li>
+    	<a href="#testsida">Test</a>
+  	</li>
+	</ul>
 </div>
-<h2>Enheter</h2>
-<ul class="edit rounded">
-<div id="enheter"></div>
-</ul>
-<h2>Genvägar</h2>
-<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
-<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
-<h2>Utetemperatur</h2>
-<ul class="individual">
-  <li>
-    <!-- Temperatur från temperatur.nu -->
-    <script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
-    </script>
-  </li>
-  <li>
-     <a href="#testsida">Test</a>
-  </li>
-</ul>
-</div>
-</div>
+
 <!-- "Debug page" -->
 <div id="testsida">
-<div class="toolbar">
-<h1>Debug/test</h1>
-<a class="button back" href="#">Bakåt</a>
-</div>
-<ul class="pageitem">
-  <li class="textbox">
-    <div id="debug">
-    </div>
-  </li>
-<h2>Motorvärmaren</h2>
-<ul class="edit rounded">
-    <div class="info" id="u">
-       <p>Nästa starttid</p>
-    </div>
-</ul>
-<h2>Garaget</h2>
-  <ul class="pageitem">
-     <li>Portöppnare
-     <span class="toggle">
-     <input name="4" type="checkbox" />
-     </span>
-     </li>
-  </ul>
-  <li class="select">
-  	<select name="Dimmer" onChange='dimDevice("1", options[this.selectedIndex].value);'>
-  	<option value="0">0</option>
-  	<option value="64">25%</option>
-  	<option value="128">50%</option>
-  	<option value="192">75%</option>
-  	<option value="255">100%</option>
-  	</select>
-  	<span class="arrow"></span>
-  </li>
-</ul>
+	<div class="toolbar">
+		<h1>Debug/test</h1>
+		<a class="button back" href="#">Bakåt</a>
+	</div>
+	<h2>Debug and testinfo
+	<ul class="pageitem">
+  		<li class="textbox">
+    		<div id="debug"></div>
+  		</li>
+  	</ul>
+
+	<h2>Motorvärmaren</h2>
+	<ul class="edit rounded">
+    	<div class="info" id="u">
+       		<p>Nästa starttid</p>
+    	</div>
+	</ul>
+
+	<h2>Garaget</h2>
+	<ul class="pageitem">
+		<li>Portšppnare
+    		<span class="toggle"><input name="4" type="checkbox" /></span>
+    	</li>
+	  	<li class="select">
+  		<select name="Dimmer" onChange='dimDevice("1", options[this.selectedIndex].value);'>
+  			<option value="0">0</option>
+  			<option value="64">25%</option>
+  			<option value="128">50%</option>
+  			<option value="192">75%</option>
+  			<option value="255">100%</option>
+  		</select>
+  		<span class="arrow"></span>
+  		</li>
+	</ul>
 </div>
 <img src="ali.jpg" style="position:absolute; top: -1000px;"/>
 </body>
