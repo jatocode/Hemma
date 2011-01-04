@@ -8,7 +8,8 @@
 <style type="text/css" media="screen">@import "themes/apple/theme.min.css";</style>
 <script type="text/javascript">
   var jQT = $.jQTouch({
-	icon: 'icon.png'
+	icon: 'icon.png',
+	startupScreen: 'startup.png'
       });
 </script>
 <title>Hemma</title>
@@ -147,12 +148,10 @@ function handleError(e) {
 <div id="enheter"></div>
 </ul>
 <h2>Genvägar</h2>
-<ul class="individual">
+<ul class="rounded">
   <li>
-     <a href="#" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
-  </li>
-  <li>
-     <a href="#" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
+     <a href="#" style="margin: 10px;" class="whiteButton submit" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
+     <a href="#" style="margin: 10px;" class="whiteButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
   </li>
 </ul>
 <h2>Utetemperatur</h2>
@@ -181,7 +180,7 @@ function handleError(e) {
   </li>
 <h2>Motorvärmaren</h2>
 <ul class="edit rounded">
-    <div id="u">
+    <div class="info" id="u">
        <p>Nästa starttid</p>
     </div>
 </ul>
