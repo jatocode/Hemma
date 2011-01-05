@@ -24,6 +24,7 @@ function checkDeviceCalendar(id, tag) {
 	 turnOn(["2"]);
       } else {
          txt.innerHTML = "<p> Inget aktivt event</p>";
+         turnOff(["2"]);
       }
     }
   }
