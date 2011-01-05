@@ -6,10 +6,10 @@ function finishedLoaded() {
 function finishedLoaded() {
      queryDevices();
      getCalendarEntries();
-     checkDeviceCalendar("not used");
+     checkDeviceCalendar("2", "not used");
 }
 
-function checkDeviceCalendar(tag) {
+function checkDeviceCalendar(id, tag) {
   var req = new XMLHttpRequest();
   req.open("POST", "tellstickService.php", true);
   var params = 'cmd=isrunning';
@@ -21,6 +21,7 @@ function checkDeviceCalendar(tag) {
       var txt = document.getElementById("tider");
       if(runningEntry != null) {
          txt.innerHTML = "<p> Motorvärmaren aktiv till: " + runningEntry.endTime + "</p>";
+	 turnOn(["2"]);
       } else {
          txt.innerHTML = "<p> Inget aktivt event</p>";
       }
@@ -116,6 +117,23 @@ function turnOff(idList) {
 		var chkbox = document.getElementsByName(id)[0];
 		chkbox.checked = false;
 		findDeviceById(id).state = "off";
+	}
+}
+
+function turnOn(idList) {
+	var xhReq = new XMLHttpRequest();
+	var req = 'tellstickService.php';
+	xhReq.open("POST", req, true);
+	var params = 'cmd=on';
+	params += '&devices=' + JSON.stringify(idList);
+	xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhReq.send(params);
+	
+	for(var i in idList) {
+		var id = idList[i]
+		var chkbox = document.getElementsByName(id)[0];
+		chkbox.checked = true;
+		findDeviceById(id).state = "on";
 	}
 }
 
