@@ -39,28 +39,46 @@ if($cmd=="list") {
 		$o[] = $run;
 	}
 	$r = $o;
-} else if ($cmd == "nextStarttime") {
+} else if (($cmd == "nextstarttime") || ("nextstarttime" == strtolower($_GET['cmd']))) {
 	require_once('Zend/Loader.php');  
 	$classes = array('Zend_Gdata','Zend_Gdata_Query','Zend_Gdata_ClientLogin','Zend_Gdata_Calendar');  
 	foreach($classes as $class) {  
     	Zend_Loader::loadClass($class);  
 	}  
-	// TBD
-	$service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
+	$calService = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
 	$user = "tobias.jansson@gmail.com";
 	$pass = "pio535neer";
-	$client = Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $service);
-	$service = new Zend_Gdata_Calendar($client);
+	$client = Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $calService);
+	$calService = new Zend_Gdata_Calendar($client);
 	
-	// calendarService = new google.gdata.calendar.CalendarService('motorvarmare-1');
-	//$gdata = new Zend_Gdata();
-	//$query = New Zend_Gdata_Query("https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full");
-	//$query->setMaxResults(10);
-	//$feed = $query
-	$r = "Not implemented";
+	//$feedURI = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
+	
+	$query = $calService->newEventQuery();
+	$query->setUser('8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com');
+	$query->setVisibility('public');
+	$query->setProjection('full');
+	$query->setOrderby('starttime');
+	$query->setFutureEvents(true);
+	$eventFeed = $calService->getCalendarEventFeed($query);
+
+	$r = array();
+	foreach ($eventFeed as $entry) {
+    	$when = $entry->when[0];
+    	$e = new SimpleEntry();
+    	$e->title = $entry->title->text;
+    	$e->startTime = $when->startTime;
+    	$e->endTime = $when->endTime;
+    	$r[] = $e;
+	}
 }
 
 print_r(json_encode($r));
+
+class SimpleEntry {
+	public $title;
+	public $startTime;
+	public $endTime;
+}
 
 class Devices {
 	public $numDev;

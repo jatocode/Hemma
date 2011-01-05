@@ -1,35 +1,29 @@
-var calendarService;
-var deviceData = null;
-var feedUrl = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
+function finishedLoaded() {
+     queryDevices();
+     getCalendarEntries();
+}
 
 function finishedLoaded() {
-     setupCalendarService();
-     calendarService.getEventsFeed(feedUrl, handleCalendarFeed, handleError);
      queryDevices();
+     getCalendarEntries();
 }
 
-function setupCalendarService() {
-	calendarService = new google.gdata.calendar.CalendarService('motorvarmare-1');
-}
-
-function handleCalendarFeed(result) {
-    var entries = result.feed.entry;
-    var txt = document.getElementById("u");
-    txt.innerHTML = "<p>";
-    for(var i in entries) {
-       var eventEntry = entries[i];
-       var eventTitle = eventEntry.getTitle().getText();
-       var eventTimes = eventEntry.getTimes();
-
-       var startTime = eventTimes[0].getStartTime().getDate();
-       var endTime = eventTimes[0].getEndTime().getDate();
-       var startString = startTime.getHours() + ":" + startTime.getMinutes();
-       var endString = endTime.getHours() + ":" + endTime.getMinutes();
-       var day = startTime.getDay();
-
-       txt.innerHTML += "<p>" + eventTitle + ": " + startString + "->" + endString + "," + day + "</p>"; 
-    }    
-    txt.innerHTML += "</p>";
+function getCalendarEntries() {
+	var req = new XMLHttpRequest();
+	req.open("POST", "tellstickService.php", true);
+	var params = 'cmd=nextstarttime';
+	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	req.onreadystatechange = function statesResponse() {
+		if(req.readyState == 4) {
+			entries = JSON.parse(req.responseText);
+			var txt = document.getElementById("debug");
+			for(var d in entries) {
+				e = entries[d];
+		    	txt.innerHTML += "<p>" + e.title + ": " + e.startTime + "->" + e.endTime + "</p>"; 
+			}
+		}
+	}
+	req.send(params);
 }
 
 function queryDevices() {

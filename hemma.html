@@ -12,7 +12,6 @@
 <script type="text/javascript">
 	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
 	google.setOnLoadCallback(finishedLoaded);
-	google.load("gdata", "1", {packages:["calendar"]});
 </script>
 <title>Hemma</title>
 </head>
@@ -54,14 +53,14 @@
 	<h2>Debug and testinfo
 	<ul class="pageitem">
   		<li class="textbox">
-    		<div id="debug"></div>
-  		</li>
+			<div class="info" id="debug"></div>
+		</li>
   	</ul>
 
 	<h2>Motorvärmaren</h2>
 	<ul class="edit rounded">
-    	<div class="info" id="u">
-       		<p>Nästa starttid</p>
+		<div class="info" id="tider">
+				<p>Nästa starttid</p>
     	</div>
 	</ul>
 
