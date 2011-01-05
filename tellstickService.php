@@ -1,5 +1,6 @@
 <?php
 $cmd = strtolower($_POST['cmd']);
+if($cmd == '') $cmd = strtolower($_GET['cmd']);
 if($cmd=="list") {
 	exec("tdtool --list", $out);
 	$i = 0;
@@ -39,19 +40,17 @@ if($cmd=="list") {
 		$o[] = $run;
 	}
 	$r = $o;
-} else if (($cmd == "nextstarttime") || ("nextstarttime" == strtolower($_GET['cmd']))) {
+} else if ($cmd == "nextstarttime") {
 	require_once('Zend/Loader.php');  
 	$classes = array('Zend_Gdata','Zend_Gdata_Query','Zend_Gdata_ClientLogin','Zend_Gdata_Calendar');  
 	foreach($classes as $class) {  
-    	Zend_Loader::loadClass($class);  
+    	    Zend_Loader::loadClass($class);  
 	}  
 	$calService = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
 	$user = "tobias.jansson@gmail.com";
 	$pass = "pio535neer";
 	$client = Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $calService);
 	$calService = new Zend_Gdata_Calendar($client);
-	
-	//$feedURI = "https://www.google.com/calendar/feeds/8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com/public/full";
 	
 	$query = $calService->newEventQuery();
 	$query->setUser('8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com');
@@ -63,13 +62,53 @@ if($cmd=="list") {
 
 	$r = array();
 	foreach ($eventFeed as $entry) {
-    	$when = $entry->when[0];
-    	$e = new SimpleEntry();
-    	$e->title = $entry->title->text;
-    	$e->startTime = $when->startTime;
-    	$e->endTime = $when->endTime;
-    	$r[] = $e;
+    	  $when = $entry->when[0];
+    	  $e = new SimpleEntry();
+    	  $e->title = $entry->title->text;
+    	  $e->startTime = date("Ymd H:i", strtotime($when->startTime));
+    	  $e->endTime = date("Ymd H:i", strtotime($when->endTime));
+    	  $r[] = $e;
 	}
+} else if ($cmd == "isrunning") {
+	$tag = $_POST['tag'];	
+	require_once('Zend/Loader.php');  
+	$classes = array('Zend_Gdata','Zend_Gdata_Query','Zend_Gdata_ClientLogin','Zend_Gdata_Calendar');  
+	foreach($classes as $class) {  
+    	    Zend_Loader::loadClass($class);  
+	}  
+	$calService = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
+	$user = "tobias.jansson@gmail.com";
+	$pass = "pio535neer";
+	$client = Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $calService);
+	$calService = new Zend_Gdata_Calendar($client);
+	
+	$query = $calService->newEventQuery();
+	$query->setUser('8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com');
+	$query->setVisibility('public');
+	$query->setProjection('full');
+	$query->setOrderby('starttime');
+	$query->setFutureEvents(true);
+	$eventFeed = $calService->getCalendarEventFeed($query);
+
+        $running = false;
+	foreach ($eventFeed as $entry) {
+    	  $when = $entry->when[0];
+    	  $e = new SimpleEntry();
+    	  $e->title = $entry->title->text;
+	  $start = strtotime($when->startTime);
+          $end = strtotime($when->endTime);
+          $now = time();
+          if(($now >= $start) && ($now <= $end)) {
+    	     $e->startTime = date("Ymd H:i", $start);
+    	     $e->endTime = date("Ymd H:i", $end);
+    	     $r = $e;
+             $running = true;
+             break;
+          }
+	}
+        if($running == false) {
+           $r = null;
+        }
 }
 
 print_r(json_encode($r));

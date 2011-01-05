@@ -27,10 +27,13 @@
 		<div id="enheter"></div>
 	</ul>
 	
-	<h2>Genvägar</h2>
-	<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
-	<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
-	
+	<h2>Motorvärmaren</h2>
+	<ul class="edit rounded">
+		<div class="info" id="tider">
+				<p>Nästa starttid</p>
+    	</div>
+	</ul>
+
 	<h2>Utetemperatur</h2>
 	<ul class="individual">
   	<li>
@@ -39,7 +42,7 @@
     	</script>
   	</li>
   	<li>
-    	<a href="#testsida">Test</a>
+    	<a href="#testsida">Debug</a>
   	</li>
 	</ul>
 </div>
@@ -57,13 +60,12 @@
 		</li>
   	</ul>
 
-	<h2>Motorvärmaren</h2>
-	<ul class="edit rounded">
-		<div class="info" id="tider">
-				<p>Nästa starttid</p>
-    	</div>
-	</ul>
-
+	<h2>Genvägar</h2>
+        <ul class="individual">
+	<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
+	<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
+        </ul>
+	
 	<h2>Garaget</h2>
 	<ul class="pageitem">
 		<li>Portšppnare

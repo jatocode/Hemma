@@ -6,6 +6,27 @@ function finishedLoaded() {
 function finishedLoaded() {
      queryDevices();
      getCalendarEntries();
+     checkDeviceCalendar("not used");
+}
+
+function checkDeviceCalendar(tag) {
+  var req = new XMLHttpRequest();
+  req.open("POST", "tellstickService.php", true);
+  var params = 'cmd=isrunning';
+  params += "&tag=" + tag;
+  req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  req.onreadystatechange = function statesResponse() {
+    if(req.readyState == 4) {
+      var runningEntry = JSON.parse(req.responseText);
+      var txt = document.getElementById("tider");
+      if(runningEntry != null) {
+         txt.innerHTML = "<p> Motorvärmaren aktiv till: " + runningEntry.endTime + "</p>";
+      } else {
+         txt.innerHTML = "<p> Inget aktivt event</p>";
+      }
+    }
+  }
+  req.send(params);
 }
 
 function getCalendarEntries() {
