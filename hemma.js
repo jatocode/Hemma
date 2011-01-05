@@ -23,7 +23,7 @@ function checkDeviceCalendar(id, tag) {
       if(runningEntry != null) {
          now = (new Date().getTime())/1000; // Javascript is in ms
          minutesLeft = Math.round((runningEntry.endTimestamp - now)/60);
-         txt.innerHTML = "<p>" + findDeviceById(id).name + " aktiv i " + minutesLeft + "minuter till</p>";
+         txt.innerHTML = "<p>" + findDeviceById(id).name + " aktiv i " + minutesLeft + " minuter till</p>";
         turnOn([id]);
       } else {
          txt.innerHTML = "<p> Inget aktivt event</p>";
@@ -43,6 +43,7 @@ function getCalendarEntries() {
 		if(req.readyState == 4) {
 			entries = JSON.parse(req.responseText);
 			var txt = document.getElementById("debug");
+			txt.innerHTML = "";
 			for(var d in entries) {
 				e = entries[d];
 		    	txt.innerHTML += "<p>" + e.title + ": " + e.startTime + "->" + e.endTime + "</p>"; 
@@ -61,6 +62,7 @@ function queryDevices() {
 		if(req.readyState == 4) {
 			deviceData = JSON.parse(req.responseText);
 			var e = document.getElementById("enheter");
+			e.innerHTML = "";
 			for(var d in deviceData.devices) {
 		    	// State can be ON/OFF/DIMMED:xx
 		    	var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
