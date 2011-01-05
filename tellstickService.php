@@ -5,7 +5,7 @@ if($cmd == '') {
   $cmd = strtolower($_GET['cmd']);
 }
 if($cmd=="list") {
-	exec("tdtool --list", $out);
+        $out = tdTool("--list");
 	$i = 0;
 	$r = new Devices();
 	$r->devices = array();
@@ -27,8 +27,7 @@ if($cmd=="list") {
 	$devices = json_decode(stripslashes($_POST['devices']));
 	$o = array();
 	foreach($devices as $id) {
-		$run = "tdtool --$cmd $id";
-		exec($run, $o[]);
+		$o[] = tdTool("--$cmd $id");
 	}
 	$r = $o;
 	// TODO: Return useful info, Success/Failure + id
@@ -37,10 +36,7 @@ if($cmd=="list") {
 	$power = $_POST['power'];
 	$o = array();
 	foreach($devices as $id) {
-		$run = "tdtool --dim $id --dimlevel $power";
-		// TBD
-		//exec($run, $o[]);
-		$o[] = $run;
+		$o[] = tdTool("--dim $id --dimlevel $power");
 	}
 	$r = $o;
 } else if ($cmd == "nextstarttime") {
@@ -106,12 +102,22 @@ if($cmd=="list") {
     	     $e->endTime = date("Ymd H:i", $end);
     	     $r = $e;
              $running = true;
+	     // TODO: Hardcoded id
+             tdTool("--on 2"); 
              break;
           }
 	}
         if($running == false) {
            $r = null;
+	   // TODO: Hardcoded id
+           tdTool("--off 2"); 
         }
+}
+
+function tdTool($params) {
+  $command = "tdtool" . " " . $params;
+  exec($command, $output);
+  return $output;
 }
 
 print_r(json_encode($r));
