@@ -21,10 +21,10 @@ function checkDeviceCalendar(id, tag) {
       var txt = document.getElementById("tider");
       if(runningEntry != null) {
          txt.innerHTML = "<p> Motorvärmaren aktiv till: " + runningEntry.endTime + "</p>";
-	 turnOn(["2"]);
+        turnOn([id]);
       } else {
          txt.innerHTML = "<p> Inget aktivt event</p>";
-         turnOff(["2"]);
+         turnOff([id]);
       }
     }
   }
