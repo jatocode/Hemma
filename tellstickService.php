@@ -1,6 +1,9 @@
 <?php
 $cmd = strtolower($_POST['cmd']);
-if($cmd == '') $cmd = strtolower($_GET['cmd']);
+if($cmd == '') {
+ // Use GET while testing new stuff
+  $cmd = strtolower($_GET['cmd']);
+}
 if($cmd=="list") {
 	exec("tdtool --list", $out);
 	$i = 0;
