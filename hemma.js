@@ -1,3 +1,4 @@
+var deviceData;
 function finishedLoaded() {
      queryDevices();
      getCalendarEntries();
@@ -20,7 +21,9 @@ function checkDeviceCalendar(id, tag) {
       var runningEntry = JSON.parse(req.responseText);
       var txt = document.getElementById("tider");
       if(runningEntry != null) {
-         txt.innerHTML = "<p> Motorvärmaren aktiv till: " + runningEntry.endTime + "</p>";
+         now = (new Date().getTime())/1000; // Javascript is in ms
+         minutesLeft = Math.round((runningEntry.endTimestamp - now)/60);
+         txt.innerHTML = "<p>" + findDeviceById(id).name + " aktiv i " + minutesLeft + "minuter till</p>";
         turnOn([id]);
       } else {
          txt.innerHTML = "<p> Inget aktivt event</p>";

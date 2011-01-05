@@ -100,6 +100,7 @@ if($cmd=="list") {
           if(($now >= $start) && ($now <= $end)) {
     	     $e->startTime = date("Ymd H:i", $start);
     	     $e->endTime = date("Ymd H:i", $end);
+    	     $e->endTimestamp = $end;
     	     $r = $e;
              $running = true;
 	     // TODO: Hardcoded id
@@ -126,6 +127,7 @@ class SimpleEntry {
 	public $title;
 	public $startTime;
 	public $endTime;
+	public $endTimestamp;
 }
 
 class Devices {
