@@ -1,4 +1,5 @@
 <?php
+header('Content-type: application/json');
 $cmd = strtolower($_POST['cmd']);
 if($cmd == '') {
  // Use GET while testing new stuff
@@ -90,30 +91,30 @@ if($cmd=="list") {
 	$eventFeed = $calService->getCalendarEventFeed($query);
 
 	foreach ($eventFeed as $entry) {
-    	  $when = $entry->when[0];
-    	  $e = new SimpleEntry();
+       $when = $entry->when[0];
+       $e = new SimpleEntry();
        $e->running = false;
-    	  $e->title = $entry->title->text;
+       $e->title = $entry->title->text;
        $e->id = $entry->where[0] . "";
-	  $start = strtotime($when->startTime);
-          $end = strtotime($when->endTime);
-          $now = time();
-		$e->startTime = $start;
-    	     $e->endTime = $end;
-		$e->startTimeString = date("Ymd, H:i", $start);
-    	     $e->endTimeString = date("Ymd, H:i", $end);
-          if(($now >= $start) && ($now <= $end)) {   
-          	$e->running = true;
-    	     	$r = $e;
-	     	// TODO: Hardcoded id
-             	tdTool("--on 2"); 
-             break;
-          }
-	}
-     if($e->running == false) {
+       $start = strtotime($when->startTime);
+       $end = strtotime($when->endTime);
+       $now = time();
+       $e->startTime = $start;
+       $e->endTime = $end;
+       $e->startTimeString = date("Ymd, H:i", $start);
+       $e->endTimeString = date("Ymd, H:i", $end);
+       if(($now >= $start) && ($now <= $end)) {   
+           $e->running = true;
            $r = $e;
-	   // TODO: Hardcoded id
-           tdTool("--off 2"); 
+        // TODO: Hardcoded id
+           tdTool("--on 2"); 
+           break;
+       }
+    }
+     if($e->running == false) {
+         $r = $e;
+          // TODO: Hardcoded id
+         tdTool("--off 2"); 
      }
 }
 
