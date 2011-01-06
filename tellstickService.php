@@ -94,11 +94,14 @@ if($cmd=="list") {
     	  $e = new SimpleEntry();
        $e->running = false;
     	  $e->title = $entry->title->text;
+       $e->id = $entry->where[0] . "";
 	  $start = strtotime($when->startTime);
           $end = strtotime($when->endTime);
           $now = time();
 		$e->startTime = $start;
     	     $e->endTime = $end;
+		$e->startTimeString = date("Ymd, H:i", $start);
+    	     $e->endTimeString = date("Ymd, H:i", $end);
           if(($now >= $start) && ($now <= $end)) {   
           	$e->running = true;
     	     	$r = $e;
@@ -124,8 +127,11 @@ print_r(json_encode($r));
 
 class SimpleEntry {
 	public $title;
+     public $id;
 	public $startTime;
 	public $endTime;
+	public $startTimeString;
+	public $endTimeString;
 	public $running;
 }
 

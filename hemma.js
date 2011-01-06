@@ -18,18 +18,15 @@ function checkDeviceCalendar(id, tag) {
   req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   req.onreadystatechange = function statesResponse() {
     if(req.readyState == 4) {
-      var runningEntry = JSON.parse(req.responseText);
+      var entry = JSON.parse(req.responseText);
       var txt = document.getElementById("tider");
-      if(runningEntry.running == true) {
+      if(entry.running == true) {
          now = (new Date().getTime())/1000; // Javascript is in ms
-         minutesLeft = Math.round((runningEntry.endTime - now)/60);
+         minutesLeft = Math.round((entry.endTime - now)/60);
          txt.innerHTML = "<p>" + findDeviceById(id).name + " aktiv i " + minutesLeft + " minuter till</p>";
         turnOn([id]);
       } else {
-		var newDate = new Date();
-		newDate.setTime(runningEntry.startTime*1000);
-		dateString = newDate.toUTCString();
-         txt.innerHTML = "<p> Nästa start: " + dateString + "</p>";
+         txt.innerHTML = "<p> Nästa start: " + entry.startTimeString + ", " + findDeviceById(entry.id).name + "</p>";
          turnOff([id]);
       }
     }
