@@ -89,30 +89,29 @@ if($cmd=="list") {
 	$query->setFutureEvents(true);
 	$eventFeed = $calService->getCalendarEventFeed($query);
 
-        $running = false;
 	foreach ($eventFeed as $entry) {
     	  $when = $entry->when[0];
     	  $e = new SimpleEntry();
+       $e->running = false;
     	  $e->title = $entry->title->text;
 	  $start = strtotime($when->startTime);
           $end = strtotime($when->endTime);
           $now = time();
-          if(($now >= $start) && ($now <= $end)) {
-    	     $e->startTime = date("Ymd H:i", $start);
-    	     $e->endTime = date("Ymd H:i", $end);
-    	     $e->endTimestamp = $end;
-    	     $r = $e;
-             $running = true;
-	     // TODO: Hardcoded id
-             tdTool("--on 2"); 
+		$e->startTime = $start;
+    	     $e->endTime = $end;
+          if(($now >= $start) && ($now <= $end)) {   
+          	$e->running = true;
+    	     	$r = $e;
+	     	// TODO: Hardcoded id
+             	tdTool("--on 2"); 
              break;
           }
 	}
-        if($running == false) {
-           $r = null;
+     if($e->running == false) {
+           $r = $e;
 	   // TODO: Hardcoded id
            tdTool("--off 2"); 
-        }
+     }
 }
 
 function tdTool($params) {
@@ -127,7 +126,7 @@ class SimpleEntry {
 	public $title;
 	public $startTime;
 	public $endTime;
-	public $endTimestamp;
+	public $running;
 }
 
 class Devices {
