@@ -81,6 +81,9 @@ if($cmd=="list") {
           // TODO: Hardcoded id
          tdTool("--off 2"); 
      }
+} else if ($cmd == "sun") {
+	$r->upp = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
+	$r->ner = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 }
 
 function tdTool($params) {
