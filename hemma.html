@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" manifest="hemma.manifest">
 <head>
 <meta content="To be used for home control" name="description" />
 <!-- jsapi, jquery and jqtouch js files -->
@@ -23,18 +23,44 @@
 		<a href="#" class="button leftButton refresh" onClick='finishedLoaded();'>Refresh</a>
 	</div>
 	
-	<h2>Enheter</h2>
+	<h2>Grupper</h2>
 	<ul class="edit rounded">
-		<div id="enheter"></div>
+		<li>F&ouml;nsterlampor
+			<span class="toggle">
+			<script type="text/javascript">
+			//	displayGroup("grupp1", ["1","2"]);
+			</script>
+			</span>
+		</li>
+		<li>Utebelysning
+			<span class="toggle">
+			<script type="text/javascript">
+			//	displayGroup("grupp2", ["3"]);
+			</script>
+			</span>
+		</li>
 	</ul>
 	
-	<h2>Motorvärmaren</h2>
+	<h2>Enheter</h2>
 	<ul class="edit rounded">
-		<div class="info" id="tider">
-				<p>Nästa starttid</p>
-    	</div>
+		<!-- Populated by js -->
+		<div id="enheter"></div>	
 	</ul>
-
+	
+	<ul class="edit rounded">
+	<li>
+    	<a href="#units" class="dissolve">Enheter</a>
+  	</li>
+	<li>
+    	<a href="#calendar" >Kalenderstyrt</a>
+  	</li>
+	<li>
+    	<a href="#duskdawn" class="slideup">Ljusstyrt</a>
+  	</li>
+  	<li>
+    	<a href="#settings" class="flip">Inst&auml;llningar</a>
+  	</li>
+  	</ul>
 	<h2>Utetemperatur</h2>
 	<ul class="individual">
   	<li>
@@ -43,16 +69,63 @@
     	</script>
   	</li>
   	<li>
-    	<a href="#testsida">Debug</a>
+    	<a href="#testsida" class="cube">Debug</a>
   	</li>
 	</ul>
 </div>
 
+<!-- Alla enheter i systemet -->
+<div id="units">
+	<div class="toolbar">
+		<h1>Enheter</h1>
+		<a class="button back" href="#">Hem</a>
+	</div>
+	<ul class="edit rounded">
+		<div id="enheter"></div>
+	</ul>	
+</div>
+<!-- Calender controlled -->
+<div id="calendar">
+<div class="toolbar">
+		<h1>Kalenderstyrt</h1>
+		<a class="button back" href="#">Hem</a>
+	</div>
+	<ul class="edit rounded">
+		<div class="info" id="tider">
+				<p>N&auml;sta starttid</p>
+    	</div>
+	</ul>
+</div>
+<!-- Dusk 'til dawn -->
+<div id="duskdawn">
+<div class="toolbar">
+		<h1>Ljusstyrt</h1>
+</div>
+<div class="info">
+Saker som styrs av ljuset
+</div>
+<h2>Solen</h2>
+		<a class="button back" href="#">Hem</a>
+		<ul class="edit rounded">
+		<div id="solen"> 
+		</div>
+		</ul>
+</div>
+<!-- Settings -->
+<div id="settings">
+<div class="toolbar">
+		<h1>Inst&auml;llningar</h1>
+		<a class="button back" href="#">Hem</a>
+	</div>
+<div class="info">
+Ska en enhet styras av checkbox, kalender eller ljuset?
+</div>
+</div>
 <!-- "Debug page" -->
 <div id="testsida">
 	<div class="toolbar">
 		<h1>Debug/test</h1>
-		<a class="button back" href="#">Bakåt</a>
+		<a class="button back" href="#">Hem</a>
 	</div>
 	<h2>Debug and testinfo
 	<ul class="pageitem">
