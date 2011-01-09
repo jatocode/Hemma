@@ -63,7 +63,7 @@ function queryDevices() {
 function createGroups() {
 	var grupp = new Object();
 	grupp.name = "F&ouml;nsterlampor";
-	grupp.members = ["1", "2"];
+	grupp.members = ["1", "2"]; // Motorvärmarnen pga debug
 	grupper.push(grupp);
 	grupp = new Object();
  	grupp.name = "Utebelysning";
