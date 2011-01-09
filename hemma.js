@@ -60,17 +60,26 @@ function queryDevices() {
 	});
 }
 
-function displayGroups() {
+function createGroups() {
 	var grupp = new Object();
 	grupp.name = "F&ouml;nsterlampor";
-	grupp.members = ["1","2"];
+	grupp.members = ["1", "2"];
 	grupper.push(grupp);
+	grupp = new Object();
+ 	grupp.name = "Utebelysning";
+ 	grupp.members = ["3"];
+ 	grupper.push(grupp);
+}
+
+function displayGroups() {
+	createGroups(); // TODO Better way to create groups
 	var txt = document.getElementById("grupper");
 	for(var g in grupper) {
 		name = grupper[g].name;
 		idList = grupper[g].members;
 		checked=groupState(g)=="on"?"checked":"";
 		newState = checked =="checked"?"off":"on";
+		grupper[g].state = groupState(g);
 		txt.innerHTML += "<li>" + name + "<span class=\"toggle\">" + 
 			"<input name=" + name + " " + checked + " type=\"checkbox\"" +
 			"onclick=\'flipGroupState(" + g + ");\'>" +
@@ -91,8 +100,9 @@ function groupState(groupId) {
 }
 
 function flipGroupState(groupId) {
-	newState = groupState(groupId)=="on"?"off":"on";
+	newState = grupper[groupId].state =="on"?"off":"on";	
 	fixedState(newState, grupper[groupId].members);
+	grupper[groupId].state = newState;
 }
 
 function flipState(id) {
