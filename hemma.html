@@ -12,6 +12,8 @@
 <script type="text/javascript">
 	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
 	google.setOnLoadCallback(finishedLoaded);
+	var grupper = new Array();
+	var deviceData = null;
 </script>
 <title>Hemma</title>
 </head>
@@ -28,7 +30,11 @@
 		<li>F&ouml;nsterlampor
 			<span class="toggle">
 			<script type="text/javascript">
-			//	displayGroup("grupp1", ["1","2"]);
+				var grupp = new Object();
+				grupp.name = "grupp1";
+				grupp.members = ["1","2"];
+				grupper.push(grupp);
+				displayGroup(0);
 			</script>
 			</span>
 		</li>
@@ -52,10 +58,10 @@
     	<a href="#units" class="dissolve">Enheter</a>
   	</li>
 	<li>
-    	<a href="#calendar" >Kalenderstyrt</a>
+    	<a href="#calendar">Kalenderstyrt</a>
   	</li>
 	<li>
-    	<a href="#duskdawn" class="slideup">Ljusstyrt</a>
+    	<a href="#duskdawn" class="dissolve">Ljusstyrt</a>
   	</li>
   	<li>
     	<a href="#settings" class="flip">Inst&auml;llningar</a>

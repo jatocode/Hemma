@@ -42,15 +42,16 @@ if($cmd=="list") {
 	$r = $o;
 } else if ($cmd == "nextstarttime") {
 	$eventFeed = getNextEvents();
-	$r = array();
+	$rr = array();
 	foreach ($eventFeed as $entry) {
     	  $when = $entry->when[0];
     	  $e = new SimpleEntry();
     	  $e->title = $entry->title->text;
     	  $e->startTime = date("Ymd H:i", strtotime($when->startTime));
     	  $e->endTime = date("Ymd H:i", strtotime($when->endTime));
-    	  $r[] = $e;
+    	  $rr[] = $e;
 	}
+    $r = array_reverse($rr);
 } else if ($cmd == "isrunning") {
 	$tag = $_POST['tag'];	
 	$eventFeed = getNextEvents();
@@ -143,7 +144,7 @@ function getNextEvents() {
 	$calService = createCalendarService();
 	$query = createCalendarQuery($calService);
 	
-	$query->setOrderby('starttime');
+//	$query->setOrderby('starttime');
 	$query->setFutureEvents(true);
 	
 	return $calService->getCalendarEventFeed($query);	

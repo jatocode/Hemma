@@ -1,5 +1,4 @@
 $SERVICE = "tellstickService.php";
-var deviceData = null;
 
 function finishedLoaded() {
      queryDevices();
@@ -40,7 +39,7 @@ function queryDevices() {
 	$.ajax({
 		url : $SERVICE,
 		data : { "cmd":"list" },
-		async: true,
+		async: false,
 		success: function statesResponse(data) {
 			deviceData = data;
 			var e = document.getElementById("enheter");
@@ -60,23 +59,27 @@ function queryDevices() {
 	});
 }
 
-function displayGroup(groupId, idList) {
-	checked=groupState(idList)=="on"?"checked":"";
-	document.write('<input name=' + groupId + " " + checked + ' type="checkbox" ');
-	newState = groupState(idList)=="on"?"off":"on";
-	//document.write("onclick=niss");
-	document.write("onclick=\'fixedState(\"" + newState + "\",[" + idList + "]);\'>");
+function displayGroup(groupId) {
+	name = grupper[groupId].name;
+	idList = grupper[groupId].members;
+	checked=groupState(groupId)=="on"?"checked":"";
+	document.write('<input name=' + name + " " + checked + ' type="checkbox" ');
+	newState = checked =="checked"?"off":"on";
+	document.write("onclick=\'flipGroupState(\"" + newState +"\"," + groupId + ");\'>");
 }
 
 // Any device is on -> whole group is on
-function groupState(idList) {
-	// for(var i in idList) {
-// 		if(findDeviceById(idList[i]).state == "on") {
-// 			return "on";
-// 		}
-// 	}
-// 	return "off";
-	return "on";
+function groupState(groupId) {
+// 	 for(var i in idList) {
+//  		if(findDeviceById(idList[i]).state == "on") {
+//  			return "on";
+//  		}
+//  	}
+ 	return "off";
+}
+
+function flipGroupState(newState, groupId) {
+	fixedState(newState, grupper[groupId].members);
 }
 
 function flipState(id) {
