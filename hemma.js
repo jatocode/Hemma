@@ -8,6 +8,31 @@ function finishedLoaded() {
      getSun();
 }
 
+function queryDevices() {
+	// Using .ajax to be able to control sync/async or not.
+	$.ajax({
+		url : $SERVICE,
+		data : { "cmd":"list" },
+		async: false,  // To make sure we have device-data. Use local storage?
+		success: function statesResponse(data) {
+			deviceData = data;
+			var e = document.getElementById("enheter");
+			e.innerHTML = "";
+			for(var d in deviceData.devices) {
+				// State can be ON/OFF/DIMMED:xx
+				var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
+				var id = deviceData.devices[d].id;
+				e.innerHTML += "<li>" + deviceData.devices[d].name +
+					"<span class=\"toggle\">" +
+					"<input name=\"" + id + "\"" + 
+					" type=\"checkbox\"" + checked + 
+					" onClick='flipState(\"" + id + "\");'/>" +
+					"</span></li>";
+			}
+		}
+	});
+}
+
 function checkDeviceCalendar(id, tag) {
 	$.post($SERVICE, { "cmd":"isrunning","id":id, "tag":tag },
 		function statesResponse(entry) {
@@ -31,31 +56,6 @@ function getCalendarEntries() {
 		for(var d in entries) {
 			e = entries[d];
 			txt.innerHTML += "<p>" + e.title + ": " + e.startTime + "->" + e.endTime + "</p>"; 
-		}
-	});
-}
-
-function queryDevices() {
-	// Using .ajax to be able to control sync/async or not.
-	$.ajax({
-		url : $SERVICE,
-		data : { "cmd":"list" },
-		async: false,
-		success: function statesResponse(data) {
-			deviceData = data;
-			var e = document.getElementById("enheter");
-			e.innerHTML = "";
-			for(var d in deviceData.devices) {
-				// State can be ON/OFF/DIMMED:xx
-				var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
-				var id = deviceData.devices[d].id;
-				e.innerHTML += "<li>" + deviceData.devices[d].name +
-					"<span class=\"toggle\">" +
-					"<input name=\"" + id + "\"" + 
-					" type=\"checkbox\"" + checked + 
-					" onClick='flipState(\"" + id + "\");'/>" +
-					"</span></li>";
-			}
 		}
 	});
 }

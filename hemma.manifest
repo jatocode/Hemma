@@ -1,15 +1,25 @@
 CACHE MANIFEST
 
+NETWORK:
+/i/hemma.hmtl
+/i/hemma.js
+/i/tellstickService.php
+tellstickService.php
+http://www.temperatur.nu/jsdata.php
+hemma.hmtl
+hemma.js
+
 CACHE:
 /i/themes/apple/img/pinstripes.png
 /i/themes/apple/img/toolButton.png
 /i/themes/apple/img/backButton.png
 /i/themes/apple/img/whiteButton.png
-/i/themes/apple/img/greyButton.png
-/i/themes/apple/img/toolBar.png
+/i/themes/apple/img/grayButton.png
+/i/themes/apple/img/toolbar.png
 /i/themes/apple/img/on_off.png
 /i/themes/apple/theme.min.css
-/i/themes/apple/jqtouch.min.css
 /i/jqtouch/jqtouch.min.js
+/i/js/jquery-1.4.4.min.js
+/i/jqtouch/jqtouch.min.css
 /i/ali.jpg
-
+/favicon.ico
