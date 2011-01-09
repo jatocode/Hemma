@@ -42,15 +42,16 @@ if($cmd=="list") {
 	$r = $o;
 } else if ($cmd == "nextstarttime") {
 	$eventFeed = getNextEvents();
-	$r = array();
+	$rr = array();
 	foreach ($eventFeed as $entry) {
     	  $when = $entry->when[0];
     	  $e = new SimpleEntry();
     	  $e->title = $entry->title->text;
     	  $e->startTime = date("Ymd H:i", strtotime($when->startTime));
     	  $e->endTime = date("Ymd H:i", strtotime($when->endTime));
-    	  $r[] = $e;
+    	  $rr[] = $e;
 	}
+	$r = array_reverse($rr);
 } else if ($cmd == "isrunning") {
 	$tag = $_POST['tag'];	
 	$eventFeed = getNextEvents();
@@ -76,11 +77,11 @@ if($cmd=="list") {
            break;
        }
     }
-     if($e->running == false) {
+    if($e->running == false) {
          $r = $e;
           // TODO: Hardcoded id
          tdTool("--off 2"); 
-     }
+    }
 } else if ($cmd == "sun") {
 	$r->upp = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->ner = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
@@ -143,7 +144,7 @@ function getNextEvents() {
 	$calService = createCalendarService();
 	$query = createCalendarQuery($calService);
 	
-//	$query->setOrderby('starttime');
+	$query->setOrderby('starttime');
 	$query->setFutureEvents(true);
 	
 	return $calService->getCalendarEventFeed($query);	
