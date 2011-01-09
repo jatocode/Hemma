@@ -3,6 +3,7 @@ $SERVICE = "tellstickService.php";
 function finishedLoaded() {
      queryDevices();
      getCalendarEntries();
+     displayGroups();
      checkDeviceCalendar("2", "not used");
      getSun();
 }
@@ -59,26 +60,38 @@ function queryDevices() {
 	});
 }
 
-function displayGroup(groupId) {
-	name = grupper[groupId].name;
-	idList = grupper[groupId].members;
-	checked=groupState(groupId)=="on"?"checked":"";
-	document.write('<input name=' + name + " " + checked + ' type="checkbox" ');
-	newState = checked =="checked"?"off":"on";
-	document.write("onclick=\'flipGroupState(\"" + newState +"\"," + groupId + ");\'>");
+function displayGroups() {
+	var grupp = new Object();
+	grupp.name = "F&ouml;nsterlampor";
+	grupp.members = ["1","2"];
+	grupper.push(grupp);
+	var txt = document.getElementById("grupper");
+	for(var g in grupper) {
+		name = grupper[g].name;
+		idList = grupper[g].members;
+		checked=groupState(g)=="on"?"checked":"";
+		newState = checked =="checked"?"off":"on";
+		txt.innerHTML += "<li>" + name + "<span class=\"toggle\">" + 
+			"<input name=" + name + " " + checked + " type=\"checkbox\"" +
+			"onclick=\'flipGroupState(" + g + ");\'>" +
+			"</span>" + 
+			"</li>";
+	}
 }
 
 // Any device is on -> whole group is on
 function groupState(groupId) {
-// 	 for(var i in idList) {
-//  		if(findDeviceById(idList[i]).state == "on") {
-//  			return "on";
-//  		}
-//  	}
+	 for(var i in idList) {
+	 	device = findDeviceById(idList[i]);
+ 		if(device.state.toLowerCase() == "on") {
+ 			return "on";
+ 		}
+ 	}
  	return "off";
 }
 
-function flipGroupState(newState, groupId) {
+function flipGroupState(groupId) {
+	newState = groupState(groupId)=="on"?"off":"on";
 	fixedState(newState, grupper[groupId].members);
 }
 
