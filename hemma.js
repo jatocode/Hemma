@@ -72,8 +72,8 @@ function createGroups() {
 }
 
 function displayGroups() {
-	createGroups(); // TODO Better way to create groups
 	var txt = document.getElementById("grupper");
+	txt.innerHTML = "";
 	for(var g in grupper) {
 		name = grupper[g].name;
 		idList = grupper[g].members;

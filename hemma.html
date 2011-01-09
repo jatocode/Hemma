@@ -8,12 +8,14 @@
 <script src="jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
 <style type="text/css" media="screen">@import "jqtouch/jqtouch.min.css";</style>
 <style type="text/css" media="screen">@import "themes/apple/theme.min.css";</style>
+<!-- Here we go -->
 <script src="hemma.js"></script>
 <script type="text/javascript">
 	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
 	google.setOnLoadCallback(finishedLoaded);
 	var grupper = new Array();
 	var deviceData = null;
+	createGroups(); // TODO Better way to create groups
 </script>
 <title>Hemma</title>
 </head>
