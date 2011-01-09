@@ -42,16 +42,15 @@ if($cmd=="list") {
 	$r = $o;
 } else if ($cmd == "nextstarttime") {
 	$eventFeed = getNextEvents();
-	$rr = array();
+	$r = array();
 	foreach ($eventFeed as $entry) {
     	  $when = $entry->when[0];
     	  $e = new SimpleEntry();
     	  $e->title = $entry->title->text;
     	  $e->startTime = date("Ymd H:i", strtotime($when->startTime));
     	  $e->endTime = date("Ymd H:i", strtotime($when->endTime));
-    	  $rr[] = $e;
+    	  $r[] = $e;
 	}
-    $r = array_reverse($rr);
 } else if ($cmd == "isrunning") {
 	$tag = $_POST['tag'];	
 	$eventFeed = getNextEvents();

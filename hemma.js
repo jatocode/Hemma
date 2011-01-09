@@ -3,7 +3,6 @@ $SERVICE = "tellstickService.php";
 function finishedLoaded() {
      queryDevices();
      getCalendarEntries();
-     displayGroups();
      checkDeviceCalendar("2", "not used");
      getSun();
 }
@@ -13,9 +12,10 @@ function queryDevices() {
 	$.ajax({
 		url : $SERVICE,
 		data : { "cmd":"list" },
-		async: false,  // To make sure we have device-data. Use local storage?
+		async: true,  // Sync o make sure we have device-data? Use local storage?
 		success: function statesResponse(data) {
 			deviceData = data;
+			displayGroups();
 			var e = document.getElementById("enheter");
 			e.innerHTML = "";
 			for(var d in deviceData.devices) {
