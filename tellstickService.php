@@ -47,6 +47,7 @@ if($cmd=="list") {
     	  $when = $entry->when[0];
     	  $e = new SimpleEntry();
     	  $e->title = $entry->title->text;
+          $e->id = $entry->where[0] . "";
     	  $e->startTime = date("Ymd H:i", strtotime($when->startTime));
     	  $e->endTime = date("Ymd H:i", strtotime($when->endTime));
     	  $rr[] = $e;
@@ -145,7 +146,10 @@ function getNextEvents() {
 	$query = createCalendarQuery($calService);
 	
 	$query->setOrderby('starttime');
-	$query->setFutureEvents(true);
+	$now = time();
+	$query->setStartMin(date("Y-m-d", $now));
+        $query->setStartMax(date("Y-m-d", $now+60*60*24));
+//	$query->setFutureEvents(true);
 	
 	return $calService->getCalendarEventFeed($query);	
 }
