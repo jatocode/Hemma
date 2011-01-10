@@ -5,6 +5,7 @@ function finishedLoaded() {
      getCalendarEntries();
      checkDeviceCalendar("2", "not used");
      getSun();
+     getLocation();
 }
 
 function queryDevices() {
@@ -36,14 +37,13 @@ function queryDevices() {
 function checkDeviceCalendar(id, tag) {
 	$.post($SERVICE, { "cmd":"isrunning","id":id, "tag":tag },
 		function statesResponse(entry) {
-		  var txt = document.getElementById("tider");
 		  if(entry.running == true) {
 			 now = (new Date().getTime())/1000; // Javascript is in ms
 			 minutesLeft = Math.round((entry.endTime - now)/60);
-			 txt.innerHTML = "<p>" + findDeviceById(id).name + " aktiv i " + minutesLeft + " minuter till</p>";
+			 $('.tider').empty().append("<p>" + findDeviceById(id).name + " aktiv i " + minutesLeft + " minuter till</p>");
 			 turnOn([id]);
 		  } else {
-			 txt.innerHTML = "<p> Nästa start: " + entry.startTimeString + ", " + findDeviceById(entry.id).name + "</p>";
+			 $('.tider').empty().append("<p> Nästa start: " + entry.startTimeString + ", " + findDeviceById(entry.id).name + "</p>");
 			 turnOff([id]);
 		  }
 		});
@@ -142,6 +142,13 @@ function getSun() {
 		solen.innerHTML += "<li>Upp:" + tider.upp + "</li>";
 		solen.innerHTML += "<li>Ner:" + tider.ner + "</li>";
 	});
+}
+
+function getLocation() {
+    jQT.updateLocation(function(coords){
+        locationTxt = 'Latitude: ' + coords.latitude + '<br />Longitude: ' + coords.longitude;
+        $('.plats').empty().append(locationTxt);
+    });
 }
 
 function turnOff(idList) {

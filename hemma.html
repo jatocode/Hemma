@@ -6,6 +6,7 @@
 <script src="js/jquery-1.4.4.min.js" type="application/x-javascript" charset="utf-8"></script>
 <script src="jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
 <script src="extensions/jqt.offline.js" type="application/x-javascript" charset="utf-8"></script>
+<script src="extensions/jqt.location.js" type="application/x-javascript" charset="utf-8"></script>
 <style type="text/css" media="screen">@import "jqtouch/jqtouch.min.css";</style>
 <style type="text/css" media="screen">@import "themes/apple/theme.min.css";</style>
 <!-- Here we go -->
@@ -82,8 +83,10 @@
 	<h1>Kalenderstyrt</h1>
 	<a class="button back" href="#">Hem</a>
    </div>
-   <div class="info" id="tider">
-	<p>N&auml;sta starttid</p>
+   <div class="info" >
+   <div class="tider" id="tider">
+	<p>Ingen info tillgänglig.</p>
+   </div>
    </div>
 </div>
 <!-- Dusk 'til dawn -->
@@ -122,6 +125,9 @@ Ska en enhet styras av checkbox, kalender eller ljuset?
   		<li class="textbox">
 			<div class="info" id="debug"></div>
 		</li>
+		<li>
+                <div class="plats"></div>
+                </li>
   	</ul>
 
 	<h2>Genvägar</h2>
