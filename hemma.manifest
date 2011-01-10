@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#Version 1.2.6
+#Version 1.2.8
 
 NETWORK:
 /i/hemma.hmtl
@@ -19,6 +19,7 @@ CACHE:
 /i/themes/apple/img/toolbar.png
 /i/themes/apple/img/on_off.png
 /i/themes/apple/img/selection.png
+/i/themes/apple/img/chevron.png
 /i/themes/apple/theme.min.css
 /i/jqtouch/jqtouch.min.js
 /i/js/jquery-1.4.4.min.js
