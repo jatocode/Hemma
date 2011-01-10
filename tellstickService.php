@@ -46,10 +46,19 @@ if($cmd=="list") {
 	foreach ($eventFeed as $entry) {
     	  $when = $entry->when[0];
     	  $e = new SimpleEntry();
+    	  $e->running = false;
     	  $e->title = $entry->title->text;
           $e->id = $entry->where[0] . "";
-    	  $e->startTime = date("Ymd H:i", strtotime($when->startTime));
-    	  $e->endTime = date("Ymd H:i", strtotime($when->endTime));
+          $start = strtotime($when->startTime);
+          $end = strtotime($when->endTime);
+          $e->startTime = $start;
+          $e->endTime = $end;
+          $now = time();
+          if(($now >= $start) && ($now <= $end)) {   
+             $e->running = true;
+          }
+          $e->startTimeString = date("Ymd, H:i", $start);
+          $e->endTimeString = date("Ymd, H:i", $end);
     	  $rr[] = $e;
 	}
 	$r = array_reverse($rr);
@@ -147,9 +156,11 @@ function getNextEvents() {
 	
 	$query->setOrderby('starttime');
 	$now = time();
+	// En vecka framåt blir bra
 	$query->setStartMin(date("Y-m-d", $now));
-        $query->setStartMax(date("Y-m-d", $now+60*60*24));
-//	$query->setFutureEvents(true);
+    $query->setStartMax(date("Y-m-d", $now+60*60*24*7));
+    //  singleEvents till true för att expandera repeterande möten
+    $query->setSingleEvents(true);
 	
 	return $calService->getCalendarEventFeed($query);	
 }
