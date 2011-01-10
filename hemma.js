@@ -55,7 +55,7 @@ function getCalendarEntries() {
 		txt.innerHTML = "";
 		for(var d in entries) {
 			e = entries[d];
-			txt.innerHTML += "<p>" + e.title + ": " + e.startTime + "->" + e.endTime + "</p>"; 
+			txt.innerHTML += "<p>" + e.title + ": " + e.startTimeString + "->" + e.endTimeString + ". Running: " + (e.running==true?"yes":"no") + "</p>"; 
 		}
 	});
 }

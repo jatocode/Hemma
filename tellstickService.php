@@ -65,7 +65,6 @@ if($cmd=="list") {
 } else if ($cmd == "isrunning") {
 	$tag = $_POST['tag'];	
 	$eventFeed = getNextEvents();
-
 	foreach ($eventFeed as $entry) {
        $when = $entry->when[0];
        $e = new SimpleEntry();
