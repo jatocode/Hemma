@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#Version 1.2
+#Version 1.2.2
 
 NETWORK:
 /i/hemma.hmtl
@@ -23,5 +23,5 @@ CACHE:
 /i/jqtouch/jqtouch.min.js
 /i/js/jquery-1.4.4.min.js
 /i/jqtouch/jqtouch.min.css
-/i/ali.jpg
+/i/extensions/jqt.offline.js
 /favicon.ico
