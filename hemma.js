@@ -4,7 +4,6 @@ function finishedLoaded() {
      queryDevices();
      getCalendarEntries();
      checkDeviceCalendar("2", "not used");
-     getSun();
      getLocation();
 }
 
@@ -17,6 +16,7 @@ function queryDevices() {
 		success: function statesResponse(data) {
 			deviceData = data;
 			displayGroups();
+			getSun(1);
 			var e = document.getElementById("enheter");
 			e.innerHTML = "";
 			for(var d in deviceData.devices) {
@@ -57,7 +57,6 @@ function getCalendarEntries() {
                     var r = (e.running==true?"on":"off");
                     $('.kalenderinfo').append('<li><small>' + r + '</small>' + e.startTimeString +
                         '<em>' + e.title + '</em></li>');
-//			txt.innerHTML += "<p>" + e.title + ": " + e.startTimeString + "->" + e.endTimeString + ". Running: " + (e.running==true?"yes":"no") + "</p>"; 
 		}
 	});
 }
@@ -137,12 +136,19 @@ function fixedState(state, idList) {
 	}	
 }
 
-function getSun() {
+function getSun(groupId) {
 	$.post($SERVICE, { "cmd":"sun" }, function sunResponse(tider) {	
 		var solen = document.getElementById("solen");
 		solen.innerHTML = "";
-		solen.innerHTML += "<li>Upp:" + tider.upp + "</li>";
-		solen.innerHTML += "<li>Ner:" + tider.ner + "</li>";
+		solen.innerHTML += "<li>Upp:" + tider.up + "</li>";
+		solen.innerHTML += "<li>Ner:" + tider.down + "</li>";
+		solen.innerHTML += "<li>M&ouml;rkt ute:" + tider.dark + "</li>";
+		
+		if(tider.dark == true) {
+			fixedState("on", grupper[groupId].members);
+			$('.ljusenheter').empty().append("<p> Turning group " + groupId + 
+				" on until " + tider.up + "</p>");
+		}
 	});
 }
 

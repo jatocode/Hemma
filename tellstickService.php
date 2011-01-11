@@ -93,9 +93,15 @@ if($cmd=="list") {
          tdTool("--off 2"); 
     }
 } else if ($cmd == "sun") {
-	$r->upp = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
-	$r->ner = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
-}
+	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
+	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
+	$upp = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
+	$ner = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
+	$now = time();
+	$r->dark = !(($now >= $upp) && ($now <= $ner));
+} 
+
+
 
 function tdTool($params) {
   $command = "tdtool" . " " . $params;
