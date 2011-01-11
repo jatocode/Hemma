@@ -61,11 +61,12 @@ if($cmd=="list") {
           $e->endTimeString = date("Ymd, H:i", $end);
     	  $rr[] = $e;
 	}
-	$r = array_reverse($rr);
+	$r = $rr;
 } else if ($cmd == "isrunning") {
 	$tag = $_POST['tag'];	
 	$eventFeed = getNextEvents();
-	foreach ($eventFeed as $entry) {
+//	foreach ($eventFeed as $entry) {
+       $entry = $eventFeed[0];
        $when = $entry->when[0];
        $e = new SimpleEntry();
        $e->running = false;
@@ -85,7 +86,7 @@ if($cmd=="list") {
            tdTool("--on 2"); 
            break;
        }
-    }
+ //   }
     if($e->running == false) {
          $r = $e;
           // TODO: Hardcoded id
@@ -156,11 +157,13 @@ function getNextEvents() {
 	$query->setOrderby('starttime');
 	$now = time();
 	// En vecka framåt blir bra
-	$query->setStartMin(date("Y-m-d", $now));
-    $query->setStartMax(date("Y-m-d", $now+60*60*24*7));
-    //  singleEvents till true för att expandera repeterande möten
-    $query->setSingleEvents(true);
-	
+	// $query->setStartMin(date("Y-m-d", $now));
+        //$query->setStartMax(date("Y-m-d", $now+60*60*24*7));
+        // singleEvents till true för att expandera repeterande möten
+        $query->setSingleEvents(true);
+        $query->setFutureEvents(true);
+        $query->setMaxResults(10);	
+        $query->setSortOrder(a);
 	return $calService->getCalendarEventFeed($query);	
 }
 ?>
