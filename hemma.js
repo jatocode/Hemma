@@ -51,11 +51,13 @@ function checkDeviceCalendar(id, tag) {
 
 function getCalendarEntries() {
 	$.post($SERVICE, { "cmd":"nextstarttime" }, function statesResponse(entries) {	
-		var txt = document.getElementById("debug");
-		txt.innerHTML = "";
+                $('.kalenderinfo').empty();
 		for(var d in entries) {
 			e = entries[d];
-			txt.innerHTML += "<p>" + e.title + ": " + e.startTimeString + "->" + e.endTimeString + ". Running: " + (e.running==true?"yes":"no") + "</p>"; 
+                    var r = (e.running==true?"on":"off");
+                    $('.kalenderinfo').append('<li><small>' + r + '</small>' + e.startTimeString +
+                        '<em>' + e.title + '</em></li>');
+//			txt.innerHTML += "<p>" + e.title + ": " + e.startTimeString + "->" + e.endTimeString + ". Running: " + (e.running==true?"yes":"no") + "</p>"; 
 		}
 	});
 }
@@ -63,7 +65,7 @@ function getCalendarEntries() {
 function createGroups() {
 	var grupp = new Object();
 	grupp.name = "F&ouml;nsterlampor";
-	grupp.members = ["1", "2"]; // Motorvärmarnen pga debug
+	grupp.members = ["1", "4", "5", "6"]; // Motorvärmarnen pga debug
 	grupper.push(grupp);
 	grupp = new Object();
  	grupp.name = "Utebelysning";

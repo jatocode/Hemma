@@ -155,15 +155,12 @@ function getNextEvents() {
 	$query = createCalendarQuery($calService);
 	
 	$query->setOrderby('starttime');
-	$now = time();
-	// En vecka framåt blir bra
-	// $query->setStartMin(date("Y-m-d", $now));
-        //$query->setStartMax(date("Y-m-d", $now+60*60*24*7));
-        // singleEvents till true för att expandera repeterande möten
-        $query->setSingleEvents(true);
-        $query->setFutureEvents(true);
-        $query->setMaxResults(10);	
-        $query->setSortOrder(a);
+
+	// singleEvents till true för att expandera repeterande möten
+	$query->setSingleEvents(true);
+	$query->setFutureEvents(true);
+	$query->setMaxResults(10);	
+	$query->setSortOrder(a);
 	return $calService->getCalendarEventFeed($query);	
 }
 ?>
