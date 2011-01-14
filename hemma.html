@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" manifest="hemma.manifest">
+<html xmlns="http://www.w3.org/1999/xhtml" manifest="hemma.manifest"> 
 <head>
 <meta content="To be used for home control" name="description" />
 <!-- jsapi, jquery and jqtouch js files -->
@@ -44,6 +44,9 @@
 	<li>
     	<a href="#units" class="dissolve">Enheter</a>
   	</li>
+  	<li>
+    	<a href="#editgroups" class="flip">Grupper</a>
+  	</li>
 	<li>
     	<a href="#calendar">Kalenderstyrt</a>
   	</li>
@@ -57,7 +60,7 @@
 	<h2>Utetemperatur</h2>
 	<ul class="individual">
   	<li>
-    	<!-- Temperatur från temperatur.nu -->
+    	<!-- Temperatur frÂn temperatur.nu -->
     	<script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
     	</script>
   	</li>
@@ -85,7 +88,7 @@
    </div>
    <div class="info" >
    <div class="tider" id="tider">
-	<p>Ingen info tillgänglig.</p>
+	<p>Ingen info tillg&auml;nglig.</p>
    </div>
    </div>
 </div>
@@ -117,6 +120,17 @@ Saker som styrs av ljuset
 Ska en enhet styras av checkbox, kalender eller ljuset?
 </div>
 </div>
+<!-- Grupper -->
+<div id="editgroups">
+	<div class="toolbar">
+			<h1>Grupper</h1>
+			<a class="button back" href="#">Hem</a>
+		</div>
+	<ul class="edit">
+	<div class="gruppinfo">
+	</div>
+	</ul>
+</div>
 <!-- "Debug page" -->
 <div id="testsida">
 	<div class="toolbar">
@@ -132,7 +146,7 @@ Ska en enhet styras av checkbox, kalender eller ljuset?
           <div class="plats"></div>
         </div>
 
-	<h2>Genvägar</h2>
+	<h2>Genv&auml;gar</h2>
         <ul class="individual">
 	<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
 	<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
@@ -140,7 +154,7 @@ Ska en enhet styras av checkbox, kalender eller ljuset?
 	
 	<h2>Garaget</h2>
 	<ul class="pageitem">
-		<li>Portšppnare
+		<li>Portöppnare
     		<span class="toggle"><input name="4" type="checkbox" /></span>
     	</li>
 	  	<li class="select">

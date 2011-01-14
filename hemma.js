@@ -64,11 +64,15 @@ function getCalendarEntries() {
 function createGroups() {
 	var grupp = new Object();
 	grupp.name = "F&ouml;nsterlampor";
-	grupp.members = ["1", "4", "5", "6"]; // MotorvŠrmarnen pga debug
+	grupp.members = ["1", "6"]; 
 	grupper.push(grupp);
 	grupp = new Object();
  	grupp.name = "Utebelysning";
  	grupp.members = ["3"];
+ 	grupper.push(grupp);
+ 	grupp = new Object();
+ 	grupp.name = "Myslys";
+	grupp.members = ["4", "5"]; 
  	grupper.push(grupp);
 }
 
@@ -86,6 +90,9 @@ function displayGroups() {
 			"onclick=\'flipGroupState(" + g + ");\'>" +
 			"</span>" + 
 			"</li>";
+	   // Grupp 1: <input type="text" name="Grupp 1" placeholder="1,2" id="grupp1">
+		$('.gruppinfo').append('<li>' + name + '<input type="text" name="' + name + '" ' +
+			'value="' + idList + '" id="' + name + '"></li>');
 	}
 }
 
