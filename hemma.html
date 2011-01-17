@@ -14,10 +14,10 @@
 <script type="text/javascript">
 	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
 	// Run finishedLoaded when DOM is ready
-	$(finishedLoaded);
 	var grupper = new Array();
 	var deviceData = null;
 	createGroups(); // TODO Better way to create groups
+	$(finishedLoaded);
 </script>
 <title>Hemma</title>
 </head>
@@ -43,9 +43,7 @@
     	<a href="#editgroups" class="flip">Grupper</a>
   	</li>
 	<li>
-		<div id="calendarlink">
-    		<a href="#calendar">Kalenderstyrt</a>
-    	</div>
+    	<a href="#calendar" id="calendarlink">Kalenderstyrt</a>
   	</li>
 	<li>
     	<a href="#duskdawn" id="duskdawnlink" class="dissolve">Ljusstyrt</a>

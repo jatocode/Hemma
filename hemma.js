@@ -3,13 +3,15 @@ $SERVICE = "tellstickService.php";
 function finishedLoaded() {
 	queryDevices();
 	
-    var cm = $('#calendarlink').bind('click', function() {
+    $('#calendarlink').tap(function() {
     	checkDeviceCalendar("notused", "notused")
     	});
-	var ddm = $('#duskdawnlink').bind('click', function() {
+	$('#duskdawnlink').tap(function() {
 		getSun(1)
 		});
-    var dl = $('#debuglink').bind('click', getCalendarEntries());
+    $('#debuglink').tap(function(){
+    	getCalendarEntries()
+    	});
     
 }
 
@@ -19,6 +21,7 @@ function queryDevices() {
 	$.ajax({
 		url : $SERVICE,
 		data : { "cmd":"list" },
+		type: "POST",
 		async: true,  // Sync o make sure we have device-data? Use local storage?
 		success: function statesResponse(data) {
 			deviceData = data;
@@ -44,6 +47,7 @@ function queryDevices() {
 function checkDeviceCalendar(id, tag) {
 	$.post($SERVICE, { "cmd":"isrunning","id":id, "tag":tag },
 		function statesResponse(entry) {
+		  id = entry.id;
 		  if(entry.running == true) {
 			 now = (new Date().getTime())/1000; // Javascript is in ms
 			 minutesLeft = Math.round((entry.endTime - now)/60);
@@ -144,9 +148,10 @@ function fixedState(state, idList) {
 	$.post($SERVICE, { "cmd":state, "devices": JSON.stringify(idList)  });
 	for(var i in idList) {
 		var id = idList[i]
-		var chkbox = document.getElementsByName(id)[0];
+		var device = findDeviceById(id);
+		var chkbox = document.getElementsByName(device.id)[0];
 		chkbox.checked = state=="on"?true:false;
-		findDeviceById(id).state = state;
+		device.state = state;
 	}	
 }
 
