@@ -1,11 +1,18 @@
 $SERVICE = "tellstickService.php";
 
 function finishedLoaded() {
-     queryDevices();
-     getCalendarEntries();
-     checkDeviceCalendar("2", "not used");
-     getLocation();
+	queryDevices();
+	
+    var cm = $('#calendarlink').bind('click', function() {
+    	checkDeviceCalendar("notused", "notused")
+    	});
+	var ddm = $('#duskdawnlink').bind('click', function() {
+		getSun(1)
+		});
+    var dl = $('#debuglink').bind('click', getCalendarEntries());
+    
 }
+
 
 function queryDevices() {
 	// Using .ajax to be able to control sync/async or not.
@@ -16,7 +23,7 @@ function queryDevices() {
 		success: function statesResponse(data) {
 			deviceData = data;
 			displayGroups();
-			getSun(1);
+			//getSun(1);
 			var e = document.getElementById("enheter");
 			e.innerHTML = "";
 			for(var d in deviceData.devices) {

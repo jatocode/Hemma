@@ -13,13 +13,8 @@
 <script src="hemma.js"></script>
 <script type="text/javascript">
 	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
-	window.onDomReady = DomReady(finishedLoaded);
-	//Setup the event
-	function DomReady(fn) {
-		if(document.addEventListener) {
-			document.addEventListener("DOMContentLoaded", fn, false);
-		}
-	}
+	// Run finishedLoaded when DOM is ready
+	$(finishedLoaded);
 	var grupper = new Array();
 	var deviceData = null;
 	createGroups(); // TODO Better way to create groups
@@ -48,10 +43,12 @@
     	<a href="#editgroups" class="flip">Grupper</a>
   	</li>
 	<li>
-    	<a href="#calendar">Kalenderstyrt</a>
+		<div id="calendarlink">
+    		<a href="#calendar">Kalenderstyrt</a>
+    	</div>
   	</li>
 	<li>
-    	<a href="#duskdawn" class="dissolve">Ljusstyrt</a>
+    	<a href="#duskdawn" id="duskdawnlink" class="dissolve">Ljusstyrt</a>
   	</li>
   	<li>
     	<a href="#settings" class="flip">Inst&auml;llningar</a>
@@ -60,12 +57,12 @@
 	<h2>Utetemperatur</h2>
 	<ul class="individual">
   	<li>
-    	<!-- Temperatur frÂn temperatur.nu -->
+    	<!-- Temperatur frÂ¬n temperatur.nu -->
     	<script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
     	</script>
   	</li>
   	<li>
-    	<a href="#testsida">Debug</a>
+    	<a href="#testsida" id="debuglink">Debug</a>
   	</li>
 	</ul>
 </div>
@@ -146,15 +143,11 @@ Ska en enhet styras av checkbox, kalender eller ljuset?
           <div class="plats"></div>
         </div>
 
-	<h2>Genv&auml;gar</h2>
-        <ul class="individual">
-	<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
-	<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
-        </ul>
+	<h2>Genvâ€°gar</h2>
 	
 	<h2>Garaget</h2>
 	<ul class="pageitem">
-		<li>Portöppnare
+		<li>PortË†ppnare
     		<span class="toggle"><input name="4" type="checkbox" /></span>
     	</li>
 	  	<li class="select">
