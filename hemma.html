@@ -23,6 +23,9 @@
 	var grupper = new Array();
 	var deviceData = null;
 	createGroups(); // TODO Better way to create groups
+        var cm = $('calendarmenu').bind('click', checkDeviceCalendar("notused", "notused"));
+	var ddm = $('#startsida').bind('click', getSun(1));
+        var dl = $('debuglink').bind('click', getCalendarEntries());
 </script>
 <title>Hemma</title>
 </head>
@@ -45,10 +48,10 @@
     	<a href="#units" class="dissolve">Enheter</a>
   	</li>
 	<li>
-    	<a href="#calendar">Kalenderstyrt</a>
+    	<a href="#calendar" id="calendarmenu">Kalenderstyrt</a>
   	</li>
 	<li>
-    	<a href="#duskdawn" class="dissolve">Ljusstyrt</a>
+    	<a href="#duskdawn" id="duskdawnmenu" class="dissolve">Ljusstyrt</a>
   	</li>
   	<li>
     	<a href="#settings" class="flip">Inst&auml;llningar</a>
@@ -62,7 +65,7 @@
     	</script>
   	</li>
   	<li>
-    	<a href="#testsida">Debug</a>
+    	<a href="#testsida" id="debuglink">Debug</a>
   	</li>
 	</ul>
 </div>
@@ -133,10 +136,6 @@ Ska en enhet styras av checkbox, kalender eller ljuset?
         </div>
 
 	<h2>Genvägar</h2>
-        <ul class="individual">
-	<a href="#" style="margin: 10px;" class="whiteButton" onClick='turnOn(["1","2","3"]);'>Godmorgon</a>
-	<a href="#" style="margin: 10px;" class="grayButton submit" onClick='turnOff(["1","2","3"]);'>Godnatt</a>
-        </ul>
 	
 	<h2>Garaget</h2>
 	<ul class="pageitem">

@@ -2,9 +2,8 @@ $SERVICE = "tellstickService.php";
 
 function finishedLoaded() {
      queryDevices();
-     getCalendarEntries();
-     checkDeviceCalendar("2", "not used");
-     getLocation();
+//     getCalendarEntries();
+//     checkDeviceCalendar("2", "not used");
 }
 
 function queryDevices() {
@@ -16,7 +15,7 @@ function queryDevices() {
 		success: function statesResponse(data) {
 			deviceData = data;
 			displayGroups();
-			getSun(1);
+			//getSun(1);
 			var e = document.getElementById("enheter");
 			e.innerHTML = "";
 			for(var d in deviceData.devices) {
