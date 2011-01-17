@@ -13,19 +13,11 @@
 <script src="hemma.js"></script>
 <script type="text/javascript">
 	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
-	window.onDomReady = DomReady(finishedLoaded);
-	//Setup the event
-	function DomReady(fn) {
-		if(document.addEventListener) {
-			document.addEventListener("DOMContentLoaded", fn, false);
-		}
-	}
+	// Run finishedLoaded when DOM is ready
+	$(finishedLoaded);
 	var grupper = new Array();
 	var deviceData = null;
 	createGroups(); // TODO Better way to create groups
-        var cm = $('calendarmenu').bind('click', checkDeviceCalendar("notused", "notused"));
-	var ddm = $('#startsida').bind('click', getSun(1));
-        var dl = $('debuglink').bind('click', getCalendarEntries());
 </script>
 <title>Hemma</title>
 </head>
@@ -48,10 +40,12 @@
     	<a href="#units" class="dissolve">Enheter</a>
   	</li>
 	<li>
-    	<a href="#calendar" id="calendarmenu">Kalenderstyrt</a>
+		<div id="calendarlink">
+    		<a href="#calendar">Kalenderstyrt</a>
+    	</div>
   	</li>
 	<li>
-    	<a href="#duskdawn" id="duskdawnmenu" class="dissolve">Ljusstyrt</a>
+    	<a href="#duskdawn" id="duskdawnlink" class="dissolve">Ljusstyrt</a>
   	</li>
   	<li>
     	<a href="#settings" class="flip">Inst&auml;llningar</a>

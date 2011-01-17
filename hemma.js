@@ -1,10 +1,18 @@
 $SERVICE = "tellstickService.php";
 
 function finishedLoaded() {
-     queryDevices();
-//     getCalendarEntries();
-//     checkDeviceCalendar("2", "not used");
+	queryDevices();
+	
+    var cm = $('#calendarlink').bind('click', function() {
+    	checkDeviceCalendar("notused", "notused")
+    	});
+	var ddm = $('#duskdawnlink').bind('click', function() {
+		getSun(1)
+		});
+    var dl = $('#debuglink').bind('click', getCalendarEntries());
+    
 }
+
 
 function queryDevices() {
 	// Using .ajax to be able to control sync/async or not.
