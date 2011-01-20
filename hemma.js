@@ -4,6 +4,7 @@ function finishedLoaded() {
 	queryDevices();
 	
     $('#calendarlink').tap(function() {
+    	getCalendarEntries();
     	checkDeviceCalendar("notused", "notused")
     	});
 	$('#duskdawnlink').tap(function() {
@@ -46,7 +47,8 @@ function queryDevices() {
 
 function checkDeviceCalendar(id, tag) {
 	$.post($SERVICE, { "cmd":"isrunning","id":id, "tag":tag },
-		function statesResponse(entry) {
+		function statesResponse(entries) {
+		  entry = entries.list[0];
 		  id = entry.id;
 		  if(entry.running == true) {
 			 now = (new Date().getTime())/1000; // Javascript is in ms
@@ -61,14 +63,14 @@ function checkDeviceCalendar(id, tag) {
 }
 
 function getCalendarEntries() {
-	$.post($SERVICE, { "cmd":"nextstarttime" }, function statesResponse(entries) {	
+	$.post($SERVICE, { "cmd":"isrunning" }, function statesResponse(entries) {	
                 $('.kalenderinfo').empty();
 		for(var d in entries.list) {
 			e = entries.list[d];
                     var r = (e.running==true?"on":"off");
                     $('.kalenderinfo').append('<li><small>' + r + '</small>' + e.startTimeString +
                     	"->" + e.endTimeString + 
-                        '<em>' + e.title + '</em></li>');
+                        '<em>&nbsp;' + findDeviceById(e.id).name + '</em></li>');
 		}
 	});
 }

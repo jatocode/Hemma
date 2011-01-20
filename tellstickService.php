@@ -40,7 +40,7 @@ if($cmd=="list") {
 		$o[] = tdTool("--dim $id --dimlevel $power");
 	}
 	$r = $o;
-} else if ($cmd == "nextstarttime") {
+} else if ($cmd == "isrunning") {
 	$eventFeed = getNextEvents();
 	$rr = array();
 	$actions = array();
@@ -72,11 +72,12 @@ if($cmd=="list") {
     	  }
 	}
 	$r->list = $rr;
+	// And now, run tdtool for the separate actions
 	$r->actions = $actions;
 	foreach($actions as $id => $action) {
 		$r->result[] = tdTool("--$action $id");
 	}
-} else if ($cmd == "isrunning") {
+} else if ($cmd == "isrunning-old") {
 	$tag = $_POST['tag'];	
 	$eventFeed = getNextEvents();
 //	foreach ($eventFeed as $entry) {
