@@ -63,10 +63,11 @@ function checkDeviceCalendar(id, tag) {
 function getCalendarEntries() {
 	$.post($SERVICE, { "cmd":"nextstarttime" }, function statesResponse(entries) {	
                 $('.kalenderinfo').empty();
-		for(var d in entries) {
-			e = entries[d];
+		for(var d in entries.list) {
+			e = entries.list[d];
                     var r = (e.running==true?"on":"off");
                     $('.kalenderinfo').append('<li><small>' + r + '</small>' + e.startTimeString +
+                    	"->" + e.endTimeString + 
                         '<em>' + e.title + '</em></li>');
 		}
 	});

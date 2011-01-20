@@ -43,25 +43,39 @@ if($cmd=="list") {
 } else if ($cmd == "nextstarttime") {
 	$eventFeed = getNextEvents();
 	$rr = array();
+	$actions = array();
 	foreach ($eventFeed as $entry) {
-    	  $when = $entry->when[0];
-    	  $e = new SimpleEntry();
-    	  $e->running = false;
-    	  $e->title = $entry->title->text;
-          $e->id = $entry->where[0] . "";
-          $start = strtotime($when->startTime);
-          $end = strtotime($when->endTime);
-          $e->startTime = $start;
-          $e->endTime = $end;
-          $now = time();
-          if(($now >= $start) && ($now <= $end)) {   
-             $e->running = true;
-          }
-          $e->startTimeString = date("Ymd, H:i", $start);
-          $e->endTimeString = date("Ymd, H:i", $end);
-    	  $rr[] = $e;
+		// TODO: idList or groups?
+		  $idList = explode(",", $entry->where[0] . "");
+		  foreach($idList as $id) {
+			  $when = $entry->when[0];
+			  $e = new SimpleEntry();
+			  $e->running = false;
+			  $e->title = $entry->title->text;
+			  $e->id = $id;
+			  //$e->id = $entry->where[0] . "";
+			  $start = strtotime($when->startTime);
+			  $end = strtotime($when->endTime);
+			  $e->startTime = $start;
+			  $e->endTime = $end;
+			  $now = time();
+			  if(($now >= $start) && ($now <= $end)) {   
+				 $e->running = true;
+				 $actions[$e->id] = "on";
+			  } else  if($actions[$e->id] != "on") {
+				// Future events will not affect running.
+				$actions[$e->id] = "off";
+			  }
+			  $e->startTimeString = date("Ymd, H:i", $start);
+			  $e->endTimeString = date("Ymd, H:i", $end);
+			  $rr[] = $e;
+    	  }
 	}
-	$r = $rr;
+	$r->list = $rr;
+	$r->actions = $actions;
+	foreach($actions as $id => $action) {
+		$r->result[] = tdTool("--$action $id");
+	}
 } else if ($cmd == "isrunning") {
 	$tag = $_POST['tag'];	
 	$eventFeed = getNextEvents();
@@ -84,7 +98,7 @@ if($cmd=="list") {
            $r = $e;
         	// TODO: Hardcoded id
            tdTool("--on 2"); 
-           break;
+          // break;
        }
  //   }
     if($e->running == false) {
@@ -100,7 +114,6 @@ if($cmd=="list") {
 	$now = time();
 	$r->dark = !(($now >= $upp) && ($now <= $ner));
 } 
-
 
 
 function tdTool($params) {
@@ -165,7 +178,7 @@ function getNextEvents() {
 	// singleEvents till true för att expandera repeterande möten
 	$query->setSingleEvents(true);
 	$query->setFutureEvents(true);
-	$query->setMaxResults(10);	
+	$query->setMaxResults(5);	
 	$query->setSortOrder(a);
 	return $calService->getCalendarEventFeed($query);	
 }
