@@ -63,10 +63,12 @@ if($cmd=="list") {
 	}
 	$r = $rr;
 } else if ($cmd == "isrunning") {
-	$tag = $_POST['tag'];	
+	$tag = $_POST['tag'];
+	// $devices = json_decode(stripslashes($_POST['devices']));
 	$eventFeed = getNextEvents();
-//	foreach ($eventFeed as $entry) {
-       $entry = $eventFeed[0];
+	$r = array();
+	foreach ($eventFeed as $entry) {
+       // $entry = $eventFeed[0];
        $when = $entry->when[0];
        $e = new SimpleEntry();
        $e->running = false;
@@ -81,17 +83,17 @@ if($cmd=="list") {
        $e->endTimeString = date("Ymd, H:i", $end);
        if(($now >= $start) && ($now <= $end)) {   
            $e->running = true;
-           $r = $e;
-        	// TODO: Hardcoded id
-           tdTool("--on 2"); 
-           break;
+          // $e->result  = tdTool("--on " . $e->id); 
+           $e->result  = 'tdTool("--on "' + $e->id + ')'; 
+           $r[] = $e;
+           //break;
        }
- //   }
-    if($e->running == false) {
-         $r = $e;
-          // TODO: Hardcoded id
-         tdTool("--off 2"); 
-    }
+       if($e->running == false) {
+         // $e->result = tdTool("--off " . $e->id); 
+         $e->result = 'tdTool("--off "' + $e->id + ')'; 
+         $r[] = $e;
+       }
+	}
 } else if ($cmd == "sun") {
 	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
