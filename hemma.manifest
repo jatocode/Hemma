@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#Version 1.2.26
+#Version 1.2.27
 
 NETWORK:
 /i/hemma.hmtl
@@ -27,3 +27,5 @@ CACHE:
 /i/extensions/jqt.offline.js
 /i/extensions/jqt.location.js
 /favicon.ico
+icon_lightbulb48.jpg
+

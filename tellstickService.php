@@ -73,9 +73,9 @@ if($cmd=="list") {
 	}
 	$r->list = $rr;
 	// And now, run tdtool for the separate actions
-	$r->actions = $actions;
+	//$r->actions = $actions;
 	foreach($actions as $id => $action) {
-		$r->result[] = tdTool("--$action $id");
+		$result[] = tdTool("--$action $id");
 	}
 } else if ($cmd == "isrunning-old") {
 	$tag = $_POST['tag'];	

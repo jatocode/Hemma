@@ -67,10 +67,20 @@ function getCalendarEntries() {
                 $('.kalenderinfo').empty();
 		for(var d in entries.list) {
 			e = entries.list[d];
-                    var r = (e.running==true?"on":"off");
-                    $('.kalenderinfo').append('<li><small>' + r + '</small>' + e.startTimeString +
-                    	"->" + e.endTimeString + 
-                        '<em>&nbsp;' + findDeviceById(e.id).name + '</em></li>');
+                    var r ="";
+                    if(e.running==true) {
+                    	r='<img src="icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
+                    }
+                    startTime = new Date();
+                    startTime.setTime(e.startTime * 1000);
+                    endTime = new Date();
+                    endTime.setTime(e.endTime * 1000);
+                    
+					startTimeString = dateFormatter(startTime, "dd/m hh:nn");
+					endTimeString = dateFormatter(endTime, "hh:nn");
+                    $('.kalenderinfo').append('<li><small>' + r + '</small>' + 
+                    	findDeviceById(e.id).name + 
+                        '<br/><em>&nbsp;' + startTimeString + "->" + endTimeString + '</em></li>');
 		}
 	});
 }
@@ -200,4 +210,42 @@ function findDeviceById(id) {
 
 function handleError(e) {
   alert(e.cause ? e.cause.statusText : e.message);
+}
+
+function dateFormatter(formatDate, formatString) {
+	if(formatDate instanceof Date) {
+		var months = new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+		var yyyy = formatDate.getFullYear();
+		var yy = yyyy.toString().substring(2);
+		var m = formatDate.getMonth() + 1;
+		var mm = m < 10 ? "0" + m : m;
+		var mmm = months[m-1];
+		var d = formatDate.getDate();
+		var dd = d < 10 ? "0" + d : d;
+		
+		var h = formatDate.getHours();
+		var hh = h < 10 ? "0" + h : h;
+		var n = formatDate.getMinutes();
+		var nn = n < 10 ? "0" + n : n;
+		var s = formatDate.getSeconds();
+		var ss = s < 10 ? "0" + s : s;
+
+		formatString = formatString.replace(/yyyy/i, yyyy);
+		formatString = formatString.replace(/yy/i, yy);
+		formatString = formatString.replace(/mmm/i, mmm);
+		formatString = formatString.replace(/mm/i, mm);
+		formatString = formatString.replace(/m/i, m);
+		formatString = formatString.replace(/dd/i, dd);
+		formatString = formatString.replace(/d/i, d);
+		formatString = formatString.replace(/hh/i, hh);
+		formatString = formatString.replace(/h/i, h);
+		formatString = formatString.replace(/nn/i, nn);
+		formatString = formatString.replace(/n/i, n);
+		formatString = formatString.replace(/ss/i, ss);
+		formatString = formatString.replace(/s/i, s);
+
+		return formatString;
+	} else {
+		return "";
+	}
 }
