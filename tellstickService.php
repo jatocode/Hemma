@@ -92,14 +92,14 @@ if($cmd=="list") {
 	}
 	$r->list = $rr;
 	// And now, run tdtool for the separate actions
-	$r->off = $off;
-        $r->on  = $on;
-        if($execute != "no") {
+    $r->off = $off;
+	$r->on  = $on;
+	if($execute != "no") {
 		foreach($actions as $id => $action) {
 			$result[] = tdTool("--$action $id");
 		}
-        	$r->execute = "PHP SWITCHED";        
-	}	
+		$r->execute = "PHP SWITCHED";        
+    }   
 } else if ($cmd == "sun") {
 	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
