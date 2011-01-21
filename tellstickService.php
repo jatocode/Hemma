@@ -31,7 +31,17 @@ if($cmd=="list") {
 		$o[] = tdTool("--$cmd $id");
 	}
 	$r = $o;
-	// TODO: Return useful info, Success/Failure + id
+} else if ($cmd == "combined") {
+	$devicesOn = json_decode(stripslashes($_POST['devicesOn']));
+	$devicesOff = json_decode(stripslashes($_POST['devicesOff']));
+	$o = array();
+	foreach($devicesOff as $id) {
+		$o[] = tdTool("--off $id");
+	}
+	foreach($devicesOn as $id) {
+		$o[] = tdTool("--on $id");
+	}
+	$r = $o;
 } else if ($cmd == "dim") {
 	$devices = json_decode(stripslashes($_POST['devices']));
 	$power = $_POST['power'];
@@ -41,9 +51,12 @@ if($cmd=="list") {
 	}
 	$r = $o;
 } else if ($cmd == "isrunning") {
+	$execute = $_POST['execute'];
 	$eventFeed = getNextEvents();
 	$rr = array();
 	$actions = array();
+	$on = array();
+	$off = array();
 	foreach ($eventFeed as $entry) {
 		// TODO: idList or groups?
 		  $idList = explode(",", $entry->where[0] . "");
@@ -62,9 +75,15 @@ if($cmd=="list") {
 			  if(($now >= $start) && ($now <= $end)) {   
 				 $e->running = true;
 				 $actions[$e->id] = "on";
+                                 if(!in_array($id, $on)) {
+                                      $on[] = $id;
+				 }
 			  } else  if($actions[$e->id] != "on") {
 				// Future events will not affect running.
 				$actions[$e->id] = "off";
+                                 if((!in_array($id, $on)) && (!in_array($id, $off))) {
+                                      $off[] = $id;
+				 }
 			  }
 			  $e->startTimeString = date("Ymd, H:i", $start);
 			  $e->endTimeString = date("Ymd, H:i", $end);
@@ -73,40 +92,14 @@ if($cmd=="list") {
 	}
 	$r->list = $rr;
 	// And now, run tdtool for the separate actions
-	//$r->actions = $actions;
-	foreach($actions as $id => $action) {
-		$result[] = tdTool("--$action $id");
-	}
-} else if ($cmd == "isrunning-old") {
-	$tag = $_POST['tag'];	
-	$eventFeed = getNextEvents();
-//	foreach ($eventFeed as $entry) {
-       $entry = $eventFeed[0];
-       $when = $entry->when[0];
-       $e = new SimpleEntry();
-       $e->running = false;
-       $e->title = $entry->title->text;
-       $e->id = $entry->where[0] . "";
-       $start = strtotime($when->startTime);
-       $end = strtotime($when->endTime);
-       $now = time();
-       $e->startTime = $start;
-       $e->endTime = $end;
-       $e->startTimeString = date("Ymd, H:i", $start);
-       $e->endTimeString = date("Ymd, H:i", $end);
-       if(($now >= $start) && ($now <= $end)) {   
-           $e->running = true;
-           $r = $e;
-        	// TODO: Hardcoded id
-           tdTool("--on 2"); 
-          // break;
-       }
- //   }
-    if($e->running == false) {
-         $r = $e;
-          // TODO: Hardcoded id
-         tdTool("--off 2"); 
-    }
+	$r->off = $off;
+        $r->on  = $on;
+        if($execute != "no") {
+		foreach($actions as $id => $action) {
+			$result[] = tdTool("--$action $id");
+		}
+        	$r->execute = "PHP SWITCHED";        
+	}	
 } else if ($cmd == "sun") {
 	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);

@@ -5,7 +5,6 @@ function finishedLoaded() {
 	
     $('#calendarlink').tap(function() {
     	getCalendarEntries();
-    	checkDeviceCalendar("notused", "notused")
     	});
 	$('#duskdawnlink').tap(function() {
 		getSun(1)
@@ -45,8 +44,8 @@ function queryDevices() {
 	});
 }
 
-function checkDeviceCalendar(id, tag) {
-	$.post($SERVICE, { "cmd":"isrunning","id":id, "tag":tag },
+function checkDeviceCalendar() {
+	$.post($SERVICE, { "cmd":"isrunning","execute":"no" },
 		function statesResponse(entries) {
 		  entry = entries.list[0];
 		  id = entry.id;
@@ -63,25 +62,30 @@ function checkDeviceCalendar(id, tag) {
 }
 
 function getCalendarEntries() {
-	$.post($SERVICE, { "cmd":"isrunning" }, function statesResponse(entries) {	
+	$.post($SERVICE, { "cmd":"isrunning", "execute":"no" }, function statesResponse(entries) {	
                 $('.kalenderinfo').empty();
+		// First draw the array for a quick response
 		for(var d in entries.list) {
 			e = entries.list[d];
                     var r ="";
-                    if(e.running==true) {
-                    	r='<img src="icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
-                    }
                     startTime = new Date();
                     startTime.setTime(e.startTime * 1000);
                     endTime = new Date();
                     endTime.setTime(e.endTime * 1000);
                     
-					startTimeString = dateFormatter(startTime, "dd/m hh:nn");
-					endTimeString = dateFormatter(endTime, "hh:nn");
+                    if(e.running==true) {
+                    	r='<img src="icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
+                    }
+
+	    	    startTimeString = dateFormatter(startTime, "dd/m hh:nn");
+		    endTimeString = dateFormatter(endTime, "hh:nn");
+
                     $('.kalenderinfo').append('<li><small>' + r + '</small>' + 
                     	findDeviceById(e.id).name + 
                         '<br/><em>&nbsp;' + startTimeString + "->" + endTimeString + '</em></li>');
 		}
+		// Talk to the hardware
+		sendCombined(entries.on, entries.off);
 	});
 }
 
@@ -165,6 +169,24 @@ function fixedState(state, idList) {
 		var chkbox = document.getElementsByName(device.id)[0];
 		chkbox.checked = state=="on"?true:false;
 		device.state = state;
+	}	
+}
+
+function sendCombined(onList, offList) {
+	$.post($SERVICE, { "cmd":"combined", "devicesOn": JSON.stringify(onList), "devicesOff":JSON.stringify(offList)  });
+	for(var i in onList) {
+		id = onList[i]
+		device = findDeviceById(id);
+		chkbox = document.getElementsByName(device.id)[0];
+		chkbox.checked = true;
+		device.state = "on";
+	}	
+	for(var i in offList) {
+		id = offList[i]
+		device = findDeviceById(id);
+		chkbox = document.getElementsByName(device.id)[0];
+		chkbox.checked = false;
+		device.state = "off";
 	}	
 }
 
