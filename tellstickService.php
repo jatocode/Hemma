@@ -1,5 +1,6 @@
 <?php
 header('Content-type: application/json');
+define('SETTINGS_FILENAME', "/var/state/hemma.conf");
 $cmd = strtolower($_POST['cmd']);
 if($cmd == '') {
  // Use GET while testing new stuff
@@ -75,15 +76,15 @@ if($cmd=="list") {
 			  if(($now >= $start) && ($now <= $end)) {   
 				 $e->running = true;
 				 $actions[$e->id] = "on";
-                                 if(!in_array($id, $on)) {
-                                      $on[] = $id;
+                 if(!in_array($id, $on)) {
+                 	$on[] = $id;
 				 }
 			  } else  if($actions[$e->id] != "on") {
 				// Future events will not affect running.
 				$actions[$e->id] = "off";
-                                 if((!in_array($id, $on)) && (!in_array($id, $off))) {
-                                      $off[] = $id;
-				 }
+                if((!in_array($id, $on)) && (!in_array($id, $off))) {
+                	$off[] = $id;
+				}
 			  }
 			  $e->startTimeString = date("Ymd, H:i", $start);
 			  $e->endTimeString = date("Ymd, H:i", $end);
@@ -92,16 +93,25 @@ if($cmd=="list") {
 	// $devices = json_decode(stripslashes($_POST['devices']));
        // $entry = $eventFeed[0];
 	}
-	$r->list = $rr;
-	// And now, run tdtool for the separate actions
-    $r->off = $off;
-	$r->on  = $on;
-	if($execute != "no") {
+	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
+	if($f != FALSE) {
+		// Alla som är i f[0] ska in i off om de inte finns redan
+		$calcontrolled = explode(",", $f[0] . "");
+		foreach($calcontrolled as $c) {
+			if(!in_array($c, $off)) {
+				$off[] = $c;
+			}
+		}
+	}	
+	if($execute != "no") {		
 		foreach($actions as $id => $action) {
 			$result[] = tdTool("--$action $id");
 		}
 		$r->execute = "PHP SWITCHED";        
-    }   
+    }
+    $r->list = $rr;
+    $r->off = $off;
+	$r->on  = $on;
 } else if ($cmd == "sun") {
 	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
@@ -114,18 +124,27 @@ if($cmd=="list") {
 	$light = $_POST['light'];	
 	$manual = $_POST['manual'];	
 	
-	// TODO: Save to file
+	$f = SETTINGS_FILENAME;
+	$fh = fopen($f, 'w');
+	if($fh != FALSE) {
+		fwrite($fh, $cal . "\n");
+		fwrite($fh, $light . "\n");
+		fwrite($fh, $manual . "\n");
+		fclose($fh);
+		$r->write = "OK";
+	}
+	
 	$r->cal = $cal;
 	$r->light = $light;
 	$r->manual = $manual;
 	
-} else if ($cmd == "settings_get") {	
-	$f = file("/var/state/hemma.conf", FILE_IGNORE_NEW_LINES);
-	if($f != FALSE) {
-		$r->cal = $f[0];
-		$r->light = $f[1];
-		$r->manual = $f[2];
-	}
+} else if ($cmd == "settings_get") {
+	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
+ 	if($f != FALSE) {
+ 		$r->cal = $f[0];
+ 		$r->light = $f[1];
+ 		$r->manual = $f[2];
+ 	}
 } 
 
 
@@ -195,5 +214,6 @@ function getNextEvents() {
 	$query->setSortOrder(a);
 	return $calService->getCalendarEventFeed($query);	
 }
+
 ?>
 
