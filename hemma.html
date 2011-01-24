@@ -19,6 +19,14 @@
 	createGroups(); // TODO Better way to create groups
 	$(finishedLoaded);
 </script>
+<style type="text/css">
+ul li small {
+float: left; 
+}
+ul li small.counter {
+margin-top:0;
+}
+</style>
 <title>Hemma</title>
 </head>
 <body>
@@ -49,7 +57,7 @@
     	<a href="#duskdawn" id="duskdawnlink" class="dissolve">Ljusstyrt</a>
   	</li>
   	<li>
-    	<a href="#settings" class="flip">Inst&auml;llningar</a>
+    	<a href="#settings" id="settingslink" class="flip">Inst&auml;llningar</a>
   	</li>
   	</ul>
 	<h2>Utetemperatur</h2>
@@ -74,6 +82,12 @@
 	<ul class="edit rounded">
 		<div id="enheter"></div>
 	</ul>	
+	<h2>Manual override</h2>
+	<ul class="edit rounded">
+		<li>Override<span class="toggle">
+			<input name="override" type="checkbox" onclick="">
+		</span></li>
+	</ul>	
 </div>
 <!-- Calender controlled -->
 <div id="calendar">
@@ -81,6 +95,9 @@
 	<h1>Kalenderstyrt</h1>
 	<a class="button back" href="#">Hem</a>
    </div>
+   <ul class="metal">
+        <div class="kalenderinfo"></div>
+   </ul>
    <div class="info" >
    <div class="tider" id="tider">
 	<p>Ingen info tillg&auml;nglig.</p>
@@ -111,9 +128,23 @@ Saker som styrs av ljuset
 		<h1>Inst&auml;llningar</h1>
 		<a class="button back" href="#">Hem</a>
 	</div>
-<div class="info">
-Ska en enhet styras av checkbox, kalender eller ljuset?
-</div>
+	<h2>Kalenderstyrda</h2>
+	<ul class="edit rounded">
+	<li><input type="text" name="Enheter" id="calstyrda" />
+	</li>
+	</ul>
+	<h2>Ljusstyrda</h2>
+	<ul class="edit rounded">
+	<li><input type="text" name="Enheter" id="ljusstyrda"  />
+	</li>
+	</ul>
+	<h2>Manuellt</h2>
+	<ul class="edit rounded">
+	<li><input type="text" name="Enheter" id="manuelltstyrda" />
+	</li>
+	</ul>
+	
+     <a href="#" class="submit grayButton" id="updatesettings">Spara</a>
 </div>
 <!-- Grupper -->
 <div id="editgroups">
@@ -133,9 +164,6 @@ Ska en enhet styras av checkbox, kalender eller ljuset?
 		<a class="button back" href="#">Hem</a>
 	</div>
 	<h2>Debug and testinfo</h2>
-	<ul class="metal">
-        <div class="kalenderinfo"></div>
-  	</ul>
         <br/>
         <div class="info">
           <div class="plats"></div>

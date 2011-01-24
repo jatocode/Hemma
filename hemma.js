@@ -4,7 +4,7 @@ function finishedLoaded() {
 	queryDevices();
 	
     $('#calendarlink').tap(function() {
-    	checkDeviceCalendar("notused", "notused")
+    	getCalendarEntries();
     	});
 	$('#duskdawnlink').tap(function() {
 		getSun(1)
@@ -12,7 +12,12 @@ function finishedLoaded() {
     $('#debuglink').tap(function(){
     	getCalendarEntries()
     	});
-    
+     $('#settingslink').tap(function(){
+    	getSettings()
+    	});
+    $("#updatesettings").tap(function(){
+  		updateSettings();
+ 	});
 }
 
 
@@ -33,7 +38,8 @@ function queryDevices() {
 				// State can be ON/OFF/DIMMED:xx
 				var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
 				var id = deviceData.devices[d].id;
-				e.innerHTML += "<li>" + deviceData.devices[d].name +
+				e.innerHTML += "<li>&nbsp;" + deviceData.devices[d].name +
+					'<small class="counter">' + id + "</small>" + 
 					"<span class=\"toggle\">" +
 					"<input name=\"" + id + "\"" + 
 					" type=\"checkbox\"" + checked + 
@@ -44,9 +50,10 @@ function queryDevices() {
 	});
 }
 
-function checkDeviceCalendar(id, tag) {
-	$.post($SERVICE, { "cmd":"isrunning","id":id, "tag":tag },
-		function statesResponse(entry) {
+function checkDeviceCalendar() {
+	$.post($SERVICE, { "cmd":"isrunning","execute":"no" },
+		function statesResponse(entries) {
+		  entry = entries.list[0];
 		  id = entry.id;
 		  if(entry.running == true) {
 			 now = (new Date().getTime())/1000; // Javascript is in ms
@@ -61,14 +68,30 @@ function checkDeviceCalendar(id, tag) {
 }
 
 function getCalendarEntries() {
-	$.post($SERVICE, { "cmd":"nextstarttime" }, function statesResponse(entries) {	
+	$.post($SERVICE, { "cmd":"isrunning", "execute":"no" }, function statesResponse(entries) {	
                 $('.kalenderinfo').empty();
-		for(var d in entries) {
-			e = entries[d];
-                    var r = (e.running==true?"on":"off");
-                    $('.kalenderinfo').append('<li><small>' + r + '</small>' + e.startTimeString +
-                        '<em>' + e.title + '</em></li>');
+		// First draw the array for a quick response
+		for(var d in entries.list) {
+			e = entries.list[d];
+                    var r ="";
+                    startTime = new Date();
+                    startTime.setTime(e.startTime * 1000);
+                    endTime = new Date();
+                    endTime.setTime(e.endTime * 1000);
+                    
+                    if(e.running==true) {
+                    	r='<img src="icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
+                    }
+
+	    	    startTimeString = dateFormatter(startTime, "dd/m hh:nn");
+		    endTimeString = dateFormatter(endTime, "hh:nn");
+
+                    $('.kalenderinfo').append('<li><small>' + r + '</small>' + 
+                    	findDeviceById(e.id).name + 
+                        '<br/><em>&nbsp;' + startTimeString + "->" + endTimeString + '</em></li>');
 		}
+		// Talk to the hardware
+		sendCombined(entries.on, entries.off);
 	});
 }
 
@@ -155,6 +178,24 @@ function fixedState(state, idList) {
 	}	
 }
 
+function sendCombined(onList, offList) {
+	$.post($SERVICE, { "cmd":"combined", "devicesOn": JSON.stringify(onList), "devicesOff":JSON.stringify(offList)  });
+	for(var i in onList) {
+		id = onList[i]
+		device = findDeviceById(id);
+		chkbox = document.getElementsByName(device.id)[0];
+		chkbox.checked = true;
+		device.state = "on";
+	}	
+	for(var i in offList) {
+		id = offList[i]
+		device = findDeviceById(id);
+		chkbox = document.getElementsByName(device.id)[0];
+		chkbox.checked = false;
+		device.state = "off";
+	}	
+}
+
 function getSun(groupId) {
 	$.post($SERVICE, { "cmd":"sun" }, function sunResponse(tider) {	
 		var solen = document.getElementById("solen");
@@ -171,6 +212,26 @@ function getSun(groupId) {
 	});
 }
 
+function getSettings() {
+	$.post($SERVICE, { "cmd":"settings_get" }, function(settings) {	
+		$('#calstyrda').val(settings.cal);
+		$('#ljusstyrda').val(settings.light);
+		$('#manuelltstyrda').val(settings.manual);
+
+	});
+}
+
+function updateSettings() {
+	var cal = $('#calstyrda').val();
+	var light = $('#ljusstyrda').val();
+	var manual = $('#manuelltstyrda').val();
+	$.post($SERVICE, { "cmd":"settings",
+		"cal":cal,
+		"light":light,
+		"manual":manual,
+		}, function(settings) {	
+	});
+}
 function getLocation() {
     jQT.updateLocation(function(coords){
         locationTxt = 'Latitude: ' + coords.latitude + '<br />Longitude: ' + coords.longitude;
@@ -197,4 +258,42 @@ function findDeviceById(id) {
 
 function handleError(e) {
   alert(e.cause ? e.cause.statusText : e.message);
+}
+
+function dateFormatter(formatDate, formatString) {
+	if(formatDate instanceof Date) {
+		var months = new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+		var yyyy = formatDate.getFullYear();
+		var yy = yyyy.toString().substring(2);
+		var m = formatDate.getMonth() + 1;
+		var mm = m < 10 ? "0" + m : m;
+		var mmm = months[m-1];
+		var d = formatDate.getDate();
+		var dd = d < 10 ? "0" + d : d;
+		
+		var h = formatDate.getHours();
+		var hh = h < 10 ? "0" + h : h;
+		var n = formatDate.getMinutes();
+		var nn = n < 10 ? "0" + n : n;
+		var s = formatDate.getSeconds();
+		var ss = s < 10 ? "0" + s : s;
+
+		formatString = formatString.replace(/yyyy/i, yyyy);
+		formatString = formatString.replace(/yy/i, yy);
+		formatString = formatString.replace(/mmm/i, mmm);
+		formatString = formatString.replace(/mm/i, mm);
+		formatString = formatString.replace(/m/i, m);
+		formatString = formatString.replace(/dd/i, dd);
+		formatString = formatString.replace(/d/i, d);
+		formatString = formatString.replace(/hh/i, hh);
+		formatString = formatString.replace(/h/i, h);
+		formatString = formatString.replace(/nn/i, nn);
+		formatString = formatString.replace(/n/i, n);
+		formatString = formatString.replace(/ss/i, ss);
+		formatString = formatString.replace(/s/i, s);
+
+		return formatString;
+	} else {
+		return "";
+	}
 }
