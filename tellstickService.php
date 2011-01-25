@@ -90,15 +90,16 @@ if($cmd=="list") {
 	}
 	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
 	if($f != FALSE) {
+		$settings = json_decode($f[0]);
 		// Alla som är i f[0] ska in i off om de inte finns redan
-		$calcontrolled = explode(",", $f[0] . "");
+		$calcontrolled = explode(",", $settings->cal . "");
 		foreach($calcontrolled as $u) {
 			if(!in_array($u, $off)) {
 				$off[] = $u;
 			}
 		}
 		// Add lightcontrol
-		$lightcontrolled = explode(",", $f[1] . "");
+		$lightcontrolled = explode(",", $settings->light . "");
 		// TODO: Duplicated code
 		$upp = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
 		$ner = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
@@ -121,10 +122,11 @@ if($cmd=="list") {
 		}
 		$r->execute = "PHP SWITCHED";        
     }
+    $r->calcontrolled = $set;
     $r->list = $rr;
     $r->off = $off;
 	$r->on  = $on;
-	//$r->result = $result;
+	$r->result = $result;
 } else if ($cmd == "sun") {
 	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);

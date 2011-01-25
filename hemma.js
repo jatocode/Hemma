@@ -19,8 +19,8 @@ function finishedLoaded() {
   		updateSettings();
  	});
     $("#override").tap(function(){
-    	getSettings();
-  		updateSettings();    	
+    	//getSettings();
+  		//updateSettings();    	
   		// $("#override").is(':checked'));
  	});
 }
