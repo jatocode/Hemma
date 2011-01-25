@@ -18,6 +18,11 @@ function finishedLoaded() {
     $("#updatesettings").tap(function(){
   		updateSettings();
  	});
+    $("#override").tap(function(){
+    	getSettings();
+  		updateSettings();    	
+  		// $("#override").is(':checked'));
+ 	});
 }
 
 
@@ -217,7 +222,7 @@ function getSettings() {
 		$('#calstyrda').val(settings.cal);
 		$('#ljusstyrda').val(settings.light);
 		$('#manuelltstyrda').val(settings.manual);
-
+		$("#override").checked = settings.override;
 	});
 }
 
@@ -225,10 +230,12 @@ function updateSettings() {
 	var cal = $('#calstyrda').val();
 	var light = $('#ljusstyrda').val();
 	var manual = $('#manuelltstyrda').val();
+	var override = $("#override").is(':checked');
 	$.post($SERVICE, { "cmd":"settings",
 		"cal":cal,
 		"light":light,
 		"manual":manual,
+		"override":override?"on":"off"
 		}, function(settings) {	
 	});
 }

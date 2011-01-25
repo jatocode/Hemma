@@ -55,7 +55,6 @@ if($cmd=="list") {
 	$execute = $_POST['execute'];
 	$eventFeed = getNextEvents();
 	$rr = array();
-	$actions = array();
 	$on = array();
 	$off = array();
 	foreach ($eventFeed as $entry) {
@@ -75,13 +74,11 @@ if($cmd=="list") {
 			  $now = time();
 			  if(($now >= $start) && ($now <= $end)) {   
 				 $e->running = true;
-				 $actions[$e->id] = "on";
                  if(!in_array($id, $on)) {
                  	$on[] = $id;
 				 }
-			  } else  if($actions[$e->id] != "on") {
+			  } else  {
 				// Future events will not affect running.
-				$actions[$e->id] = "off";
                 if((!in_array($id, $on)) && (!in_array($id, $off))) {
                 	$off[] = $id;
 				}
@@ -90,8 +87,6 @@ if($cmd=="list") {
 			  $e->endTimeString = date("Ymd, H:i", $end);
 			  $rr[] = $e;
     	  }
-	// $devices = json_decode(stripslashes($_POST['devices']));
-       // $entry = $eventFeed[0];
 	}
 	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
 	if($f != FALSE) {
@@ -118,14 +113,18 @@ if($cmd=="list") {
 		}
 	}
 	if($execute != "no") {		
-		foreach($actions as $id => $action) {
-			$result[] = tdTool("--$action $id");
+		foreach($on as $id) {
+			$result[] = tdTool("--on $id");	
+		}
+		foreach($off as $id) {
+			$result[] = tdTool("--off $id");	
 		}
 		$r->execute = "PHP SWITCHED";        
     }
     $r->list = $rr;
     $r->off = $off;
 	$r->on  = $on;
+	//$r->result = $result;
 } else if ($cmd == "sun") {
 	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
@@ -137,27 +136,23 @@ if($cmd=="list") {
 	$cal = $_POST['cal'];	
 	$light = $_POST['light'];	
 	$manual = $_POST['manual'];	
+	$override = $_POST['override'];	
 	
 	$f = SETTINGS_FILENAME;
 	$fh = fopen($f, 'w');
-	if($fh != FALSE) {
-		fwrite($fh, $cal . "\n");
-		fwrite($fh, $light . "\n");
-		fwrite($fh, $manual . "\n");
-		fclose($fh);
-		$r->write = "OK";
-	}
-	
 	$r->cal = $cal;
 	$r->light = $light;
 	$r->manual = $manual;
-	
+	$r->override = $override;
+	if($fh != FALSE) {
+		$r->write = "OK";
+		fwrite($fh, json_encode($r));
+		fclose($fh);
+	}
 } else if ($cmd == "settings_get") {
 	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
  	if($f != FALSE) {
- 		$r->cal = $f[0];
- 		$r->light = $f[1];
- 		$r->manual = $f[2];
+ 		$r = json_decode($f[0]);
  	}
 } 
 
