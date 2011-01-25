@@ -97,12 +97,26 @@ if($cmd=="list") {
 	if($f != FALSE) {
 		// Alla som är i f[0] ska in i off om de inte finns redan
 		$calcontrolled = explode(",", $f[0] . "");
-		foreach($calcontrolled as $c) {
-			if(!in_array($c, $off)) {
-				$off[] = $c;
+		foreach($calcontrolled as $u) {
+			if(!in_array($u, $off)) {
+				$off[] = $u;
 			}
 		}
-	}	
+		// Add lightcontrol
+		$lightcontrolled = explode(",", $f[1] . "");
+		// TODO: Duplicated code
+		$upp = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
+		$ner = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
+		$now = time();
+		$dark = !(($now >= $upp) && ($now <= $ner));
+		foreach($lightcontrolled as $u) {
+			if((!in_array($u, $on) && $dark)) {
+				$on[] = $u;
+			} else if(!in_array($u, $off)) {
+				$off[] = $u;
+			}
+		}
+	}
 	if($execute != "no") {		
 		foreach($actions as $id => $action) {
 			$result[] = tdTool("--$action $id");
