@@ -38,8 +38,8 @@ function queryDevices() {
 				// State can be ON/OFF/DIMMED:xx
 				var checked = (deviceData.devices[d].state).toLowerCase()=="off"?"":"checked";
 				var id = deviceData.devices[d].id;
-				e.innerHTML += "<li>&nbsp;" + deviceData.devices[d].name +
-					'<small class="counter">' + id + "</small>" + 
+				e.innerHTML += "<li>" +'<span class="unitid">' + id + "</span>&nbsp;" +
+					deviceData.devices[d].name +
 					"<span class=\"toggle\">" +
 					"<input name=\"" + id + "\"" + 
 					" type=\"checkbox\"" + checked + 
