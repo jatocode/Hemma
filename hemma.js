@@ -19,9 +19,7 @@ function finishedLoaded() {
   		updateSettings();
  	});
     $("#override").tap(function(){
-    	//getSettings();
-  		//updateSettings();    	
-  		// $("#override").is(':checked'));
+  		updateOverride($("#override").is(':checked'));    	
  	});
 }
 
@@ -218,11 +216,18 @@ function getSun(groupId) {
 }
 
 function getSettings() {
-	$.post($SERVICE, { "cmd":"settings_get" }, function(settings) {	
+	$.post($SERVICE, { "cmd":"settings" }, function(settings) {	
 		$('#calstyrda').val(settings.cal);
 		$('#ljusstyrda').val(settings.light);
 		$('#manuelltstyrda').val(settings.manual);
 		$("#override").checked = settings.override;
+	});
+}
+
+function updateOverride(override) {
+	$.post($SERVICE, { "cmd":"settings",
+		"override":override
+		}, function(settings) {	
 	});
 }
 

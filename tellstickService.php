@@ -57,48 +57,11 @@ if($cmd=="list") {
 	$rr = array();
 	$on = array();
 	$off = array();
-	foreach ($eventFeed as $entry) {
-		// TODO: idList or groups?
-		  $idList = explode(",", $entry->where[0] . "");
-		  foreach($idList as $id) {
-			  $when = $entry->when[0];
-			  $e = new SimpleEntry();
-			  $e->running = false;
-			  $e->title = $entry->title->text;
-			  $e->id = $id;
-			  //$e->id = $entry->where[0] . "";
-			  $start = strtotime($when->startTime);
-			  $end = strtotime($when->endTime);
-			  $e->startTime = $start;
-			  $e->endTime = $end;
-			  $now = time();
-			  if(($now >= $start) && ($now <= $end)) {   
-				 $e->running = true;
-                 if(!in_array($id, $on)) {
-                 	$on[] = $id;
-				 }
-			  } else  {
-				// Future events will not affect running.
-                if((!in_array($id, $on)) && (!in_array($id, $off))) {
-                	$off[] = $id;
-				}
-			  }
-			  $e->startTimeString = date("Ymd, H:i", $start);
-			  $e->endTimeString = date("Ymd, H:i", $end);
-			  $rr[] = $e;
-    	  }
-	}
+	// TODO duplicated code for reading settings
 	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
 	if($f != FALSE) {
 		$settings = json_decode($f[0]);
-		// Alla som är i f[0] ska in i off om de inte finns redan
 		$calcontrolled = explode(",", $settings->cal . "");
-		foreach($calcontrolled as $u) {
-			if(!in_array($u, $off)) {
-				$off[] = $u;
-			}
-		}
-		// Add lightcontrol
 		$lightcontrolled = explode(",", $settings->light . "");
 		// TODO: Duplicated code
 		$upp = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
@@ -113,7 +76,40 @@ if($cmd=="list") {
 			}
 		}
 	}
-	if($execute != "no") {		
+	foreach ($eventFeed as $entry) {
+		// TODO: idList or groups?
+		  $idList = explode(",", $entry->where[0] . "");
+		  foreach($idList as $id) {
+			  $when = $entry->when[0];
+			  $e = new SimpleEntry();
+			  $e->running = false;
+			  $e->title = $entry->title->text;
+			  $e->id = $id;
+			  $start = strtotime($when->startTime);
+			  $end = strtotime($when->endTime);
+			  $e->startTime = $start;
+			  $e->endTime = $end;
+			  $now = time();
+			  if(in_array($id, $calcontrolled)) {	  
+				  if(($now >= $start) && ($now <= $end)) {   
+					 $e->running = true;
+					 if(!in_array($id, $on)) {
+						$on[] = $id;
+					 }
+				  } else  {
+					// Future events will not affect running.
+					if( (!in_array($id, $on)) && (!in_array($id, $off))) {
+						$off[] = $id;
+					}
+				  }
+			  }
+			  $e->startTimeString = date("Ymd, H:i", $start);
+			  $e->endTimeString = date("Ymd, H:i", $end);
+			  $rr[] = $e;
+    	  }
+	}
+	$r->test = ($settings->override);
+	if(($execute != "no") && ($settings->override=="false")) {		
 		foreach($on as $id) {
 			$result[] = tdTool("--on $id");	
 		}
@@ -122,7 +118,7 @@ if($cmd=="list") {
 		}
 		$r->execute = "PHP SWITCHED";        
     }
-    $r->calcontrolled = $set;
+    $r->calcontrolled = $settings;
     $r->list = $rr;
     $r->off = $off;
 	$r->on  = $on;
@@ -140,24 +136,21 @@ if($cmd=="list") {
 	$manual = $_POST['manual'];	
 	$override = $_POST['override'];	
 	
-	$f = SETTINGS_FILENAME;
-	$fh = fopen($f, 'w');
-	$r->cal = $cal;
-	$r->light = $light;
-	$r->manual = $manual;
-	$r->override = $override;
+	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
+ 	if($f != FALSE) {
+ 		$r = json_decode($f[0]);
+ 	}
+	$fh = fopen(SETTINGS_FILENAME, 'w');
+	$r->cal = $cal==null?$r->cal:$cal;
+	$r->light = $light==null?$r->light:$light;
+	$r->manual = $manual==null?$r->manual:$manual;
+	$r->override = $override==null?$r->override:$override;
 	if($fh != FALSE) {
 		$r->write = "OK";
 		fwrite($fh, json_encode($r));
 		fclose($fh);
 	}
-} else if ($cmd == "settings_get") {
-	$f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
- 	if($f != FALSE) {
- 		$r = json_decode($f[0]);
- 	}
 } 
-
 
 function tdTool($params) {
   $command = "tdtool" . " " . $params;
