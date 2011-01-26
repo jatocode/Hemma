@@ -94,7 +94,10 @@ function getCalendarEntries() {
                         '<br/><em>&nbsp;' + startTimeString + "->" + endTimeString + '</em></li>');
 		}
 		// Talk to the hardware
-		sendCombined(entries.on, entries.off);
+		o = $("#override").is(':checked');
+		if(o == false) {
+			sendCombined(entries.on, entries.off);
+		}
 	});
 }
 

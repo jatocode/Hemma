@@ -108,7 +108,6 @@ if($cmd=="list") {
 			  $rr[] = $e;
     	  }
 	}
-	$r->test = ($settings->override);
 	if(($execute != "no") && ($settings->override=="false")) {		
 		foreach($on as $id) {
 			$result[] = tdTool("--on $id");	
