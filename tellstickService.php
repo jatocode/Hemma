@@ -108,7 +108,7 @@ if($cmd=="list") {
 			  $rr[] = $e;
     	  }
 	}
-	if(($execute != "no") && ($settings->override=="false")) {		
+	if(($execute != "no") && ($settings->override=="true")) {		
 		foreach($on as $id) {
 			$result[] = tdTool("--on $id");	
 		}
@@ -120,8 +120,8 @@ if($cmd=="list") {
     $r->calcontrolled = $settings;
     $r->list = $rr;
     $r->off = $off;
-	$r->on  = $on;
-	$r->result = $result;
+    $r->on  = $on;
+//	$r->result = $result;
 } else if ($cmd == "sun") {
 	$r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
 	$r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
