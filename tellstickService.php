@@ -108,7 +108,7 @@ if($cmd=="list") {
 			  $rr[] = $e;
     	  }
 	}
-	if(($execute != "no") && ($settings->override=="true")) {		
+	if(($execute != "no") && ($settings->override=="false")) {		
 		foreach($on as $id) {
 			$result[] = tdTool("--on $id");	
 		}
@@ -147,6 +147,7 @@ if($cmd=="list") {
 	if($fh != FALSE) {
 		$r->write = "OK";
 		fwrite($fh, json_encode($r));
+                fwrite($fh, "\n"); // For human readability
 		fclose($fh);
 	}
 } 

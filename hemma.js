@@ -16,12 +16,15 @@ function finishedLoaded() {
      $('#settingslink').tap(function(){
     	getSettings()
     	});
-    $("#updatesettings").tap(function(){
-  		updateSettings();
- 	});
-    $("#override").tap(function(){
-  		updateOverride($("#override").is(':checked'));    	
- 	});
+
+     $("#settings").change(function(){
+	updateSettings();
+     });
+
+     $('#startsida').live('swipe', function(event, info){ 
+	console.log(info.direction);
+        jQT.goTo($('#units'), 'slide'); 
+     }); 
 }
 
 
@@ -228,13 +231,6 @@ function getSettings() {
 	});
 }
 
-function updateOverride(override) {
-	$.post($SERVICE, { "cmd":"settings",
-		"override":override
-		}, function(settings) {	
-	});
-}
-
 function updateSettings() {
 	var cal = $('#calstyrda').val();
 	var light = $('#ljusstyrda').val();
@@ -244,7 +240,7 @@ function updateSettings() {
 		"cal":cal,
 		"light":light,
 		"manual":manual,
-		"override":override?"on":"off"
+		"override":override
 		}, function(settings) {	
 	});
 }
