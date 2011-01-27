@@ -10,7 +10,7 @@ function finishedLoaded() {
 		getSun(1)
 		});
     $('#debuglink').tap(function(){
-	getSun(1)
+		getSun(1)
     	getCalendarEntries()
     	});
      $('#settingslink').tap(function(){
@@ -18,11 +18,21 @@ function finishedLoaded() {
     	});
 
      $("#settings").change(function(){
-	updateSettings();
+		updateSettings();
+     });
+
+     $("#editgroups").change(function(){
+        gr = new Array();
+        $(this).find(':input').each(function(i) {
+     		var g = {};
+     		g.name = this.name;
+     		g.members = this.value;
+     		gr.push(g);
+     	});
+		updateGroups(gr);
      });
 
      $('#startsida').live('swipe', function(event, info){ 
-	console.log(info.direction);
         jQT.goTo($('#units'), 'slide'); 
      }); 
 }
@@ -222,6 +232,12 @@ function getSun(groupId) {
 	});
 }
 
+function updateGroups(groups) {
+	$.post($SERVICE, { "cmd":"groups",
+		"groups":JSON.stringify(groups)}, 
+		function(settings) {	
+	});	
+}
 function getSettings() {
 	$.post($SERVICE, { "cmd":"settings" }, function(settings) {	
 		$('#calstyrda').val(settings.cal);

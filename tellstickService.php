@@ -150,15 +150,18 @@ if($cmd=="list") {
                 fwrite($fh, "\n"); // For human readability
 		fclose($fh);
 	}
-} 
+} else {
+	$r = "unsupported function";
+}
+
+// END of WebService, return json_encoded string
+print_r(json_encode($r));
 
 function tdTool($params) {
   $command = "tdtool" . " " . $params;
   exec($command, $output);
   return $output;
 }
-// END of WebService, return json_encoded string
-print_r(json_encode($r));
 
 // Helper classes
 class SimpleEntry {
