@@ -10,6 +10,7 @@ function finishedLoaded() {
 		getSun(1)
 		});
     $('#debuglink').tap(function(){
+	getSun(1)
     	getCalendarEntries()
     	});
      $('#settingslink').tap(function(){
