@@ -53,21 +53,22 @@ function controlDevices($execute) {
     $lightcontrolled = explode(",", $settings->light . "");
     // Add all units controlled by light
     foreach($lightcontrolled as $u) {
+        $e = new SimpleEntry();
+        $e->type = "l";
+        $e->title = "Dusk till dawn";
+        $e->id = $u;
+        $e->startTime = $sun->nerTS;
+        $e->endTime = $sun->uppTS;
+        $e->startTimeString = $sun->down;
+        $e->endTimeString = $sun->up;
         if((!in_array($u, $on) && $sun->dark)) {
             $on[] = $u;
-            $e = new SimpleEntry();
             $e->running = true;
-            $e->type = "l";
-            $e->title = "Dusk till dawn";
-            $e->id = $u;
-            $e->startTime = $sun->nerTS;
-            $e->endTime = $sun->uppTS;
-            $e->startTimeString = $sun->down;
-            $e->endTimeString = $sun->up;
-            $rr[] = $e;
         } else if(!in_array($u, $off)) {
             $off[] = $u;
+            $e->running = false;
         }
+        $rr[] = $e;
     }
     // Add units controlled by calendar
     foreach ($eventFeed as $entry) {
