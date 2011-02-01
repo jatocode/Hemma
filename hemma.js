@@ -4,6 +4,7 @@ function finishedLoaded() {
     // Fetch list of devices at startup
     deviceData = JSON.parse(localStorage.getItem('deviceData'));
     if(deviceData != null) {
+        displayUnits();
         displayGroups();
     }
 
@@ -56,28 +57,30 @@ function queryDevices() {
         data : { "cmd":"list" },
         type: "POST",
         async: true,  // Sync o make sure we have device-data? Use local storage?
-        success: function statesResponse(data) {
-            deviceData = data;
+        success: function statesResponse(deviceData) {
             localStorage.setItem('deviceData', JSON.stringify(deviceData)); 
+            displayUnits();
             displayGroups();
-            var e = document.getElementById("enheter");
-            e.innerHTML = "";
-            for(var d in deviceData.devices) {
-                var device = deviceData.devices[d];
-                // State can be ON/OFF/DIMMED:xx
-                var checked = (device.state).toLowerCase()=="off"?"":"checked";
-                var id = deviceData.devices[d].id;
-                e.innerHTML += "<li>" +'<span class="unitid">' + id +
-                    "</span>&nbsp;" +
-                    device.name +
-                    "<span class=\"toggle\">" +
-                    "<input name=\"" + id + "\"" + 
-                    " type=\"checkbox\"" + checked + 
-                    " onClick='flipState(\"" + id + "\");'/>" +
-                    "</span></li>";
-            }
         }
     });
+}
+
+function displayUnits() {
+    $('.enheter').empty();
+    for(var d in deviceData.devices) {
+        var device = deviceData.devices[d];
+        // State can be ON/OFF/DIMMED:xx
+        var checked = (device.state).toLowerCase()=="off"?"":"checked";
+        var id = deviceData.devices[d].id;
+        $('.enheter').append("<li>" +'<span class="unitid">' + id +
+            "</span>&nbsp;" +
+            device.name +
+            "<span class=\"toggle\">" +
+            "<input name=\"" + id + "\"" + 
+            " type=\"checkbox\"" + checked + 
+            " onClick='flipState(\"" + id + "\");'/>" +
+            "</span></li>");
+    }
 }
 
 function checkDeviceCalendar() {
