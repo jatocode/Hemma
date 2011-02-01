@@ -12,34 +12,39 @@ if($cmd=="list") {
 } else if ($cmd == "on" || $cmd == "off") {
     $r = setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])), $retries);
 } else if ($cmd == "combined") {
-    $devicesOn = json_decode(stripslashes($_POST['devicesOn']));
-    $devicesOff = json_decode(stripslashes($_POST['devicesOff']));
-    $r = combined($devicesOn, $devicesOff, $retries);
+    $r = combined(json_decode(stripslashes($_POST['devicesOn'])),
+        json_decode(stripslashes($_POST['devicesOff'])), $retries);
 } else if ($cmd == "dim") {
-    dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
+    $r= dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
 } else if ($cmd == "isrunning") {
-    $execute = $_POST['execute'];
+    $r = controlDevices($_POST['execute']);
+} else if ($cmd == "sun") {
+    $r = getSun();
+} else if ($cmd == "settings") {
+    $r = getSettings();
+} else {
+    $r = "unsupported function";
+}
+
+// END of WebService, return json_encoded string
+print_r(json_encode($r));
+
+// Check witch devices that should be active according to settings
+// Execute change if execute flag is NOT explicitly set.
+function controlDevices($execute) {
     $eventFeed = getNextEvents();
     $rr = array();
     $on = array();
     $off = array();
-    // TODO duplicated code for reading settings
-    $f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
-    if($f != FALSE) {
-        $settings = json_decode($f[0]);
-        $calcontrolled = explode(",", $settings->cal . "");
-        $lightcontrolled = explode(",", $settings->light . "");
-        // TODO: Duplicated code
-        $upp = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
-        $ner = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
-        $now = time();
-        $dark = !(($now >= $upp) && ($now <= $ner));
-        foreach($lightcontrolled as $u) {
-            if((!in_array($u, $on) && $dark)) {
-                $on[] = $u;
-            } else if(!in_array($u, $off)) {
-                $off[] = $u;
-            }
+    $settings = getSettings();
+    $sun = getSun();
+    $calcontrolled = explode(",", $settings->cal . "");
+    $lightcontrolled = explode(",", $settings->light . "");
+    foreach($lightcontrolled as $u) {
+        if((!in_array($u, $on) && $sun->dark)) {
+            $on[] = $u;
+        } else if(!in_array($u, $off)) {
+            $off[] = $u;
         }
     }
     foreach ($eventFeed as $entry) {
@@ -83,21 +88,13 @@ if($cmd=="list") {
         }
         $r->execute = "PHP SWITCHED";        
     }
-    $r->calcontrolled = $settings;
-    $r->list = $rr;
     $r->off = $off;
     $r->on  = $on;
+    $r->calcontrolled = $settings;
+    $r->list = $rr;
     //      $r->result = $result;
-} else if ($cmd == "sun") {
-    $r = getSun();
-} else if ($cmd == "settings") {
-    $r = getSettings();
-} else {
-    $r = "unsupported function";
+    return $r;
 }
-
-// END of WebService, return json_encoded string
-print_r(json_encode($r));
 
 // Find all devices in system
 function listDevices() {
