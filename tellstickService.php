@@ -57,6 +57,7 @@ function controlDevices($execute) {
             $on[] = $u;
             $e = new SimpleEntry();
             $e->running = true;
+            $e->type = "l";
             $e->title = "Dusk till dawn";
             $e->id = $u;
             $e->startTime = $sun->nerTS;
@@ -76,6 +77,7 @@ function controlDevices($execute) {
             $when = $entry->when[0];
             $e = new SimpleEntry();
             $e->running = false;
+            $e->type = "c";
             $e->title = $entry->title->text;
             $e->id = $id;
             $start = strtotime($when->startTime);
@@ -224,13 +226,14 @@ function tdTool($params, $retries) {
 
 // Helper classes
 class SimpleEntry {
-        public $title;
+    public $title;
     public $id;
-        public $startTime;
-        public $endTime;
-        public $startTimeString;
-        public $endTimeString;
-        public $running;
+    public $startTime;
+    public $endTime;
+    public $startTimeString;
+    public $endTimeString;
+    public $running;
+    public $type;
 }
 
 class Devices {
