@@ -4,26 +4,36 @@ define('SETTINGS_FILENAME', "/var/state/hemma.conf");
 $cmd = strtolower($_POST['cmd']);
 $retries = 3; // Default value
 if($cmd == '') {
- // Use GET while testing new stuff
+ // Use GET while testing new stuff and for cronjob
   $cmd = strtolower($_GET['cmd']);
 }
-if($cmd=="list") {
-    $r = listDevices();
-} else if ($cmd == "on" || $cmd == "off") {
-    $r = setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])), $retries);
-} else if ($cmd == "combined") {
-    $r = combined(json_decode(stripslashes($_POST['devicesOn'])),
-        json_decode(stripslashes($_POST['devicesOff'])), $retries);
-} else if ($cmd == "dim") {
-    $r= dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
-} else if ($cmd == "isrunning") {
-    $r = controlDevices($_POST['execute']);
-} else if ($cmd == "sun") {
-    $r = getSun();
-} else if ($cmd == "settings") {
-    $r = getSettings();
-} else {
-    $r = "unsupported function";
+
+switch($cmd) {
+    case "list":
+        $r=listDevices();
+        break;
+    case "on":
+    case "off":
+        $r=setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])), $retries);
+        break;
+    case "dim":
+        $r=dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
+        break;
+    case "combined":
+        $r = combined(json_decode(stripslashes($_POST['devicesOn'])),
+            json_decode(stripslashes($_POST['devicesOff'])), $retries);
+        break;
+    case "isrunning":
+        $r = controlDevices($_POST['execute']);
+        break;
+    case "settings":
+        $r = getSettings();
+        break;
+    case "sun":
+        $r = getSun();
+        break;
+    default:
+        $r = "unsupported function";
 }
 
 // END of WebService, return json_encoded string
@@ -81,16 +91,16 @@ function controlDevices($execute) {
     }
     if(($execute != "no") && ($settings->override=="false")) {              
         foreach($on as $id) {
-            $result[] = tdTool("--on $id", $retries);       
+            $result[] = tdTool("--on $id", $settings->retries);       
         }
         foreach($off as $id) {
-            $result[] = tdTool("--off $id", $retries);      
+            $result[] = tdTool("--off $id", $settings->retries);      
         }
         $r->execute = "PHP SWITCHED";        
     }
     $r->off = $off;
     $r->on  = $on;
-    $r->calcontrolled = $settings;
+    $r->settings = $settings;
     $r->list = $rr;
     //      $r->result = $result;
     return $r;
@@ -133,10 +143,10 @@ function setDeviceState($cmd, $devices, $retries) {
 // Multiple comands on multiple devices
 function combined($onList, $offList, $retries) {
     $o = array();
-    foreach($onList as $id) {
+    foreach($offList as $id) {
         $o[] = tdTool("--off $id", $retries);
     }
-    foreach($offList as $id) {
+    foreach($onList as $id) {
         $o[] = tdTool("--on $id", $retries);
     }
     $r->result = $o;
