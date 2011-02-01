@@ -2,7 +2,6 @@ $SERVICE = "tellstickService.php";
 
 function finishedLoaded() {
     // Fetch list of devices at startup
-    //queryDevices();
     deviceData = JSON.parse(localStorage.getItem('deviceData'));
     if(deviceData != null) {
         displayGroups();
@@ -135,18 +134,18 @@ function getCalendarEntries() {
 }
 
 function createGroups() {
-        var grupp = new Object();
-        grupp.name = "F&ouml;nsterlampor";
-        grupp.members = ["1", "6"]; 
-        grupper.push(grupp);
-        grupp = new Object();
-        grupp.name = "Utebelysning";
-        grupp.members = ["3"];
-        grupper.push(grupp);
-        grupp = new Object();
-        grupp.name = "Myslys";
-        grupp.members = ["4", "5"]; 
-        grupper.push(grupp);
+    var grupp = new Object();
+    grupp.name = "F&ouml;nsterlampor";
+    grupp.members = ["1", "6"]; 
+    grupper.push(grupp);
+    grupp = new Object();
+    grupp.name = "Utebelysning";
+    grupp.members = ["3"];
+    grupper.push(grupp);
+    grupp = new Object();
+    grupp.name = "Myslys";
+    grupp.members = ["4", "5"]; 
+    grupper.push(grupp);
 }
 
 function displayGroups() {

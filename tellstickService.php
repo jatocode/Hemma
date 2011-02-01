@@ -14,7 +14,8 @@ switch($cmd) {
         break;
     case "on":
     case "off":
-        $r=setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])), $retries);
+        $r=setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])), 
+            $retries);
         break;
     case "dim":
         $r=dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
@@ -54,6 +55,15 @@ function controlDevices($execute) {
     foreach($lightcontrolled as $u) {
         if((!in_array($u, $on) && $sun->dark)) {
             $on[] = $u;
+            $e = new SimpleEntry();
+            $e->running = true;
+            $e->title = "Dusk till dawn";
+            $e->id = $u;
+            $e->startTime = $sun->nerTS;
+            $e->endTime = $sun->uppTS;
+            $e->startTimeString = $sun->down;
+            $e->endTimeString = $sun->up;
+            $rr[] = $e;
         } else if(!in_array($u, $off)) {
             $off[] = $u;
         }
