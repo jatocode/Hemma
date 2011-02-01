@@ -50,6 +50,7 @@ function controlDevices($execute) {
     $sun = getSun();
     $calcontrolled = explode(",", $settings->cal . "");
     $lightcontrolled = explode(",", $settings->light . "");
+    // Add all units controlled by light
     foreach($lightcontrolled as $u) {
         if((!in_array($u, $on) && $sun->dark)) {
             $on[] = $u;
@@ -57,6 +58,7 @@ function controlDevices($execute) {
             $off[] = $u;
         }
     }
+    // Add units controlled by calendar
     foreach ($eventFeed as $entry) {
         // TODO: idList or groups?
         $idList = explode(",", $entry->where[0] . "");
