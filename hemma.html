@@ -17,7 +17,7 @@
 	var jQT = $.jQTouch({icon: 'icon.png', startupScreen: 'startup.png'});
 	// Run finishedLoaded when DOM is ready
 	var grupper = new Array();
-	var deviceData = null;
+        var deviceData = null;
 	createGroups(); // TODO Better way to create groups
 	$(finishedLoaded);
 </script>
@@ -39,7 +39,7 @@
 	
 	<ul class="edit rounded">
 	<li>
-    	<a href="#units" class="dissolve">Enheter</a>
+    	<a href="#units" id="unitslink" class="dissolve">Enheter</a>
   	</li>
   	<li>
     	<a href="#editgroups" class="flip">Grupper</a>
@@ -51,13 +51,8 @@
     	<a href="#settings" id="settingslink">Inst&auml;llningar</a>
   	</li>
   	</ul>
-	<h2>Utetemperatur</h2>
+	<h2>Debug/test</h2>
 	<ul class="individual">
-  	<li>
-    	<!-- Temperatur fr¬n temperatur.nu -->
-    	<script type="text/javascript" src="http://www.temperatur.nu/jsdata.php?t=static&amp;s=hammaro">
-    	</script>
-  	</li>
   	<li>
     	<a href="#testsida" id="debuglink">Debug</a>
   	</li>
@@ -138,10 +133,10 @@
 		<h1>Debug/test</h1>
 		<a class="button back" href="#">Hem</a>
 	</div>
-	<h2>Solen</h2>
+	<h2>Utomhus</h2>
 	<ul class="edit rounded">
-		<div id="solen"> 
-	</div>
+            <div id="solen"> 
+            </div>
 	</ul>
 	<h2>Debug and testinfo</h2>
         <br/>

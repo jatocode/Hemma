@@ -2,7 +2,15 @@ $SERVICE = "tellstickService.php";
 
 function finishedLoaded() {
     // Fetch list of devices at startup
-    queryDevices();
+    //queryDevices();
+    deviceData = JSON.parse(localStorage.getItem('deviceData'));
+    if(deviceData != null) {
+        displayGroups();
+    }
+
+    $('#unitslink').tap(function() {
+            queryDevices();
+            });
 
     $('#calendarlink').tap(function() {
             getCalendarEntries();
@@ -51,8 +59,8 @@ function queryDevices() {
         async: true,  // Sync o make sure we have device-data? Use local storage?
         success: function statesResponse(data) {
             deviceData = data;
+            localStorage.setItem('deviceData', JSON.stringify(deviceData)); 
             displayGroups();
-            //getSun(1);
             var e = document.getElementById("enheter");
             e.innerHTML = "";
             for(var d in deviceData.devices) {

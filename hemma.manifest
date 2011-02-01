@@ -1,16 +1,14 @@
 CACHE MANIFEST
-#Version 1.2.62
+#Version 1.3.11
 
 NETWORK:
-/i/hemma.hmtl
-/i/hemma.js
 /i/tellstickService.php
 tellstickService.php
 http://www.temperatur.nu/jsdata.php
-hemma.hmtl
-hemma.js
 
 CACHE:
+hemma.html
+hemma.js
 /i/themes/apple/img/pinstripes.png
 /i/themes/apple/img/toolButton.png
 /i/themes/apple/img/backButton.png
