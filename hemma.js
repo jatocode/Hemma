@@ -7,6 +7,7 @@ function finishedLoaded() {
         displayUnits();
         displayGroups();
     }
+    displayAutomaticEvents();
 
     $('#unitslink').tap(function() {
             queryDevices();
@@ -111,39 +112,48 @@ function checkDeviceCalendar() {
 function getCalendarEntries() {
     $.post($SERVICE, { "cmd":"isrunning", "execute":"no" }, 
         function statesResponse(entries) {      
-            $('.kalenderinfo').empty();
             // First draw the array for a quick response
-            for(var d in entries.list) {
-                var r ="";
-                e = entries.list[d];
-                startTime = new Date();
-                startTime.setTime(e.startTime * 1000);
-                endTime = new Date();
-                endTime.setTime(e.endTime * 1000);
-                
-                if(e.running==true) {
-                    r='<img src="icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
-                    if(e.type == "l") {
-                        r+='<img src="sun_icon.png" width="20" height="20" alt="sun"/>';
-                    } else if(e.type == "c") {
-                        r+='<img src="cal_icon.gif" width="20" height="20" alt="cal"/>';
-                    }
-                }
-
-                startTimeString = dateFormatter(startTime, "dd/m hh:nn");
-                endTimeString = dateFormatter(endTime, "hh:nn");
-
-                $('.kalenderinfo').append('<li><small>' + r + '</small>' + 
-                    findDeviceById(e.id).name + 
-                    '<br/><em>&nbsp;' + startTimeString + "->" + 
-                        endTimeString + '</em></li>');
-            }
+            localStorage.setItem('automatic', JSON.stringify(entries));
+            displayAutomaticEvents();
             // Talk to the hardware
             o = $("#override").is(':checked');
             if(o == false) {
                 sendCombined(entries.on, entries.off);
             }
     });
+}
+
+function displayAutomaticEvents() {
+    entries = JSON.parse(localStorage.getItem('automatic'));
+    if(entries == null) {
+        return;
+    }
+    $('.kalenderinfo').empty();
+    for(var d in entries.list) {
+        var r ="";
+        e = entries.list[d];
+        startTime = new Date();
+        startTime.setTime(e.startTime * 1000);
+        endTime = new Date();
+        endTime.setTime(e.endTime * 1000);
+        
+        if(e.running==true) {
+            r='<img src="icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
+            if(e.type == "l") {
+                r+='<img src="sun_icon.png" width="20" height="20" alt="sun"/>';
+            } else if(e.type == "c") {
+                r+='<img src="cal_icon.gif" width="20" height="20" alt="cal"/>';
+            }
+        }
+
+        startTimeString = dateFormatter(startTime, "dd/m hh:nn");
+        endTimeString = dateFormatter(endTime, "hh:nn");
+
+        $('.kalenderinfo').append('<li><small>' + r + '</small>' + 
+            findDeviceById(e.id).name + 
+            '<br/><em>&nbsp;' + startTimeString + "->" + 
+            endTimeString + '</em></li>');
+    }
 }
 
 function createGroups() {
