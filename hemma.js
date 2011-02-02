@@ -22,7 +22,6 @@ function finishedLoaded() {
 
     $('#debuglink').tap(function(){
             getSun(1);
-            getCalendarEntries()
             });
 
     $('#settingslink').tap(function(){
@@ -45,8 +44,14 @@ function finishedLoaded() {
             });
 
     $('#startsida').live('swipe', function(event, info){ 
-            jQT.goTo($('#units'), 'slide'); 
-            }); 
+            if(info.direction == "left") {
+                jQT.goTo($('#units'), 'slide'); 
+            } else if(info.direction == "right") {
+                //jQT.goTo($('#testsida'), 'slide');
+                //getSun(1);
+                //getCalendarEntries();
+            }
+        }); 
 }
 
 
