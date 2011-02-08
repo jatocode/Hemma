@@ -1,30 +1,28 @@
 CACHE MANIFEST
-#Version 1.4.1
+#Version 1.4.2
 
 NETWORK:
-/i/tellstickService.php
 tellstickService.php
 http://www.temperatur.nu/jsdata.php
 
 CACHE:
 index.html
 hemma.js
-/i/themes/apple/img/pinstripes.png
-/i/themes/apple/img/toolButton.png
-/i/themes/apple/img/backButton.png
-/i/themes/apple/img/whiteButton.png
-/i/themes/apple/img/grayButton.png
-/i/themes/apple/img/toolbar.png
-/i/themes/apple/img/on_off.png
-/i/themes/apple/img/selection.png
-/i/themes/apple/img/chevron.png
-/i/themes/apple/theme.min.css
-/i/jqtouch/jqtouch.min.js
-/i/js/jquery-1.4.4.min.js
-/i/jqtouch/jqtouch.min.css
-/i/extensions/jqt.offline.js
-/i/extensions/jqt.location.js
-/favicon.ico
+themes/apple/img/pinstripes.png
+themes/apple/img/toolButton.png
+themes/apple/img/backButton.png
+themes/apple/img/whiteButton.png
+themes/apple/img/grayButton.png
+themes/apple/img/toolbar.png
+themes/apple/img/on_off.png
+themes/apple/img/selection.png
+themes/apple/img/chevron.png
+themes/apple/theme.min.css
+jqtouch/jqtouch.min.js
+js/jquery-1.4.4.min.js
+jqtouch/jqtouch.min.css
+extensions/jqt.offline.js
+extensions/jqt.location.js
 icon_lightbulb48.jpg
 cal_icon.gif
 sun_icon.png
