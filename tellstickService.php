@@ -2,7 +2,7 @@
 header('Content-type: application/json');
 define('SETTINGS_FILENAME', "/var/state/hemma.conf");
 $cmd = strtolower($_POST['cmd']);
-$retries = 3; // Default value
+$retries = 1; // Default value
 if($cmd == '') {
  // Use GET while testing new stuff and for cronjob
   $cmd = strtolower($_GET['cmd']);

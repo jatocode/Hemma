@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#Version 1.3.28
+#Version 1.4.1
 
 NETWORK:
 /i/tellstickService.php
@@ -7,7 +7,7 @@ tellstickService.php
 http://www.temperatur.nu/jsdata.php
 
 CACHE:
-hemma.html
+index.html
 hemma.js
 /i/themes/apple/img/pinstripes.png
 /i/themes/apple/img/toolButton.png
@@ -29,5 +29,3 @@ icon_lightbulb48.jpg
 cal_icon.gif
 sun_icon.png
 css/hemma.css
-
-
