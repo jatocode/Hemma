@@ -53,6 +53,10 @@ function finishedLoaded() {
                 //getCalendarEntries();
             }
         }); 
+
+    $('#startsida').ajaxError(function() {
+        alert("Ajax request failed");
+        });
 }
 
 

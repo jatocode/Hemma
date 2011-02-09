@@ -1,9 +1,8 @@
 CACHE MANIFEST
-#Version 1.4.3
+#Version 1.4.4
 
 NETWORK:
 tellstickService.php
-http://www.temperatur.nu/jsdata.php
 
 CACHE:
 index.html

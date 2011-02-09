@@ -2,12 +2,11 @@
 header('Content-type: application/json');
 define('SETTINGS_FILENAME', "/var/state/hemma.conf");
 $cmd = strtolower($_POST['cmd']);
-$retries = 1; // Default value
 if($cmd == '') {
  // Use GET while testing new stuff and for cronjob
   $cmd = strtolower($_GET['cmd']);
 }
-
+$settings = getSettings();
 switch($cmd) {
     case "list":
         $r=listDevices();
@@ -15,14 +14,14 @@ switch($cmd) {
     case "on":
     case "off":
         $r=setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])), 
-            $retries);
+            $settings->retries);
         break;
     case "dim":
         $r=dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
         break;
     case "combined":
         $r = combined(json_decode(stripslashes($_POST['devicesOn'])),
-            json_decode(stripslashes($_POST['devicesOff'])), $retries);
+            json_decode(stripslashes($_POST['devicesOff'])), $settings->retries);
         break;
     case "isrunning":
         $r = controlDevices($_POST['execute']);
