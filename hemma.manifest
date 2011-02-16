@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#Version 1.4.4
+#Version 1.5.0
 
 NETWORK:
 tellstickService.php
@@ -7,21 +7,21 @@ tellstickService.php
 CACHE:
 index.html
 hemma.js
-themes/apple/img/pinstripes.png
-themes/apple/img/toolButton.png
-themes/apple/img/backButton.png
-themes/apple/img/whiteButton.png
-themes/apple/img/grayButton.png
-themes/apple/img/toolbar.png
-themes/apple/img/on_off.png
-themes/apple/img/selection.png
-themes/apple/img/chevron.png
-themes/apple/theme.min.css
-jqtouch/jqtouch.min.js
-js/jquery-1.4.4.min.js
-jqtouch/jqtouch.min.css
-extensions/jqt.offline.js
-extensions/jqt.location.js
+/javascript-common/jqtouch/themes/apple/img/pinstripes.png
+/javascript-common/jqtouch/themes/apple/img/toolButton.png
+/javascript-common/jqtouch/themes/apple/img/backButton.png
+/javascript-common/jqtouch/themes/apple/img/whiteButton.png
+/javascript-common/jqtouch/themes/apple/img/grayButton.png
+/javascript-common/jqtouch/themes/apple/img/toolbar.png
+/javascript-common/jqtouch/themes/apple/img/on_off.png
+/javascript-common/jqtouch/themes/apple/img/selection.png
+/javascript-common/jqtouch/themes/apple/img/chevron.png
+/javascript-common/jqtouch/themes/apple/theme.min.css
+/javascript-common/jqtouch/jqtouch/jqtouch.min.js
+/javascript-common/jqtouch/js/jquery.min.js
+/javascript-common/jqtouch/jqtouch/jqtouch.min.css
+/javascript-common/jqtouch/extensions/jqt.offline.js
+/javascript-common/jqtouch/extensions/jqt.location.js
 icon_lightbulb48.jpg
 cal_icon.gif
 sun_icon.png
