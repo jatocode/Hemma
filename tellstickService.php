@@ -1,6 +1,7 @@
 <?php
 header('Content-type: application/json');
 define('SETTINGS_FILENAME', "/var/state/hemma.conf");
+define('GOOGLE_SETTINGS_FILENAME', "/var/state/hemma-google.conf");
 $cmd = strtolower($_POST['cmd']);
 if($cmd == '') {
  // Use GET while testing new stuff and for cronjob
@@ -195,6 +196,16 @@ function getSettings() {
     return $r;
 }
 
+function getGoogleSettings() {
+    $f = file(GOOGLE_SETTINGS_FILENAME);
+    if($f != FALSE) {
+        $g->user = $f[0]; // Row 1: Username
+        $g->pass = $f[1]; // Row 2: passwd
+        $g->calendar = $f[2]; // Row 3: calendar address
+    }
+    return $g;
+}
+
 function dimDevice($devices, $power) {
     $o = array();
     foreach($devices as $id) {
@@ -247,32 +258,31 @@ class Device {
 }
 
 // Calendar helper functions
-function createCalendarService() {
+function createCalendarService($user, $pass) {
     require_once('Zend/Loader.php');  
     $classes = array('Zend_Gdata','Zend_Gdata_Query','Zend_Gdata_ClientLogin','Zend_Gdata_Calendar');  
     foreach($classes as $class) {  
         Zend_Loader::loadClass($class);  
     }  
     $calService = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
-    $user = "tobias.jansson@gmail.com";
-    $pass = "pio535neer";
     $client = Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $calService);
     $calService = new Zend_Gdata_Calendar($client); 
 
     return $calService;
 }
 
-function createCalendarQuery($service) {
+function createCalendarQuery($service, $calendar) {
     $query = $service->newEventQuery();
-    $query->setUser('8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com');
+    $query->setUser($calendar);
     $query->setVisibility('public');
     $query->setProjection('full');
     return $query;
 }
 
 function getNextEvents() {
-    $calService = createCalendarService();
-    $query = createCalendarQuery($calService);
+    $google = getGoogleSettings();
+    $calService = createCalendarService(trim($google->user), trim($google->pass));
+    $query = createCalendarQuery($calService, trim($google->calendar));
 
     $query->setOrderby('starttime');
 
