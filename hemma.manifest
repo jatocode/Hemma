@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#Version 1.5.6
+#Version 1.6.0
 
 NETWORK:
 tellstickService.php
@@ -7,7 +7,17 @@ tellstickService.php
 CACHE:
 index.html
 hemma.js
+img/icon_lightbulb48.jpg
+img/cal_icon.gif
+img/sun_icon.png
+css/hemma.css
+
+## javascript libraries
 /javascript-common/jquery/jquery.min.js
+
+#jqtouch
+/javascript-common/jqtouch/jqtouch.min.js
+/javascript-common/jqtouch/jqtouch.min.css
 /javascript-common/jqtouch/themes/apple/img/pinstripes.png
 /javascript-common/jqtouch/themes/apple/img/toolButton.png
 /javascript-common/jqtouch/themes/apple/img/backButton.png
@@ -18,11 +28,6 @@ hemma.js
 /javascript-common/jqtouch/themes/apple/img/selection.png
 /javascript-common/jqtouch/themes/apple/img/chevron.png
 /javascript-common/jqtouch/themes/apple/theme.min.css
-/javascript-common/jqtouch/jqtouch.min.js
-/javascript-common/jqtouch/jqtouch.min.css
+#jqtouch extensions
 /javascript-common/jqtouch/extensions/jqt.offline.js
 /javascript-common/jqtouch/extensions/jqt.location.js
-icon_lightbulb48.jpg
-cal_icon.gif
-sun_icon.png
-css/hemma.css

@@ -142,11 +142,11 @@ function displayAutomaticEvents() {
         endTime.setTime(e.endTime * 1000);
         
         if(e.running==true) {
-            r='<img src="icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
+            r='<img src="img/icon_lightbulb48.jpg" width="20" height="20" alt="on"/>';
             if(e.type == "l") {
-                r+='<img src="sun_icon.png" width="20" height="20" alt="sun"/>';
+                r+='<img src="img/sun_icon.png" width="20" height="20" alt="sun"/>';
             } else if(e.type == "c") {
-                r+='<img src="cal_icon.gif" width="20" height="20" alt="cal"/>';
+                r+='<img src="img/cal_icon.gif" width="20" height="20" alt="cal"/>';
             }
         }
 
