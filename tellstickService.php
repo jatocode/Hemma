@@ -40,7 +40,7 @@ switch($cmd) {
 // END of WebService, return json_encoded string
 print_r(json_encode($r));
 
-// Check witch devices that should be active according to settings
+// Check which devices that should be active according to settings
 // Execute change if execute flag is NOT explicitly set.
 function controlDevices($execute) {
     $eventFeed = getNextEvents();
