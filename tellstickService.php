@@ -80,6 +80,20 @@ function controlDevices($execute) {
             $e->running = false;
             $e->type = "c";
             $e->title = $entry->title->text;
+            $e->content = $entry->content->text;
+            $e->conditional = true;
+            if (preg_match("/Villkor:(.*)/", $e->content, $matches)) {
+                  $condition = trim($matches[1]);
+                  switch($condition) {
+                      case "ljus":
+                        if(!$sun->dark) {
+                            $e->conditional = false;
+                        }
+                        break;
+                      default:
+                        break;
+                    }
+            }
             $e->id = $id;
             $start = strtotime($when->startTime);
             $end = strtotime($when->endTime);
@@ -87,7 +101,7 @@ function controlDevices($execute) {
             $e->endTime = $end;
             $now = time();
             if(in_array($id, $calcontrolled)) {     
-                if(($now >= $start) && ($now <= $end)) {   
+                if(($now >= $start) && ($now <= $end) && ($e->conditional)) {   
                     $e->running = true;
                     if(!in_array($id, $on)) {
                         $on[] = $id;
