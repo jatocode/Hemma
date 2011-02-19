@@ -178,6 +178,7 @@ function createGroups() {
 function displayGroups() {
         var txt = document.getElementById("grupper");
         txt.innerHTML = "";
+        $('.gruppinfo').empty();
         for(var g in grupper) {
                 name = grupper[g].name;
                 idList = grupper[g].members;
