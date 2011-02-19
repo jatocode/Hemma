@@ -128,6 +128,7 @@ function checkConditions($content) {
         $condition = trim($matches[1]);
         switch($condition) {
             case "ljus":
+                $sun = getSun();
                 if(!$sun->dark) {
                     return false;
                 }
