@@ -81,19 +81,7 @@ function controlDevices($execute) {
             $e->type = "c";
             $e->title = $entry->title->text;
             $e->content = $entry->content->text;
-            $e->conditional = true;
-            if (preg_match("/Villkor:(.*)/", $e->content, $matches)) {
-                  $condition = trim($matches[1]);
-                  switch($condition) {
-                      case "ljus":
-                        if(!$sun->dark) {
-                            $e->conditional = false;
-                        }
-                        break;
-                      default:
-                        break;
-                    }
-            }
+            $e->conditional = checkConditions($e->content);;
             $e->id = $id;
             $start = strtotime($when->startTime);
             $end = strtotime($when->endTime);
@@ -133,6 +121,22 @@ function controlDevices($execute) {
     $r->list = $rr;
     //      $r->result = $result;
     return $r;
+}
+
+function checkConditions($content) {
+    if (preg_match("/Villkor:(.*)/", $e->content, $matches)) {
+        $condition = trim($matches[1]);
+        switch($condition) {
+            case "ljus":
+                if(!$sun->dark) {
+                    return false;
+                }
+            break;
+            default:
+            break;
+        }
+    }
+    return true;
 }
 
 // Find all devices in system
@@ -262,13 +266,13 @@ class SimpleEntry {
 }
 
 class Devices {
-        public $numDev;
-        public $devices;
+    public $numDev;
+    public $devices;
 }
 class Device {
-        public $id;
-        public $name;
-        public $state;
+    public $id;
+    public $name;
+    public $state;
 }
 
 // Calendar helper functions
