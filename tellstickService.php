@@ -88,17 +88,15 @@ function controlDevices($execute) {
             $e->startTime = $start;
             $e->endTime = $end;
             $now = time();
-            if(in_array($id, $calcontrolled)) {     
-                if(($now >= $start) && ($now <= $end) && ($e->conditional)) {   
-                    $e->running = true;
-                    if(!in_array($id, $on)) {
-                        $on[] = $id;
-                    }
-                } else  {
-                    // Future events will not affect running.
-                    if( (!in_array($id, $on)) && (!in_array($id, $off))) {
-                        $off[] = $id;
-                    }
+            if(($now >= $start) && ($now <= $end) && ($e->conditional)) {   
+                $e->running = true;
+                if(!in_array($id, $on)) {
+                    $on[] = $id;
+                }
+            } else  {
+                // Future events will not affect running.
+                if( (!in_array($id, $on)) && (!in_array($id, $off))) {
+                    $off[] = $id;
                 }
             }
             $e->startTimeString = date("Ymd, H:i", $start);
