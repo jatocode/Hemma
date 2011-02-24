@@ -67,8 +67,9 @@ function queryDevices() {
         data : { "cmd":"list" },
         type: "POST",
         async: true,  // Sync o make sure we have device-data? Use local storage?
-        success: function statesResponse(deviceData) {
-            localStorage.setItem('deviceData', JSON.stringify(deviceData)); 
+        success: function statesResponse(data) {
+            localStorage.setItem('deviceData', JSON.stringify(data)); 
+            deviceData = data;
             displayUnits();
             displayGroups();
         }
