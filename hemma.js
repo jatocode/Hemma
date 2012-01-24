@@ -293,7 +293,8 @@ function getSettings() {
             $('#ljusstyrda').val(settings.light);
             $('#manuelltstyrda').val(settings.manual);
             $('#retries').val(settings.retries);
-            $("#override").checked = settings.override;
+            var override = (settings.override == "true");
+            $("#override").prop("checked", override);
     });
 }
 
