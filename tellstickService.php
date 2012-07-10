@@ -146,6 +146,9 @@ function listDevices() {
     $r = new Devices();
     $r->devices = array();
     foreach($out as $line) {
+        if(strlen($line) < 5) {
+           continue; // Sanity check
+        }
         if($i++ == 0) {
             // First line is number of devices
             $r->numDev = explode(":", $line);
