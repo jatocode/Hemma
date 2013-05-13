@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>
+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<!-- Le styles -->
+<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+<link href="flatui/css/flat-ui.css" rel="stylesheet">
+<link href="flat.css" rel="stylesheet">
+<style>
+body { padding-top: 60px; /* 60px to make the container go all the way
+                             to the bottom of the topbar */ }
+</style>
+<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+<!-- Le fav and touch icons -->
+<link rel="shortcut icon" href="bootstrap/ico/favicon.ico">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="bootstrap/ico/apple-touch-icon-144-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="bootstrap/ico/apple-touch-icon-114-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="bootstrap/ico/apple-touch-icon-72-precomposed.png">
+<link rel="apple-touch-icon-precomposed" href="bootstrap/ico/apple-touch-icon-57-precomposed.png">
+<style>
+</style>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+</head>
+<body>
+<div class="container-fluid">
+     <div class="navbar navbar-inverse">
+        <div class="navbar-inner">
+            <ul class="nav ">
+            <li class="active">
+                <a href="#">Garage</a>
+            </li>
+            <li>
+            <a href="#">Nexa</a>
+                    <ul>
+                        <li><a href="nexa.html">Enheter</a></li>
+                        <li><a href="#">Timers</a></li>
+                        <li><a href="#">Inställningar</a></li>
+                    </ul> <!-- /Sub menu -->
+                    </li>
+            </li>
+            <li>
+            <a href="kamera.html">Kamera</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="knapp"><a class="btn btn-large btn-success" id="motor" onclick="runMotor();">Garageportmotor<br></a></div>
+<hr/>
+<div class="alert alert-success" id="garageport"><h3>Garageporten</h3><p class="">Stängd</p></div>
+<div class="alert alert-success" id="innerdoor"><h3>Innerdörren</h3><p>Öppen</p></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
+</script>
+<script src="bootstrap/js/bootstrap.js">
+</script>
+<script src="http://garagepi.helentobias.se/socket.io/socket.io.js"></script>
+<script src="motordoor.js"></script>
+<script type="text/javascript">
+var socket;
+$(document).ready(function () {
+    stayInWebApp();
+    checkDoors();
+    socket = io.connect('http://garagepi.helentobias.se');
+    socket.on('status', function(msg){statusReceived(msg)});
+});
+</script>
+</body>
+</html>
