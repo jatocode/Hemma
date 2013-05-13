@@ -1,6 +1,7 @@
 <?php
 header('Content-type: application/json');
 define('SETTINGS_FILENAME', "/var/state/hemma.conf");
+define('LOG_FILENAME', "/var/log/hemma/hemma.log");
 define('GOOGLE_SETTINGS_FILENAME', "/var/state/hemma-google.conf");
 $cmd = strtolower($_POST['cmd']);
 if($cmd == '') {
@@ -8,6 +9,8 @@ if($cmd == '') {
   $cmd = strtolower($_GET['cmd']);
 }
 $settings = getSettings();
+date_default_timezone_set("Europe/Stockholm");
+
 switch($cmd) {
     case "list":
         $r=listDevices();
@@ -52,6 +55,10 @@ function controlDevices($execute) {
     $calcontrolled = explode(",", $settings->cal . "");
     $lightcontrolled = explode(",", $settings->light . "");
     // Add all units controlled by light
+    $timestamp = date('d/m/Y H:i:s');
+     
+    $message = "";
+
     foreach($lightcontrolled as $u) {
         $e = new SimpleEntry();
         $e->type = "l";
@@ -62,12 +69,15 @@ function controlDevices($execute) {
         $e->startTimeString = $sun->down;
         $e->endTimeString = $sun->up;
         if((!in_array($u, $on) && $sun->dark)) {
+            $message = "Turning on " . $u . " because of sun";
             $on[] = $u;
             $e->running = true;
         } else if(!in_array($u, $off)) {
+            $message = "Turning off " . $u . " because of sun";
             $off[] = $u;
             $e->running = false;
         }
+        error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
         $rr[] = $e;
     }
     // Add units controlled by calendar
@@ -81,7 +91,7 @@ function controlDevices($execute) {
             $e->type = "c";
             $e->title = $entry->title->text;
             $e->content = $entry->content->text;
-            $e->conditional = checkConditions($e->content);;
+            $e->conditional = checkConditions($e);
             $e->id = $id;
             $start = strtotime($when->startTime);
             $end = strtotime($when->endTime);
@@ -93,11 +103,15 @@ function controlDevices($execute) {
                     $e->running = true;
                     if(!in_array($id, $on)) {
                         $on[] = $id;
+                        $message = "Turning on " . $id . " because of calendar";
+                        error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
                     }
                 } else  {
                     // Future events will not affect running.
                     if( (!in_array($id, $on)) && (!in_array($id, $off))) {
                         $off[] = $id;
+                        $message = "Turning off " . $id . " because of calendar";
+                        error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
                     }
                 }
             }
@@ -107,10 +121,15 @@ function controlDevices($execute) {
         }
     }
     if(($execute != "no") && ($settings->override=="false")) {              
+
         foreach($on as $id) {
+        //$message = "Sending on with tdtool to: " . $id;
+        //error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
             $result[] = tdTool("--on $id", $settings->retries);       
         }
         foreach($off as $id) {
+        //$message = "Sending off with tdtool to: " . $id;
+        //error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
             $result[] = tdTool("--off $id", $settings->retries);      
         }
         $r->execute = "PHP SWITCHED";        
@@ -124,7 +143,7 @@ function controlDevices($execute) {
 }
 
 function checkConditions($content) {
-    if (preg_match("/Villkor:(.*)/", $e->content, $matches)) {
+    if (preg_match("/Villkor:(.*)/", $content, $matches)) {
         $condition = trim($matches[1]);
         switch($condition) {
             case "ljus":
@@ -141,10 +160,13 @@ function checkConditions($content) {
 
 // Find all devices in system
 function listDevices() {
+    global $settings;
     $out = tdTool("--list", 1);
     $i = 0;
     $r = new Devices();
     $r->devices = array();
+    $calcontrolled = explode(",", $settings->cal . "");
+    $lightcontrolled = explode(",", $settings->light . "");
     foreach($out as $line) {
         if(strlen($line) < 5) {
            continue; // Sanity check
@@ -159,6 +181,11 @@ function listDevices() {
             $d->name = $oo[1];
             // State can be ON/OFF/DIMMED:xx
             $d->state = $oo[2];
+            if(in_array($d->id, $calcontrolled) || in_array($d->id, $lightcontrolled)) {
+                $d->auto = "AUTO";
+            } else {
+                $d->auto = $settings->cal;
+            }
             $r->devices[] = $d;
         }
     }
@@ -169,6 +196,9 @@ function listDevices() {
 function setDeviceState($cmd, $devices, $retries) {
     $o = array();
     foreach($devices as $id) {
+        $timestamp = date('d/m/Y H:i:s');
+        $message = "Setting device state to " . $cmd . " for: " . $id;
+        error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
         $o[] = tdTool("--$cmd $id", $retries);
     }
     $r->result = $o;
@@ -180,9 +210,15 @@ function setDeviceState($cmd, $devices, $retries) {
 function combined($onList, $offList, $retries) {
     $o = array();
     foreach($offList as $id) {
+        $timestamp = date('d/m/Y H:i:s');
+        $message = "Setting combined state to on for: " . $id;
+        error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
         $o[] = tdTool("--off $id", $retries);
     }
     foreach($onList as $id) {
+        $timestamp = date('d/m/Y H:i:s');
+        $message = "Setting combined state to off for: " . $id;
+        error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
         $o[] = tdTool("--on $id", $retries);
     }
     $r->result = $o;

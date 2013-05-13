@@ -57,6 +57,14 @@ function finishedLoaded() {
     $('#startsida').ajaxError(function() {
         alert("Ajax request failed");
         });
+
+    // iOS6 Cache workaround
+    $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+            // you can use originalOptions.type || options.type to restrict specific type of requests
+                options.data = jQuery.param($.extend(originalOptions.data||{}, { 
+                          timeStamp: new Date().getTime()
+                              }));
+    });
 }
 
 
