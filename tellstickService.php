@@ -3,7 +3,11 @@ header('Content-type: application/json');
 define('SETTINGS_FILENAME', "/var/state/hemma.conf");
 define('LOG_FILENAME', "/var/log/hemma/hemma.log");
 define('GOOGLE_SETTINGS_FILENAME', "/var/state/hemma-google.conf");
-$cmd = strtolower($_POST['cmd']);
+
+$cmd = '';
+if(isset($_POST['cmd'])) {
+  $cmd = strtolower($_POST['cmd']);
+}
 if($cmd == '') {
  // Use GET while testing new stuff and for cronjob
   $cmd = strtolower($_GET['cmd']);
@@ -28,7 +32,11 @@ switch($cmd) {
             json_decode(stripslashes($_POST['devicesOff'])), $settings->retries);
         break;
     case "isrunning":
-        $r = controlDevices($_POST['execute']);
+	if(isset($_POST['execute'])) {
+          $r = controlDevices($_POST['execute']);
+	} else {
+	  $r = '';
+	}	
         break;
     case "settings":
         $r = getSettings();
@@ -46,6 +54,7 @@ print_r(json_encode($r));
 // Check which devices that should be active according to settings
 // Execute change if execute flag is NOT explicitly set.
 function controlDevices($execute) {
+    $r = new StdClass();
     $eventFeed = getNextEvents();
     $rr = array();
     $on = array();
@@ -91,7 +100,7 @@ function controlDevices($execute) {
             $e->type = "c";
             $e->title = $entry->title->text;
             $e->content = $entry->content->text;
-            $e->conditional = checkConditions($e);
+            $e->conditional = checkConditions($e->content);
             $e->id = $id;
             $start = strtotime($when->startTime);
             $end = strtotime($when->endTime);
@@ -181,10 +190,12 @@ function listDevices() {
             $d->name = $oo[1];
             // State can be ON/OFF/DIMMED:xx
             $d->state = $oo[2];
-            if(in_array($d->id, $calcontrolled) || in_array($d->id, $lightcontrolled)) {
-                $d->auto = "AUTO";
+            if(in_array($d->id, $calcontrolled)) {
+                $d->auto = "calendar";
+            } else if(in_array($d->id, $lightcontrolled)) {
+                $d->auto = "light";
             } else {
-                $d->auto = $settings->cal;
+                $d->auto = "manual";
             }
             $r->devices[] = $d;
         }
@@ -194,6 +205,7 @@ function listDevices() {
 
 // Turn on or off specified list of devices
 function setDeviceState($cmd, $devices, $retries) {
+    $r = new StdClass();
     $o = array();
     foreach($devices as $id) {
         $timestamp = date('d/m/Y H:i:s');
@@ -209,6 +221,7 @@ function setDeviceState($cmd, $devices, $retries) {
 // Multiple comands on multiple devices
 function combined($onList, $offList, $retries) {
     $o = array();
+    $r = new StdClass();
     foreach($offList as $id) {
         $timestamp = date('d/m/Y H:i:s');
         $message = "Setting combined state to on for: " . $id;
@@ -227,11 +240,15 @@ function combined($onList, $offList, $retries) {
 }
 
 function getSettings() {
-    $cal = $_POST['cal'];   
-    $light = $_POST['light'];       
-    $manual = $_POST['manual'];     
-    $override = $_POST['override']; 
-    $retries = $_POST['retries']; 
+    if(isset($_POST['cal'])) {
+      $cal = $_POST['cal'];   
+      $light = $_POST['light'];       
+      $manual = $_POST['manual'];     
+      $override = $_POST['override']; 
+      $retries = $_POST['retries']; 
+    } else {
+  	$cal = $light = $manual = $override = $retries = null;
+    }
 
     $f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
     if($f != FALSE) {
@@ -255,6 +272,7 @@ function getSettings() {
 
 function getGoogleSettings() {
     $f = file(GOOGLE_SETTINGS_FILENAME);
+    $g = new StdClass();
     if($f != FALSE) {
         $g->user = $f[0]; // Row 1: Username
         $g->pass = $f[1]; // Row 2: passwd
@@ -272,6 +290,7 @@ function dimDevice($devices, $power) {
 }
 
 function getSun() {
+    $r = new StdClass();
     $r->up = date_sunrise(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
     $r->down = date_sunset(time(), SUNFUNCS_RET_STRING, 59.33, 13.50, 94, 1);
     $upp = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, 59.33, 13.50, 94, 1);
@@ -347,7 +366,7 @@ function getNextEvents() {
     $query->setSingleEvents(true);
     $query->setFutureEvents(true);
     $query->setMaxResults(5);       
-    $query->setSortOrder(a);
+    $query->setSortOrder('a');
     return $calService->getCalendarEventFeed($query);       
 }
 
