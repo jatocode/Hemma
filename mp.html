@@ -1,0 +1,85 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+        <title>Hemma</title> 
+        <!-- Le styles -->
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+        <link href="flatui/css/flat-ui.css" rel="stylesheet">
+        <link href="flat.css" rel="stylesheet">
+        <style>
+            body { padding-top: 60px; /* 60px to make the container go all the way
+                to the bottom of the topbar */ }
+        </style>
+        <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+        <!-- Le fav and touch icons -->
+        <link rel="shortcut icon" href="bootstrap/ico/favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="bootstrap/ico/apple-touch-icon-144-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="bootstrap/ico/apple-touch-icon-114-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="bootstrap/ico/apple-touch-icon-72-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" href="bootstrap/ico/apple-touch-icon-57-precomposed.png">
+        <style>
+        </style>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    </head> 
+
+    <body> 
+        <div class="container-fluid">
+            <!-- menu -->
+            <div class="navbar navbar-inverse">
+                <div class="navbar-inner">
+                    <ul class="nav "> 
+                        <li class="top active"><a href="#garage">Garage</a></li>
+                        <li class="top" ><a href="#">Nexa</a>
+                        <ul>
+                            <li class=""><a href="#nexa">Enheter</a></li>
+                            <li class=""><a href="#">Timers</a></li>
+                            <li class=""><a href="#">Inställningar</a></li>
+                        </ul>
+                        </li>
+                        <li class="top "><a href="#kamera" >Kamera</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- pages -->
+            <div id="garage" class="page">
+                <div id="knapp"><a class="btn btn-large btn-success" id="motor" onclick="runMotor();">Garageportmotor<br></a></div>
+                <hr/>
+                <div class="alert alert-success" id="garageport"><h3>Garageporten</h3><p class="">Stängd</p></div>
+                <div class="alert alert-success" id="innerdoor"><h3>Innerdörren</h3><p>Öppen</p></div>
+            </div>
+            <div id="nexa" class="page">
+                <ul style="list-style-type:none;" id="enheter">
+                </ul>
+            </div><!-- /page nexa -->
+            <div id="kamera" class="page">
+                <div class="kamerafeed">
+                    <img src="http://kamera.helentobias.se/shot.jpg" width="400" height="400">
+                </div>
+                <a href="http://kamera.helentobias.se/video">Live feed</a>
+            </div><!-- /page kamera -->
+        </div> <!-- content -->
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="bootstrap/js/bootstrap.js"></script>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="http://garagepi.helentobias.se/socket.io/socket.io.js"></script>
+        <script src="hemma.js"></script>
+        <script src="motordoor.js"></script>
+        <script type="text/javascript">
+            var socket;
+            stayInWebApp();
+            socket = io.connect('http://garagepi.helentobias.se');
+            socket.on('status', function(msg){statusReceived(msg)});
+            $(document).ready(function() {
+                    var deviceData = null;
+                    queryDevices2();
+                    createMenu();
+                    });
+        </script>
+        </body>
+    </html>

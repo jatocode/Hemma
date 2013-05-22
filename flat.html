@@ -53,8 +53,8 @@ body { padding-top: 60px; /* 60px to make the container go all the way
 </div>
 <div id="knapp"><a class="btn btn-large btn-success" id="motor" onclick="runMotor();">Garageportmotor<br></a></div>
 <hr/>
-<div class="alert alert-success" id="garageport"><h3>Garageporten</h3><p class="">Stängd</p></div>
-<div class="alert alert-success" id="innerdoor"><h3>Innerdörren</h3><p>Öppen</p></div>
+<div class="alert alert-info" id="garageport"><h3>Garageporten</h3><p class="">-</p></div>
+<div class="alert alert-info" id="innerdoor"><h3>Innerdörren</h3><p>-</p></div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
 </script>
 <script src="bootstrap/js/bootstrap.js">
@@ -62,13 +62,10 @@ body { padding-top: 60px; /* 60px to make the container go all the way
 <script src="http://garagepi.helentobias.se/socket.io/socket.io.js"></script>
 <script src="motordoor.js"></script>
 <script type="text/javascript">
-var socket;
-$(document).ready(function () {
+    var socket;
     stayInWebApp();
-    checkDoors();
     socket = io.connect('http://garagepi.helentobias.se');
-    socket.on('status', function(msg){statusReceived(msg)});
-});
+    socket.on('status', function(msg){console.log("Received status update");statusReceived(msg)});
 </script>
 </body>
 </html>

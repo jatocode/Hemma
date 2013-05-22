@@ -1,19 +1,5 @@
-function checkDoors() {
-    var xhr = new XMLHttpRequest();
-    var url = "http://garagepi.helentobias.se/status";
-
-    xhr.onload = reqListener;
-    xhr.open("GET", url, true);
-    xhr.send(null);
-
-    function reqListener () {
-        updateAlerts(this.responseText);
-    };
-
-}
-
 function updateAlerts(jsonstatus) {
-//       console.log("updateAlerts:" + jsonstatus);
+       console.log("updateAlerts:" + jsonstatus);
        var status = JSON.parse(jsonstatus);
 
         setAlertType("#garageport", convertStatusToAttr(status.garage), convertStatusToMessage(status.garage));
@@ -38,18 +24,6 @@ function setAlertType(id, type, text) {
 
 function runMotor() {
     socket.emit('run', {start:'running'});
-}
-
-function activateMotor() {
-    var oReq = new XMLHttpRequest();
-    //oReq.onload = reqListener;
-    oReq.timeout = 1000;
-    try {
-        oReq.open("GET", "http://192.168.0.15:3000/run", true);
-        oReq.send();
-    } catch (err) {
-        console.log("Exception: " + err);
-    }
 }
 
 function statusReceived(msg){
@@ -78,20 +52,30 @@ function displayUnits2() {
         // State can be ON/OFF/DIMMED:xx
         var checked = (device.state).toLowerCase()=="off"?"":"checked";
         var id = deviceData.devices[d].id;
-        if(k == 1) {
-            j = "";
-        } else 
-            j = k;
+        var buttonclass = "btn-info";
+        if((device.state).toLowerCase()!="off") {
+            buttonclass = "btn-success";
+        }
+        var calendar = "";
+        if(device.auto == "calendar") {
+            calendar = "active";
+        }
+        var light = "";
+        if(device.auto == "light") {
+            light = "active";
+        }
 
-        $('#enheter').append("<li>" + '<label class="share-label" for="share-toggle' + i + '">' + device.name.trim() + "</label>" +
-            '<div class="toggle">' +
-            '<label class="toggle-radio" for="share-toggle' + i + '">ON</label>' +
-            '<input type="radio" name="share-toggles' + j + '" id="share-toggle' + i + '" value="toggle1'+  '">' +
-            '<label class="toggle-radio" for="share-toggle' + (i-1) + '">OFF</label>' +
-            '<input type="radio" name="share-toggles' + j + '" id="share-toggle' + (i-1) + '" value="toggle2' + '" checked="checked">' +
-            '</div></li>');
-        i += 2;
-        k++;
+        $('<li>' +
+            '<div class="btn-toolbar">' +
+            '<label>' + device.name + '</label>' +
+                '<div class="btn-group">' +
+                  '<a href="#" class="btn ' + buttonclass + '"><i class="fui-checkround-16"></i></a>' + 
+                  '<a href="#" class="btn ' + buttonclass + ' ' + calendar + '"><i class="fui-time-16"></i></a>' + 
+                  '<a href="#" class="btn ' + buttonclass + ' ' + light + '"><i class="fui-eye-16"></i></a>' + 
+                  '<a href="#" class="btn ' + buttonclass + '"><i class="fui-cross-16"></i></a>' + 
+                '</div>' + 
+            '</div>' +
+          '</li>').appendTo("#enheter");
     }
 }
 function queryDevices2() {
@@ -107,4 +91,13 @@ function queryDevices2() {
             displayUnits2();
         }
     });
+}
+
+function createMenu() {
+    $("li a").click(function(){
+            console.log("hiding");
+            $(this.hash).show().siblings(".page").hide();
+            $(".top").siblings().removeClass("active");
+            $(this).parents(".top").addClass("active");
+        });
 }

@@ -7,8 +7,18 @@ body {
     max-width: 600px;
     margin: auto;
 }
+.btn-large {
+   box-shadow: 0 2px 2px #333;
+}
 
 .kamerafeed {
+    margin-top: 80px;
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
+}
+#nexa  {
+    display:none;
+}
+#kamera {
+    display:none;
 }
