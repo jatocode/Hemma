@@ -1,5 +1,5 @@
 function updateAlerts(jsonstatus) {
-       console.log("updateAlerts:" + jsonstatus);
+//       console.log("updateAlerts:" + jsonstatus);
        var status = JSON.parse(jsonstatus);
 
         setAlertType("#garageport", convertStatusToAttr(status.garage), convertStatusToMessage(status.garage));
@@ -14,7 +14,7 @@ function convertStatusToAttr(status) {
 function convertStatusToMessage(status) {
     if(status == "closed") return "Stängd";
     else if(status == "open") return "Öppen";
-    else return "Schrödinger";
+    else return "-";
 }
 function setAlertType(id, type, text) {
     $(id).removeClass();

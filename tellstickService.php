@@ -32,11 +32,9 @@ switch($cmd) {
             json_decode(stripslashes($_POST['devicesOff'])), $settings->retries);
         break;
     case "isrunning":
-	if(isset($_POST['execute'])) {
-          $r = controlDevices($_POST['execute']);
-	} else {
-	  $r = '';
-	}	
+        $execute = "true";
+        // $execute = $_POST['execute'] 
+        $r = controlDevices($execute);
         break;
     case "settings":
         $r = getSettings();

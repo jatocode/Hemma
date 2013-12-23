@@ -52,16 +52,19 @@
                 <div class="alert alert-success" id="garageport"><h3>Garageporten</h3><p class="">Stängd</p></div>
                 <div class="alert alert-success" id="innerdoor"><h3>Innerdörren</h3><p>Öppen</p></div>
             </div>
+
             <div id="nexa" class="page">
                 <ul style="list-style-type:none;" id="enheter">
                 </ul>
             </div><!-- /page nexa -->
+
             <div id="kamera" class="page">
                 <div class="kamerafeed">
                     <img src="http://kamera.helentobias.se/shot.jpg" width="400" height="400">
                 </div>
                 <a href="http://kamera.helentobias.se/video">Live feed</a>
             </div><!-- /page kamera -->
+
         </div> <!-- content -->
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -79,6 +82,7 @@
                     var deviceData = null;
                     queryDevices2();
                     createMenu();
+                    setInterval(function() { socket.emit("status", ""); }, 1000);
                     });
         </script>
         </body>
