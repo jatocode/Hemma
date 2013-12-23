@@ -180,7 +180,8 @@ function listDevices() {
         }
         if($i++ == 0) {
             // First line is number of devices
-            $r->numDev = explode(":", $line);
+            $a = explode(":", $line);
+            $r->numDev = $a[1];            
         } else {
             $d = new Device();
             $oo = explode("\t", $line);
