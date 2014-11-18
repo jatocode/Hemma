@@ -1,8 +1,11 @@
 <?php
+session_start();
 header('Content-type: application/json');
 define('SETTINGS_FILENAME', "/var/state/hemma.conf");
 define('LOG_FILENAME', "/var/log/hemma/hemma.log");
 define('GOOGLE_SETTINGS_FILENAME', "/var/state/hemma-google.conf");
+
+require_once 'google-api-php-client/autoload.php';
 
 $cmd = '';
 if(isset($_POST['cmd'])) {
@@ -89,21 +92,20 @@ function controlDevices($execute) {
     }
     // Add units controlled by calendar
     foreach ($eventFeed as $entry) {
-        // TODO: idList or groups?
-        $idList = explode(",", $entry->where[0] . "");
+        $idList = explode(",", $entry->location . "");
         foreach($idList as $id) {
-            $when = $entry->when[0];
             $e = new SimpleEntry();
             $e->running = false;
             $e->type = "c";
-            $e->title = $entry->title->text;
-            $e->content = $entry->content->text;
-            $e->conditional = checkConditions($e->content);
+            $e->title = $entry->summary;
+            //$e->content = $entry->content->text;
+        //    $e->conditional = checkConditions($e->content);
+            $e->conditional = true;
             $e->id = $id;
-            $start = strtotime($when->startTime);
-            $end = strtotime($when->endTime);
+            $start = strtotime($entry->start->dateTime);
+            $end = strtotime($entry->end->dateTime);
             $e->startTime = $start;
-            $e->endTime = $end;
+            $e->endTime = $end; 
             $now = time();
             if(in_array($id, $calcontrolled)) {     
                 if(($now >= $start) && ($now <= $end) && ($e->conditional)) {   
@@ -186,7 +188,7 @@ function listDevices() {
             $d = new Device();
             $oo = explode("\t", $line);
             $d->id = $oo[0];
-            $d->name = $oo[1];
+            $d->name = utf8_encode($oo[1]);
             // State can be ON/OFF/DIMMED:xx
             $d->state = $oo[2];
             if(in_array($d->id, $calcontrolled)) {
@@ -276,6 +278,9 @@ function getGoogleSettings() {
         $g->user = $f[0]; // Row 1: Username
         $g->pass = $f[1]; // Row 2: passwd
         $g->calendar = $f[2]; // Row 3: calendar address
+        $g->client = $f[3];
+        $g->serviceaccount = $f[4];
+        $g->keyfile = $f[5];
     }
     return $g;
 }
@@ -332,41 +337,53 @@ class Device {
     public $state;
 }
 
-// Calendar helper functions
-function createCalendarService($user, $pass) {
-    require_once('Zend/Loader.php');  
-    $classes = array('Zend_Gdata','Zend_Gdata_Query','Zend_Gdata_ClientLogin','Zend_Gdata_Calendar');  
-    foreach($classes as $class) {  
-        Zend_Loader::loadClass($class);  
-    }  
-    $calService = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
-    $client = Zend_Gdata_ClientLogin::getHttpClient($user, $pass, $calService);
-    $calService = new Zend_Gdata_Calendar($client); 
+function createGoogleCalService($user, $pass) {
+    $google = getGoogleSettings();
 
-    return $calService;
-}
+    $client_id = trim($google->client);
+    $service_account_name = trim($google->serviceaccount);
+    $key_file_location = trim($google->keyfile);
 
-function createCalendarQuery($service, $calendar) {
-    $query = $service->newEventQuery();
-    $query->setUser($calendar);
-    $query->setVisibility('public');
-    $query->setProjection('full');
-    return $query;
+    $client = new Google_Client();
+    $client->setApplicationName("tellstick");
+    $service = new Google_Service_Calendar($client);
+
+    if (isset($_SESSION['service_token'])) {
+        $client->setAccessToken($_SESSION['service_token']);
+    }
+    $key = file_get_contents($key_file_location);
+    $cred = new Google_Auth_AssertionCredentials(
+        $service_account_name,
+        array('https://www.googleapis.com/auth/calendar'),
+        $key
+    );
+    $client->setAssertionCredentials($cred);
+    if ($client->getAuth()->isAccessTokenExpired()) {
+        $client->getAuth()->refreshTokenWithAssertion($cred);
+    }
+    $_SESSION['service_token'] = $client->getAccessToken();
+
+    return $service;
 }
 
 function getNextEvents() {
     $google = getGoogleSettings();
-    $calService = createCalendarService(trim($google->user), trim($google->pass));
-    $query = createCalendarQuery($calService, trim($google->calendar));
+    $service = createGoogleCalService($google->user, $google->pass);
+    $cal = trim($google->calendar); 
 
-    $query->setOrderby('starttime');
+    // https://developers.google.com/google-apps/calendar/v3/reference/events/list
+    $startTime = date(DateTime::ATOM); 
+    $endTime = date(DateTime::ATOM, time()+(2 * 24 * 60 * 60)); 
+    $optParams = array('timeMin' => $startTime,
+                        'timeMax' => $endTime,
+                        'singleEvents' => "true",
+                        'orderBy' => "startTime");
 
-    // singleEvents till true för att expandera repeterande möten
-    $query->setSingleEvents(true);
-    $query->setFutureEvents(true);
-    $query->setMaxResults(5);       
-    $query->setSortOrder('a');
-    return $calService->getCalendarEventFeed($query);       
+    $events = $service->events->listEvents($cal, $optParams);
+
+    $items = $events->items;
+    // print_r($items);
+    return $items;       
 }
 
 ?>
