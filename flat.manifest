@@ -1,0 +1,17 @@
+CACHE MANIFEST
+#Version 1.1.1
+
+NETWORK:
+*
+
+CACHE:
+flat.html
+motordoor.js
+
+# 3rd party
+bootstrap/css/bootstrap.css
+flatui/css/flat-ui.css
+flat.css
+bootstrap/css/bootstrap-responsive.css
+jquery.min.js
+bootstrap/js/bootstrap.js

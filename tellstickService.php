@@ -6,47 +6,48 @@ define('LOG_FILENAME', "/var/log/hemma/hemma.log");
 define('GOOGLE_SETTINGS_FILENAME', "/var/state/hemma-google.conf");
 
 require_once 'google-api-php-client/autoload.php';
+require 'googleService.php';
 
 $cmd = '';
 if(isset($_POST['cmd'])) {
-  $cmd = strtolower($_POST['cmd']);
+    $cmd = strtolower($_POST['cmd']);
 }
 if($cmd == '') {
- // Use GET while testing new stuff and for cronjob
-  $cmd = strtolower($_GET['cmd']);
+    // Use GET while testing new stuff and for cronjob
+    $cmd = strtolower($_GET['cmd']);
 }
 $settings = getSettings();
 date_default_timezone_set("Europe/Stockholm");
 
 switch($cmd) {
-    case "list":
-        $r=listDevices();
-        break;
-    case "on":
-    case "off":
-        $r=setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])), 
-            $settings->retries);
-        break;
-    case "dim":
-        $r=dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
-        break;
-    case "combined":
-        $r = combined(json_decode(stripslashes($_POST['devicesOn'])),
-            json_decode(stripslashes($_POST['devicesOff'])), $settings->retries);
-        break;
-    case "isrunning":
-        $execute = "true";
-        // $execute = $_POST['execute'] 
-        $r = controlDevices($execute);
-        break;
-    case "settings":
-        $r = getSettings();
-        break;
-    case "sun":
-        $r = getSun();
-        break;
-    default:
-        $r = "unsupported function";
+case "list":
+    $r=listDevices();
+    break;
+case "on":
+case "off":
+    $r=setDeviceState($cmd, json_decode(stripslashes($_POST['devices'])),
+    $settings->retries);
+    break;
+case "dim":
+    $r=dimDevice(json_decode(stripslashes($_POST['devices']), $_POST['power']));
+    break;
+case "combined":
+    $r = combined(json_decode(stripslashes($_POST['devicesOn'])),
+        json_decode(stripslashes($_POST['devicesOff'])), $settings->retries);
+    break;
+case "isrunning":
+    $execute = "true";
+    // $execute = $_POST['execute']
+    $r = controlDevices($execute);
+    break;
+case "settings":
+    $r = getSettings();
+    break;
+case "sun":
+    $r = getSun();
+    break;
+default:
+    $r = "unsupported function";
 }
 
 // END of WebService, return json_encoded string
@@ -56,7 +57,8 @@ print_r(json_encode($r));
 // Execute change if execute flag is NOT explicitly set.
 function controlDevices($execute) {
     $r = new StdClass();
-    $eventFeed = getNextEvents();
+    $gs = new GoogleService();
+    $eventFeed = $gs->getNextEvents();
     $rr = array();
     $on = array();
     $off = array();
@@ -66,7 +68,7 @@ function controlDevices($execute) {
     $lightcontrolled = explode(",", $settings->light . "");
     // Add all units controlled by light
     $timestamp = date('d/m/Y H:i:s');
-     
+
     $message = "";
 
     foreach($lightcontrolled as $u) {
@@ -99,16 +101,16 @@ function controlDevices($execute) {
             $e->type = "c";
             $e->title = $entry->summary;
             //$e->content = $entry->content->text;
-        //    $e->conditional = checkConditions($e->content);
+            //    $e->conditional = checkConditions($e->content);
             $e->conditional = true;
             $e->id = $id;
             $start = strtotime($entry->start->dateTime);
             $end = strtotime($entry->end->dateTime);
             $e->startTime = $start;
-            $e->endTime = $end; 
+            $e->endTime = $end;
             $now = time();
-            if(in_array($id, $calcontrolled)) {     
-                if(($now >= $start) && ($now <= $end) && ($e->conditional)) {   
+            if(in_array($id, $calcontrolled)) {
+                if(($now >= $start) && ($now <= $end) && ($e->conditional)) {
                     $e->running = true;
                     if(!in_array($id, $on)) {
                         $on[] = $id;
@@ -129,19 +131,16 @@ function controlDevices($execute) {
             $rr[] = $e;
         }
     }
-    if(($execute != "no") && ($settings->override=="false")) {              
+    if(($execute != "no") && ($settings->override=="false")) {
 
         foreach($on as $id) {
-        //$message = "Sending on with tdtool to: " . $id;
-        //error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
-            $result[] = tdTool("--on $id", $settings->retries);       
+            $result[] = tdTool("--on $id", $settings->retries);
         }
+
         foreach($off as $id) {
-        //$message = "Sending off with tdtool to: " . $id;
-        //error_log('['.$timestamp.'] INFO: '.$message.PHP_EOL, 3, LOG_FILENAME);
-            $result[] = tdTool("--off $id", $settings->retries);      
+            $result[] = tdTool("--off $id", $settings->retries);
         }
-        $r->execute = "PHP SWITCHED";        
+        $r->execute = "PHP SWITCHED";
     }
     $r->off = $off;
     $r->on  = $on;
@@ -155,12 +154,12 @@ function checkConditions($content) {
     if (preg_match("/Villkor:(.*)/", $content, $matches)) {
         $condition = trim($matches[1]);
         switch($condition) {
-            case "ljus":
-                if(!$sun->dark) {
-                    return false;
-                }
+        case "ljus":
+            if(!$sun->dark) {
+                return false;
+            }
             break;
-            default:
+        default:
             break;
         }
     }
@@ -178,12 +177,12 @@ function listDevices() {
     $lightcontrolled = explode(",", $settings->light . "");
     foreach($out as $line) {
         if(strlen($line) < 5) {
-           continue; // Sanity check
+            continue; // Sanity check
         }
         if($i++ == 0) {
             // First line is number of devices
             $a = explode(":", $line);
-            $r->numDev = $a[1];            
+            $r->numDev = $a[1];
         } else {
             $d = new Device();
             $oo = explode("\t", $line);
@@ -242,13 +241,13 @@ function combined($onList, $offList, $retries) {
 
 function getSettings() {
     if(isset($_POST['cal'])) {
-      $cal = $_POST['cal'];   
-      $light = $_POST['light'];       
-      $manual = $_POST['manual'];     
-      $override = $_POST['override']; 
-      $retries = $_POST['retries']; 
+        $cal = $_POST['cal'];
+        $light = $_POST['light'];
+        $manual = $_POST['manual'];
+        $override = $_POST['override'];
+        $retries = $_POST['retries'];
     } else {
-  	$cal = $light = $manual = $override = $retries = null;
+        $cal = $light = $manual = $override = $retries = null;
     }
 
     $f = file(SETTINGS_FILENAME, FILE_IGNORE_NEW_LINES);
@@ -269,20 +268,6 @@ function getSettings() {
         $r->write = "write FAIL";
     }
     return $r;
-}
-
-function getGoogleSettings() {
-    $f = file(GOOGLE_SETTINGS_FILENAME);
-    $g = new StdClass();
-    if($f != FALSE) {
-        $g->user = $f[0]; // Row 1: Username
-        $g->pass = $f[1]; // Row 2: passwd
-        $g->calendar = $f[2]; // Row 3: calendar address
-        $g->client = $f[3];
-        $g->serviceaccount = $f[4];
-        $g->keyfile = $f[5];
-    }
-    return $g;
 }
 
 function dimDevice($devices, $power) {
@@ -316,6 +301,8 @@ function tdTool($params, $retries) {
 }
 
 // Helper classes
+//
+
 class SimpleEntry {
     public $title;
     public $id;
@@ -337,54 +324,5 @@ class Device {
     public $state;
 }
 
-function createGoogleCalService($user, $pass) {
-    $google = getGoogleSettings();
-
-    $client_id = trim($google->client);
-    $service_account_name = trim($google->serviceaccount);
-    $key_file_location = trim($google->keyfile);
-
-    $client = new Google_Client();
-    $client->setApplicationName("tellstick");
-    $service = new Google_Service_Calendar($client);
-
-    if (isset($_SESSION['service_token'])) {
-        $client->setAccessToken($_SESSION['service_token']);
-    }
-    $key = file_get_contents($key_file_location);
-    $cred = new Google_Auth_AssertionCredentials(
-        $service_account_name,
-        array('https://www.googleapis.com/auth/calendar'),
-        $key
-    );
-    $client->setAssertionCredentials($cred);
-    if ($client->getAuth()->isAccessTokenExpired()) {
-        $client->getAuth()->refreshTokenWithAssertion($cred);
-    }
-    $_SESSION['service_token'] = $client->getAccessToken();
-
-    return $service;
-}
-
-function getNextEvents() {
-    $google = getGoogleSettings();
-    $service = createGoogleCalService($google->user, $google->pass);
-    $cal = trim($google->calendar); 
-
-    // https://developers.google.com/google-apps/calendar/v3/reference/events/list
-    $startTime = date(DateTime::ATOM); 
-    $endTime = date(DateTime::ATOM, time()+(2 * 24 * 60 * 60)); 
-    $optParams = array('timeMin' => $startTime,
-                        'timeMax' => $endTime,
-                        'singleEvents' => "true",
-                        'orderBy' => "startTime");
-
-    $events = $service->events->listEvents($cal, $optParams);
-
-    $items = $events->items;
-    // print_r($items);
-    return $items;       
-}
 
 ?>
-

@@ -1,33 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- v1.0.1 -->
+<html lang="en" manifest="flat.manifest">
 
 <head>
 <meta charset="utf-8">
 <title>
+    Styra
 </title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width, minimal-ui">
 <meta name="description" content="">
-<meta name="author" content="">
+<meta name="author" content="Tobias">
+
 <!-- Le styles -->
 <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
 <link href="flatui/css/flat-ui.css" rel="stylesheet">
 <link href="flat.css" rel="stylesheet">
+
 <style>
-body { padding-top: 60px; /* 60px to make the container go all the way
+body { padding-top: 0px; /* 60px to make the container go all the way
                              to the bottom of the topbar */ }
 </style>
+
 <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 <!-- Le fav and touch icons -->
+<!--
 <link rel="shortcut icon" href="bootstrap/ico/favicon.ico">
 <link rel="apple-touch-icon-precomposed" sizes="144x144" href="bootstrap/ico/apple-touch-icon-144-precomposed.png">
 <link rel="apple-touch-icon-precomposed" sizes="114x114" href="bootstrap/ico/apple-touch-icon-114-precomposed.png">
 <link rel="apple-touch-icon-precomposed" sizes="72x72" href="bootstrap/ico/apple-touch-icon-72-precomposed.png">
 <link rel="apple-touch-icon-precomposed" href="bootstrap/ico/apple-touch-icon-57-precomposed.png">
-<style>
-</style>
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+-->
 </head>
+
 <body>
 <div class="container-fluid">
      <div class="navbar navbar-inverse">
@@ -55,7 +61,8 @@ body { padding-top: 60px; /* 60px to make the container go all the way
 <hr/>
 <div class="alert alert-info" id="garageport"><h3>Garageporten</h3><p class="">-</p></div>
 <div class="alert alert-info" id="innerdoor"><h3>Innerdörren</h3><p>-</p></div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
+<script src="jquery.min.js">
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"> -->
 </script>
 <script src="bootstrap/js/bootstrap.js">
 </script>
@@ -66,7 +73,8 @@ body { padding-top: 60px; /* 60px to make the container go all the way
     stayInWebApp();
     socket = io.connect('http://garagepi.helentobias.se');
     socket.on('status', function(msg){statusReceived(msg)});
-    setInterval(function() { socket.emit("status", ""); }, 500);
+    socket.on('status2', function(msg){statusReceived2(msg)});
+//    setInterval(function() { socket.emit("status", ""); }, 500);
 </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 function updateAlerts(jsonstatus) {
-//       console.log("updateAlerts:" + jsonstatus);
-       var status = JSON.parse(jsonstatus);
+        // console.log("updateAlerts:" + jsonstatus);
+        // var status = JSON.parse(jsonstatus);
+        var status = jsonstatus;
 
         setAlertType("#garageport", convertStatusToAttr(status.garage), convertStatusToMessage(status.garage));
         setAlertType("#innerdoor", convertStatusToAttr(status.inner), convertStatusToMessage(status.inner));
@@ -24,6 +25,10 @@ function setAlertType(id, type, text) {
 
 function runMotor() {
     socket.emit('run', {start:'running'});
+}
+
+function statusReceived2(msg){
+    console.log(msg.status2);
 }
 
 function statusReceived(msg){
