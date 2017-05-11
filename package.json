@@ -1,0 +1,24 @@
+{
+  "name": "hemma",
+  "version": "1.1.0",
+  "description": "Styra lampor",
+  "main": "index.html",
+  "dependencies": {
+    "google-auth-library": "^0.10.0",
+    "googleapis": "^19.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jatocode/Hemma.git"
+  },
+  "author": "tobias jansson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jatocode/Hemma/issues"
+  },
+  "homepage": "https://github.com/jatocode/Hemma#readme"
+}
