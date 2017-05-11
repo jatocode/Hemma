@@ -1,7 +1,8 @@
-var fs = require('fs');
-var readline = require('readline');
-var google = require('googleapis');
-var googleAuth = require('google-auth-library');
+const fs = require('fs');
+const readline = require('readline');
+const google = require('googleapis');
+const googleAuth = require('google-auth-library');
+const exec = require('child_process').exec;
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/calendar-nodejs-quickstart.json
@@ -19,6 +20,8 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   // Authorize a client with the loaded credentials, then call the
   // Google Calendar API.
   authorize(JSON.parse(content), listEvents);
+
+  listDevices();
 });
 
 /**
@@ -126,4 +129,26 @@ function listEvents(auth) {
       }
     }
   });
+}
+
+function listDevices() {
+    exec('tdtool --list', (err, stdout, stderr) => {
+        if(err) {
+            console.error(err);
+            return;
+        }
+        var lines = stdout.split('\n');
+        var devices = [];
+        for(var i=0;i<lines.length;i++) {
+            var line = lines[i].split('\t');
+            //console.log(line);
+            if(line.length > 1) {
+                var device = { name: line[1],
+                               id: line[2],
+                               state: line[2]};
+                devices.push(device);
+            }
+        }
+        console.log(devices);
+    });
 }
