@@ -19,14 +19,12 @@ app.all('/*', function (req, res, next) {
 });
 
 app.get('/device/', function (req, res) {
-    console.log("devices");
     listDevices().then((data) => {
         res.send(data);
     });
 });
 
 app.get('/calendar/', function (req, res) {
-    console.log("calendar");
     getEventsFromCalendar().then((data) => {
         res.send(data);
     });
@@ -53,6 +51,71 @@ function getEventsFromCalendar() {
                     resolve(data);
                 });
             });
+        });
+    });
+}
+
+/**
+ * Lists the next 10 events on the user's primary calendar.
+ *
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ */
+function listEvents(auth) {
+    return new Promise((resolve, reject) => {
+        var calendar = google.calendar('v3');
+        calendar.events.list({
+            auth: auth,
+            calendarId: '8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com',
+            timeMin: (new Date()).toISOString(),
+            maxResults: 10,
+            singleEvents: true,
+            orderBy: 'startTime'
+        }, function (err, response) {
+            if (err) {
+                console.log('The API returned an error: ' + err);
+                reject(err);
+            }
+            var events = [];
+            response.items.forEach(e => {
+                var event = {};
+                event.summary = e.summary;
+                event.location = e.location;
+                event.start = new Date(Date.parse(e.start.dateTime)).toUTCString();
+                event.end = new Date(Date.parse(e.end.dateTime)).toUTCString();
+                events.push(event);
+            });
+            if (events.length == 0) {
+                console.log('No upcoming events found.');
+                resolve([]);
+            } else {
+                resolve(events);
+            }
+        });
+    });
+}
+
+function listDevices() {
+    return new Promise((resolve, reject) => {
+        exec('tdtool --list', (err, stdout, stderr) => {
+            if (err) {
+                console.error(err);
+                reject(err);
+            }
+            var lines = stdout.split('\n');
+            var devices = [];
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].split('\t');
+                if (line.length > 1) {
+                    var device = {
+                        name: line[1],
+                        id: line[2],
+                        state: line[2]
+                    };
+                    devices.push(device);
+                }
+            }
+            console.log(devices);
+            resolve(devices);
         });
     });
 }
@@ -147,62 +210,4 @@ function storeToken(token) {
     }
     fs.writeFile(TOKEN_PATH, JSON.stringify(token));
     console.log('Token stored to ' + TOKEN_PATH);
-}
-
-/**
- * Lists the next 10 events on the user's primary calendar.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-function listEvents(auth) {
-    return new Promise((resolve, reject) => {
-        var calendar = google.calendar('v3');
-        calendar.events.list({
-            auth: auth,
-            calendarId: '8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com',
-            timeMin: (new Date()).toISOString(),
-            maxResults: 10,
-            singleEvents: true,
-            orderBy: 'startTime'
-        }, function (err, response) {
-            if (err) {
-                console.log('The API returned an error: ' + err);
-                reject(err);
-            }
-            var events = response.items;
-            if (events.length == 0) {
-                console.log('No upcoming events found.');
-                resolve([]);
-            } else {
-                resolve(events);
-            }
-        });
-        console.log('Events');
-    });
-}
-
-function listDevices() {
-    return new Promise((resolve, reject) => {
-        exec('tdtool --list', (err, stdout, stderr) => {
-            if (err) {
-                console.error(err);
-                reject(err);
-            }
-            var lines = stdout.split('\n');
-            var devices = [];
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i].split('\t');
-                if (line.length > 1) {
-                    var device = {
-                        name: line[1],
-                        id: line[2],
-                        state: line[2]
-                    };
-                    devices.push(device);
-                }
-            }
-            console.log(devices);
-            resolve(devices);
-        });
-    });
 }
