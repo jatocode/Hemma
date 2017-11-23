@@ -4,6 +4,8 @@ const google = require('googleapis');
 const googleAuth = require('google-auth-library');
 const exec = require('child_process').exec;
 const express = require('express');
+const suncalc = require('suncalc');
+
 const port = 3001;
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
@@ -30,10 +32,18 @@ app.get('/calendar/', function (req, res) {
     });
 });
 
+app.get('/light/', function (req, res) {
+    res.send(getLightTimes());
+});
+
 server.listen(port);
 var ts = (new Date()).toLocaleString() + "  ";
-
 console.log(ts + 'Running on port ' + port);
+
+function getLightTimes() {
+    var times = suncalc.getTimes(new Date(), 59.33, 13.50);
+    return times;    
+}
 
 function getEventsFromCalendar() {
     return new Promise((resolve, reject) => {
@@ -63,11 +73,14 @@ function getEventsFromCalendar() {
 function listEvents(auth) {
     return new Promise((resolve, reject) => {
         var calendar = google.calendar('v3');
+        var timemin = new Date();
+        var timemax = new Date();
+        timemax.setHours(timemax.getHours() + 24);
         calendar.events.list({
             auth: auth,
             calendarId: '8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com',
-            timeMin: (new Date()).toISOString(),
-            maxResults: 10,
+            timeMin: timemin.toISOString(),
+            timeMax: timemax.toISOString(),
             singleEvents: true,
             orderBy: 'startTime'
         }, function (err, response) {
