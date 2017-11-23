@@ -3,6 +3,28 @@ const readline = require('readline');
 const google = require('googleapis');
 const googleAuth = require('google-auth-library');
 const exec = require('child_process').exec;
+const express = require('express');
+const port = 3001;
+
+var app = express(),
+    server = require('http').createServer(app);
+
+app.all('/*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+});
+
+app.get('/device/', function(req, res) {
+    console.log("devices");
+    // Need to use promises 
+    res.send(listDevices());
+});  
+
+server.listen(port);
+var ts = (new Date()).toLocaleString() + "  ";
+
+console.log (ts + 'Running on port ' + port);
+
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/calendar-nodejs-quickstart.json
@@ -21,7 +43,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   // Google Calendar API.
   authorize(JSON.parse(content), listEvents);
 
-  listDevices();
+//  listDevices();
 });
 
 /**
@@ -150,5 +172,7 @@ function listDevices() {
             }
         }
         console.log(devices);
+        return devices;
     });
+    return [];
 }

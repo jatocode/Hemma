@@ -4,6 +4,7 @@
   "description": "Styra lampor",
   "main": "index.html",
   "dependencies": {
+    "express": "^4.16.2",
     "google-auth-library": "^0.10.0",
     "googleapis": "^19.0.0"
   },
