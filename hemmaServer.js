@@ -51,21 +51,28 @@ console.log(ts + 'Running on port ' + port);
 async function getStatus() {
     var status = {};
     try {
-        status.internet = (await isonline())?'online':'no internet'; 
-        status.externalip = await getExternalIp();
-        status.nas = 'Not implemented';
-        status.garagepi = 'Not implemented';
+        status.internet = {
+                online: (await isonline())?'ok':'no internet',
+                externalip: await getExternalIp()
+        };
+        status.servers = {
+            nas : await pingServer('garagenas.local'),
+            garagepi: await pingServer('raspberrypi.local'),
+            gogs: await pingServer('gogs'),
+        };
         status.googleapi = ((await getGoogleApiAuth()).clientId_) != null?'OK':'Not auth';
-        status.tdtool = await getTellstickStatus();
         const garage = JSON.parse(await getGarageStatus());
         status.garagedoor = garage.garage;
         status.innerdoor = garage.inner;
         const devices = await listDevices();        
-        status.numDevice = devices.length; 
-        status.motorvarmare = await findEventForId(await getGoogleApiAuth(), 2);
-        status.trappan = await findEventForId(await getGoogleApiAuth(), 19);
-        status.devicesOn = devices.filter(function(device,i,array) { return device.state == 'ON'; });
-        status.devicesUnkown = devices.filter(function(device,i,array) { return device.state != 'OFF' && device.state != 'ON'; });
+        status.nexa = {
+            tdtool : await getTellstickStatus(),
+            numDevice : devices.length,
+            motorvarmare : await findEventForId(await getGoogleApiAuth(), 2),
+            trappan : await findEventForId(await getGoogleApiAuth(), 19),
+            devicesOn : devices.filter(function(device,i,array) { return device.state == 'ON'; }),
+            devicesUnkown : devices.filter(function(device,i,array) { return device.state != 'OFF' && device.state != 'ON'; })
+        };
         status.sunrise = getLightTimes().sunrise;
         status.sunset = getLightTimes().sunset;
         status.db = 'not implemented';
@@ -91,6 +98,20 @@ async function getGoogleApiAuth() {
             authorize(JSON.parse(content)).then((auth) => {
                 resolve(auth);
             });
+        });
+    });
+}
+
+async function pingServer(server) {
+    return new Promise((resolve, reject) => {
+        exec('ping -c 1 -q ' + server, (err, stdout, stderr) => {
+            if (err) {
+                console.error(err);
+                reject(err);
+            }
+            console.log(stdout);
+            var ip = stdout.match(/\((.*?)\)/);
+            resolve(ip[1]);
         });
     });
 }
