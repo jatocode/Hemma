@@ -6,6 +6,7 @@ const exec = require('child_process').exec;
 const express = require('express');
 const suncalc = require('suncalc');
 const request = require('request');
+const isonline = require('is-online');
 
 const port = 3001;
 
@@ -50,14 +51,19 @@ console.log(ts + 'Running on port ' + port);
 async function getStatus() {
     var status = {};
     try {
+        status.internet = (await isonline())?'online':'no internet'; 
+        status.googleapi = await getGoogleApiStatus();
         status.tdtool = await getTellstickStatus();
+        const devices = await listDevices();        
+        status.numDevice = devices.length; 
+        status.devicesOn = devices.filter(function(device,i,array) { return device.state == 'ON'; });
+        status.devicesUnkown = devices.filter(function(device,i,array) { return device.state != 'OFF' && device.state != 'ON'; });
         status.garage = JSON.parse(await getGarageStatus());
         status.sunrise = getLightTimes().sunrise;
         status.sunset = getLightTimes().sunset;
         status.db = 'not implemented';
-        status.googleapi = 'not implemented';
-        status.internet = 'not implemented';
         var now = new Date();
+        status.lastrun = 'not implemented';
         status.nextcheck = new Date(now.setMinutes(now.getMinutes() + 5)).toUTCString();
     } catch (err) {
         console.log(err);
@@ -67,8 +73,31 @@ async function getStatus() {
     return status;
 }
 
+async function getGoogleApiStatus() {
+    return new Promise((resolve, reject) => {
+        // Load client secrets from a local file.
+        fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+            if (err) {
+                console.log('Error loading client secret file: ' + err);
+                reject(err);
+            }
+            authorize(JSON.parse(content)).then((auth) => {
+                resolve('OK');
+            });
+        });
+    });
+}
+
 async function getTellstickStatus() {
-    return 'Not implemented yet';
+    return new Promise((resolve, reject) => {
+        exec('which tdtool', (err, stdout, stderr) => {
+            if (err) {
+                console.error(err);
+                reject(err);
+            }
+            resolve(stdout.trim());
+        });
+    });
 }
 
 async function getGarageStatus() {
@@ -162,14 +191,13 @@ function listDevices() {
                 var line = lines[i].split('\t');
                 if (line.length > 1) {
                     var device = {
+                        id: line[0],
                         name: line[1],
-                        id: line[2],
                         state: line[2]
                     };
                     devices.push(device);
                 }
             }
-            console.log(devices);
             resolve(devices);
         });
     });
