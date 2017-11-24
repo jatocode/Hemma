@@ -52,13 +52,20 @@ async function getStatus() {
     var status = {};
     try {
         status.internet = (await isonline())?'online':'no internet'; 
-        status.googleapi = await getGoogleApiStatus();
+        status.externalip = await getExternalIp();
+        status.nas = 'Not implemented';
+        status.garagepi = 'Not implemented';
+        status.googleapi = ((await getGoogleApiAuth()).clientId_) != null?'OK':'Not auth';
         status.tdtool = await getTellstickStatus();
+        const garage = JSON.parse(await getGarageStatus());
+        status.garagedoor = garage.garage;
+        status.innerdoor = garage.inner;
         const devices = await listDevices();        
         status.numDevice = devices.length; 
+        status.motorvarmare = await findEventForId(await getGoogleApiAuth(), 2);
+        status.trappan = await findEventForId(await getGoogleApiAuth(), 19);
         status.devicesOn = devices.filter(function(device,i,array) { return device.state == 'ON'; });
         status.devicesUnkown = devices.filter(function(device,i,array) { return device.state != 'OFF' && device.state != 'ON'; });
-        status.garage = JSON.parse(await getGarageStatus());
         status.sunrise = getLightTimes().sunrise;
         status.sunset = getLightTimes().sunset;
         status.db = 'not implemented';
@@ -73,7 +80,7 @@ async function getStatus() {
     return status;
 }
 
-async function getGoogleApiStatus() {
+async function getGoogleApiAuth() {
     return new Promise((resolve, reject) => {
         // Load client secrets from a local file.
         fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -82,7 +89,7 @@ async function getGoogleApiStatus() {
                 reject(err);
             }
             authorize(JSON.parse(content)).then((auth) => {
-                resolve('OK');
+                resolve(auth);
             });
         });
     });
@@ -107,6 +114,17 @@ async function getGarageStatus() {
                 reject(err);
             }
             resolve(body);
+        });
+   });
+}
+
+async function getExternalIp() {
+    return new Promise((resolve, reject) => {
+        request('http://api.ipify.org?format=json', (err, res, body) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(JSON.parse(body).ip);
         });
    });
 }
@@ -137,7 +155,6 @@ function getEventsFromCalendar() {
 }
 
 /**
- * Lists the next 10 events on the user's primary calendar.
  *
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
@@ -163,7 +180,8 @@ function listEvents(auth) {
             response.items.forEach(e => {
                 var event = {};
                 event.summary = e.summary;
-                event.location = e.location;
+                const location = e.location.split(',').filter((e,i,a) => { return parseInt(e); });
+                event.location = location;
                 event.start = new Date(Date.parse(e.start.dateTime)).toUTCString();
                 event.end = new Date(Date.parse(e.end.dateTime)).toUTCString();
                 events.push(event);
@@ -173,6 +191,44 @@ function listEvents(auth) {
                 resolve([]);
             } else {
                 resolve(events);
+            }
+        });
+    });
+}
+
+function findEventForId(auth, id) {
+    return new Promise((resolve, reject) => {
+        var calendar = google.calendar('v3');
+        var timemin = new Date();
+        calendar.events.list({
+            auth: auth,
+            calendarId: '8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com',
+            timeMin: timemin.toISOString(),
+            maxEvents: 50,
+            singleEvents: true,
+            orderBy: 'startTime'
+        }, function (err, response) {
+            if (err) {
+                console.log('The API returned an error: ' + err);
+                reject(err);
+            }
+            var events = [];
+            response.items.forEach(e => {
+                const location = e.location.split(',');
+                if(location.indexOf(id.toString()) >= 0) { // TODO: Why strings!?
+                    var event = {};
+                    event.summary = e.summary;
+                    event.location = location;
+                    event.start = new Date(Date.parse(e.start.dateTime)).toUTCString();
+                    event.end = new Date(Date.parse(e.end.dateTime)).toUTCString();
+                    events.push(event);
+                }
+            });
+            if (events.length == 0) {
+                console.log('No upcoming events found.');
+                resolve([]);
+            } else {
+                resolve(events[0]);
             }
         });
     });
