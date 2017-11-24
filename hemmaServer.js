@@ -5,6 +5,7 @@ const googleAuth = require('google-auth-library');
 const exec = require('child_process').exec;
 const express = require('express');
 const suncalc = require('suncalc');
+const request = require('request');
 
 const port = 3001;
 
@@ -36,9 +37,50 @@ app.get('/light/', function (req, res) {
     res.send(getLightTimes());
 });
 
+app.get('/status/', function (req, res) {
+    getStatus().then((data) => {
+        res.send(data);
+    });
+});
+
 server.listen(port);
 var ts = (new Date()).toLocaleString() + "  ";
 console.log(ts + 'Running on port ' + port);
+
+async function getStatus() {
+    var status = {};
+    try {
+        status.tdtool = await getTellstickStatus();
+        status.garage = JSON.parse(await getGarageStatus());
+        status.sunrise = getLightTimes().sunrise;
+        status.sunset = getLightTimes().sunset;
+        status.db = 'not implemented';
+        status.googleapi = 'not implemented';
+        status.internet = 'not implemented';
+        var now = new Date();
+        status.nextcheck = new Date(now.setMinutes(now.getMinutes() + 5)).toUTCString();
+    } catch (err) {
+        console.log(err);
+        status.err = err;
+    }
+
+    return status;
+}
+
+async function getTellstickStatus() {
+    return 'Not implemented yet';
+}
+
+async function getGarageStatus() {
+    return new Promise((resolve, reject) => {
+        request('http://raspberrypi.local:3000/status', (err, res, body) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(body);
+        });
+   });
+}
 
 function getLightTimes() {
     var times = suncalc.getTimes(new Date(), 59.33, 13.50);
