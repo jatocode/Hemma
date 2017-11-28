@@ -125,8 +125,17 @@ exports.getActiveEvents = async function getActiveEvents() {
     });
 }
 
-//db.calendar.find({$and: [{start: { $gte:1511933300000}}, {end:{$lte:1511939700000}}] })
-
+exports.getDevice = async function getDevice(id) {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject(err);
+            db.collection('device').findOne({id: id}, function(err, res) {
+                if(err) throw err;
+                resolve(res);
+            });
+        });
+    });
+}
 
 exports.getEventForId = async function getEventForId(id) {
     return new Promise((resolve, reject) => {

@@ -78,6 +78,8 @@ async function main() {
     nextCheck = new Date(lastCheck.getTime() + refreshTime * 1000);
     console.log('Checking next time: ' + nextCheck);
 
+    var deviceId = [];
+    
     try {
         // Save calendar events to DB
         var events = await googleapi.getEventsFromCalendar();
@@ -87,7 +89,10 @@ async function main() {
 
         // Save devices to DB
         var devices = await telldus.listDevices();
-        devices.forEach(device => { db.insertDevice(device) });
+        devices.forEach(device => { 
+            deviceId.push(parseInt(device.id));
+            db.insertDevice(device);
+        });
 
         // And get config
         db.insertConfig(await config.readConfig());
@@ -98,11 +103,18 @@ async function main() {
 
     // Let's turn shit on. And off.
     try {
-        (await db.getActiveEvents()).forEach(e => {
+        var events = await db.getActiveEvents();
+        events.forEach(e => {
             e.location.forEach(l => {
-                console.log(l);
+                db.getDevice(l).then((data) => {
+                    console.log(data.id + ', ' + data.name);
+                    // telldus.deviceOn(data.id);
+                });
             });
         });
+
+//var notActive = deviceId.filter((e) => { e.indexOf});
+        
     } catch (err) {
         console.log(err);
     }
