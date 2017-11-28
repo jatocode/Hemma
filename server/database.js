@@ -34,6 +34,12 @@ function createCollections() {
             db.close();
         });
     });
+    mongodb.connect(dburl, function(err, db) {
+        db.createCollection('config', function(err, res) {
+            if(err) throw err;
+            db.close();
+        });
+    });
 }
 
 exports.insertGarageStatus = function insertGarageStatus(status) {
@@ -70,10 +76,21 @@ exports.insertCalendarEvent = function insertCalendarEvent(event) {
     });
 }
 
+exports.insertConfig = function insertConfig(config) {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+
+        db.collection('config').update({version:config.version}, config, {upsert: true}, function(err, res) {
+            if(err) throw err;
+            db.close();
+        });
+    });
+}
+
 exports.getAllDevices = async function getAllDevices() {
     return new Promise((resolve, reject) => {
         mongodb.connect(dburl, function(err, db) {
-            if(err) reject('error');
+            if(err) reject(err);
             db.collection('device').find({}).toArray(function(err, res) {
                 if(err) throw err;
                 resolve(res);
@@ -85,7 +102,7 @@ exports.getAllDevices = async function getAllDevices() {
 exports.getEventForId = async function getEventForId(id) {
     return new Promise((resolve, reject) => {
         mongodb.connect(dburl, function(err, db) {
-            if(err) reject('error');
+            if(err) reject(err);
             db.collection('calendar').find({}).toArray(function(err, res) {
                 if(err) throw err;
                 res.forEach(e => {
@@ -102,7 +119,7 @@ exports.getEventForId = async function getEventForId(id) {
 exports.getGarageStatusHistory = async function getGarageStatusHistory() {
     return new Promise((resolve, reject) => {
         mongodb.connect(dburl, function(err, db) {
-            if(err) reject('error');
+            if(err) reject(err);
             db.collection('garagestatus').find({}).toArray(function(err, res) {
                 if(err) throw err;
                 resolve(res);
@@ -114,8 +131,21 @@ exports.getGarageStatusHistory = async function getGarageStatusHistory() {
 exports.getDBStatus = async function getDBStatus() {
     return new Promise((resolve, reject) => {
         mongodb.connect(dburl, function(err, db) {
-            if(err) reject('error');
+            if(err) reject(err);
             resolve(db.s.databaseName);
         });
     });
 }
+
+exports.getLightControlled = async function getLightControlled() {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject(err);
+            db.collection('config').findOne({}, function(err, res) {
+                if(err) throw err;
+                resolve(res.light);
+            });
+        });
+    });
+}
+

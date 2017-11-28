@@ -17,7 +17,6 @@ Uses a html/ajax frontend and a PHP backend for the actual work
 
 ## TODO
 * Make refreshTime configurable
-* List devices that uses light. All others use calendar by default
 * Configurable list of light-devices
 * Fallback to DB-list of events if net timeout
 * /api for setting state of a single device

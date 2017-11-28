@@ -13,7 +13,7 @@ const config = require('./server/config');
 
 // My consts
 const port = 3001;
-const refreshTime = 5*60;
+const refreshTime = 5 * 60;
 
 // Global variables 
 var lastCheck;
@@ -59,7 +59,7 @@ db.createHemmaDB();
 socket.on('connect', function () { console.log('socket.io connected'); });
 socket.on('event', function (data) {
     // Todo, save new status in DB
-    db.insertGarageStatus({garage: 'socketio', since: new Date()});
+    db.insertGarageStatus({ garage: 'socketio', since: new Date() });
     console.log(data);
 });
 
@@ -71,7 +71,7 @@ console.log(ts + 'Starting hemmaserver on port ' + port + '. Refreshing devices 
 main();
 setInterval(main, refreshTime * 1000);
 
-function main() {
+async function main() {
     var now = new Date();
     var ts = (new Date()).toLocaleString() + "  ";
     console.log(ts + 'In the future: Turn on/off all devices based on sun and/or calendar');
@@ -79,56 +79,55 @@ function main() {
     nextCheck = new Date(lastCheck.getTime() + refreshTime * 1000);
     console.log('Checking next time: ' + nextCheck);
 
-    // Save calendar events to DB
-    googleapi.getEventsFromCalendar().then((data) => {
-        data.forEach(e => {
-            db.insertCalendarEvent(e);
-        });
-    }).catch((err) => { console.log(err); });
+    try {
+        // Save calendar events to DB
+        var events = await googleapi.getEventsFromCalendar();
+        events.forEach(e => { db.insertCalendarEvent(e) });
 
-    telldus.listDevices().then((data) => {
-        data.forEach(device => {
-            db.insertDevice(device);
-        });
-    }).catch((err) => { console.log(err); });
+        // Save devices to DB
+        var devices = await telldus.listDevices();
+        devices.forEach(device => { db.insertDevice(device) });
 
-    config.readConfig().then((data) => {
-        console.log(data);
-    }).catch((err) => {console.log('error');} );
+        // And get config
+        db.insertConfig(await config.readConfig());
+
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 async function getStatus() {
     var status = {};
     try {
         status.internet = {
-                online: (await isonline())?'ok':'no internet',
-                externalip: await net.getExternalIp()
+            online: (await isonline()) ? 'ok' : 'no internet',
+            externalip: await net.getExternalIp()
         };
         status.db = await db.getDBStatus();
         status.servers = {
-            nas : await net.pingServer('garagenas.local'),
+            nas: await net.pingServer('garagenas.local'),
             garagepi: await net.pingServer('raspberrypi.local'),
             gogs: await net.pingServer('gogs'),
         };
-        status.googleapi = ((await googleapi.getGoogleApiAuth()).clientId_) != null?'OK':'Not auth';
+        status.googleapi = ((await googleapi.getGoogleApiAuth()).clientId_) != null ? 'OK' : 'Not auth';
         const garage = JSON.parse(await garageapi.getGarageStatus());
         status.garagedoor = garage.garage;
         status.innerdoor = garage.inner;
-        const devices = await db.getAllDevices();       
+        const devices = await db.getAllDevices();
         status.nexa = {
-            tdtool : await telldus.getTellstickStatus(),
-            numDevice : devices.length,
-            motorvarmare : await db.getEventForId(2),
-            trappan : await db.getEventForId(19),
-            devicesOn : devices.filter(function(device,i,array) { return device.state == 'ON'; }),
-            devicesUnkown : devices.filter(function(device,i,array) { return device.state != 'OFF' && device.state != 'ON'; })
+            tdtool: await telldus.getTellstickStatus(),
+            numDevice: devices.length,
+            motorvarmare: await db.getEventForId(2),
+            trappan: await db.getEventForId(19),
+            devicesOn: devices.filter(function (device, i, array) { return device.state == 'ON'; }),
+            lightControlled : await db.getLightControlled(),
         };
         status.sunrise = getLightTimes().sunrise;
         status.sunset = getLightTimes().sunset;
         var now = new Date();
-        status.lastcheck = lastCheck.toISOString();
-        status.nextcheck = nextCheck.toISOString();
-        status.dbtest = await db.getGarageStatusHistory();
+        status.lastCheck = lastCheck.toISOString();
+        status.nextCheck = nextCheck.toISOString();
+        status.garageHistory = await db.getGarageStatusHistory();
     } catch (err) {
         console.log(err);
         status.err = err;
@@ -139,5 +138,5 @@ async function getStatus() {
 
 function getLightTimes() {
     var times = suncalc.getTimes(new Date(), 59.33, 13.50);
-    return times;    
+    return times;
 }
