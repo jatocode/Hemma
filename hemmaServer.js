@@ -7,6 +7,8 @@ const express = require('express');
 const suncalc = require('suncalc');
 const request = require('request');
 const isonline = require('is-online');
+const mongodb = require('mongodb').MongoClient;
+const dburl = 'mongodb://localhost:27017/hemmadb';
 
 const port = 3001;
 
@@ -48,6 +50,64 @@ server.listen(port);
 var ts = (new Date()).toLocaleString() + "  ";
 console.log(ts + 'Running on port ' + port);
 
+// Playing with DB
+createmongoDb();
+createGarageStatusCollection();
+insertGarageStatus({garage: 'test', since: new Date()});
+
+function createmongoDb() {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+        console.log('DB created');
+        db.close();
+    });
+}
+
+function createGarageStatusCollection() {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+        db.createCollection('garagestatus', function(err, res) {
+            if(err) throw err;
+            console.log('Collection created');
+            db.close();
+        });
+    });
+}
+
+function insertGarageStatus(status) {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+
+        db.collection('garagestatus').insertOne(status, function(err, res) {
+            if(err) throw err;
+            console.log('inserted ');
+            db.close();
+        });
+    });
+}
+
+async function getGarageStatusHistory() {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject('error');
+            db.collection('garagestatus').find({}).toArray(function(err, res) {
+                if(err) throw err;
+                console.log(res);
+                resolve(res);
+            });
+        });
+    });
+}
+
+async function getDBStatus() {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject('error');
+            resolve(db.s.databaseName);
+        });
+    });
+}
+
 async function getStatus() {
     var status = {};
     try {
@@ -55,6 +115,7 @@ async function getStatus() {
                 online: (await isonline())?'ok':'no internet',
                 externalip: await getExternalIp()
         };
+        status.db = await getDBStatus();
         status.servers = {
             nas : await pingServer('garagenas.local'),
             garagepi: await pingServer('raspberrypi.local'),
@@ -75,10 +136,10 @@ async function getStatus() {
         };
         status.sunrise = getLightTimes().sunrise;
         status.sunset = getLightTimes().sunset;
-        status.db = 'not implemented';
         var now = new Date();
         status.lastrun = 'not implemented';
         status.nextcheck = new Date(now.setMinutes(now.getMinutes() + 5)).toUTCString();
+        status.dbtest = await getGarageStatusHistory();
     } catch (err) {
         console.log(err);
         status.err = err;
