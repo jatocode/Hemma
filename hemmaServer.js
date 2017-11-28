@@ -98,12 +98,10 @@ async function main() {
 
     // Let's turn shit on. And off.
     try {
-        var events = await db.getAllEvents();
-        events.forEach(e => {
-            var now = Date.now();
-            if(now >= e.start && now <= e.end) {
-                console.log(e);
-            }
+        (await db.getActiveEvents()).forEach(e => {
+            e.location.forEach(l => {
+                console.log(l);
+            });
         });
     } catch (err) {
         console.log(err);

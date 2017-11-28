@@ -111,6 +111,20 @@ exports.getAllEvents = async function getAllEvents() {
     });
 }
 
+exports.getActiveEvents = async function getActiveEvents() {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject(err);
+            var now = Date.now();
+            db.collection('calendar')
+                .find({$and: [{start: { $lte:now}}, {end:{$gte:now}}] }).toArray(function(err, res) {
+                    if(err) throw err;
+                    resolve(res);
+            });
+        });
+    });
+}
+
 //db.calendar.find({$and: [{start: { $gte:1511933300000}}, {end:{$lte:1511939700000}}] })
 
 
