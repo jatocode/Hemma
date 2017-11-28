@@ -14,5 +14,15 @@ Uses a html/ajax frontend and a PHP backend for the actual work
 * hemma.conf (settings from client). JSON format
 * hemma-google.conf (google user/passwd and address to calendar). Line-based
 * hemmaServer.js (Ongoing replacement for tellstickService.php)
+
+## TODO
+* Make refreshTime configurable
+* List devices that uses light. All others use calendar by default
+* Configurable list of light-devices
+* Fallback to DB-list of events if net timeout
+* /api for setting state of a single device
+* /api for reporting state of a single device
+* /api for getting last garagestate
+* /api for getting full garagestate history
 * 
 
