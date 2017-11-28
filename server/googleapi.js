@@ -53,7 +53,7 @@ function listEvents(auth) {
         var calendar = google.calendar('v3');
         var timemin = new Date();
         var timemax = new Date();
-        timemax.setHours(timemax.getHours() + 24);
+        timemax.setHours(timemax.getHours() + 48);
         calendar.events.list({
             auth: auth,
             calendarId: '8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com',
@@ -73,8 +73,8 @@ function listEvents(auth) {
                 event.summary = e.summary;
                 const location = e.location.split(',').filter((e,i,a) => { return parseInt(e); });
                 event.location = location;
-                event.start = new Date(Date.parse(e.start.dateTime)).toUTCString();
-                event.end = new Date(Date.parse(e.end.dateTime)).toUTCString();
+                event.start = Date.parse(e.start.dateTime);
+                event.end = Date.parse(e.end.dateTime);
                 events.push(event);
             });
             if (events.length == 0) {

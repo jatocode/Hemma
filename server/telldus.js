@@ -1,6 +1,30 @@
 const request = require('request');
 const exec = require('child_process').exec;
 
+exports.deviceOn = async function deviceOn(id) {
+    return new Promise((resolve, reject) => {
+        exec('tdtool --on ' + id, (err, stdout, stderr) => {
+            if (err) {
+                console.error(err);
+                reject(null);
+            }
+            resolve(id);
+        });
+    });
+}
+
+exports.deviceOff = async function deviceOff(id) {
+    return new Promise((resolve, reject) => {
+        exec('tdtool --off ' + id, (err, stdout, stderr) => {
+            if (err) {
+                console.error(err);
+                reject(null);
+            }
+            resolve(id);
+        });
+    });
+}
+
 exports.getTellstickStatus = async function getTellstickStatus() {
     return new Promise((resolve, reject) => {
         exec('which tdtool', (err, stdout, stderr) => {

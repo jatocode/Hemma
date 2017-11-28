@@ -57,7 +57,7 @@ db.createHemmaDB();
 
 // Waiting for socket io
 socket.on('connect', function () { console.log('socket.io connected'); });
-socket.on('event', function (data) {
+socket.on('status', function (data) {
     // Todo, save new status in DB
     db.insertGarageStatus({ garage: 'socketio', since: new Date() });
     console.log(data);
@@ -65,7 +65,6 @@ socket.on('event', function (data) {
 
 var ts = (new Date()).toLocaleString() + "  ";
 console.log(ts + 'Starting hemmaserver on port ' + port + '. Refreshing devices every ' + refreshTime + ' seconds');
-
 
 // Start main loop
 main();
@@ -82,7 +81,10 @@ async function main() {
     try {
         // Save calendar events to DB
         var events = await googleapi.getEventsFromCalendar();
-        events.forEach(e => { db.insertCalendarEvent(e) });
+        events.forEach(e => { 
+            console.log(e);
+            db.insertCalendarEvent(e) 
+        });
 
         // Save devices to DB
         var devices = await telldus.listDevices();
@@ -91,6 +93,24 @@ async function main() {
         // And get config
         db.insertConfig(await config.readConfig());
 
+    } catch (err) {
+        console.log(err);
+    }
+
+    // Let's turn shit on. And off.
+    try {
+        (await db.getAllEvents()).forEach(e => {
+            console.log(e);
+            var start = e.start;
+            var end = e.end;
+            var now = Date.now();
+            console.log((new Date(start)).toISOString());
+            console.log((new Date(now)).toISOString());
+            console.log((new Date(end)).toISOString());
+            if(start <= now && e >= now ) {
+                //console.log(e);
+            }
+        });
     } catch (err) {
         console.log(err);
     }

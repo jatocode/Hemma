@@ -86,12 +86,24 @@ exports.insertConfig = function insertConfig(config) {
         });
     });
 }
-
+    
 exports.getAllDevices = async function getAllDevices() {
     return new Promise((resolve, reject) => {
         mongodb.connect(dburl, function(err, db) {
             if(err) reject(err);
             db.collection('device').find({}).toArray(function(err, res) {
+                if(err) throw err;
+                resolve(res);
+            });
+        });
+    });
+}
+
+exports.getAllEvents = async function getAllEvents() {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject(err);
+            db.collection('calendar').find({}).toArray(function(err, res) {
                 if(err) throw err;
                 resolve(res);
             });
