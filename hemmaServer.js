@@ -108,12 +108,12 @@ async function getStatus() {
         const garage = JSON.parse(await garageapi.getGarageStatus());
         status.garagedoor = garage.garage;
         status.innerdoor = garage.inner;
-        const devices = await telldus.listDevices();        
+        const devices = await db.getAllDevices();       
         status.nexa = {
             tdtool : await telldus.getTellstickStatus(),
             numDevice : devices.length,
-            motorvarmare : await googleapi.findEventForId(await googleapi.getGoogleApiAuth(), 2),
-            trappan : await googleapi.findEventForId(await googleapi.getGoogleApiAuth(), 19),
+            motorvarmare : await db.getEventForId(2),
+            trappan : await db.getEventForId(19),
             devicesOn : devices.filter(function(device,i,array) { return device.state == 'ON'; }),
             devicesUnkown : devices.filter(function(device,i,array) { return device.state != 'OFF' && device.state != 'ON'; })
         };

@@ -54,7 +54,6 @@ exports.insertDevice = function insertDevice(device) {
 
         db.collection('device').update({id: device.id}, device, {upsert: true}, function(err, res) {
             if(err) throw err;
-            console.log('inserted device ' + device.id);
             db.close();
         });
     });
@@ -66,8 +65,36 @@ exports.insertCalendarEvent = function insertCalendarEvent(event) {
 
         db.collection('calendar').update({etag: event.etag}, event, {upsert: true}, function(err, res) {
             if(err) throw err;
-            console.log('inserted event ' + event.etag);
             db.close();
+        });
+    });
+}
+
+exports.getAllDevices = async function getAllDevices() {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject('error');
+            db.collection('device').find({}).toArray(function(err, res) {
+                if(err) throw err;
+                resolve(res);
+            });
+        });
+    });
+}
+
+exports.getEventForId = async function getEventForId(id) {
+    return new Promise((resolve, reject) => {
+        mongodb.connect(dburl, function(err, db) {
+            if(err) reject('error');
+            db.collection('calendar').find({}).toArray(function(err, res) {
+                if(err) throw err;
+                res.forEach(e => {
+                    if(e.location.indexOf(id.toString()) >= 0) { // TODO: Why strings!?
+                        resolve(e);
+                    }
+                });
+                resolve({});
+            });
         });
     });
 }
