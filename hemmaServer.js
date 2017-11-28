@@ -8,14 +8,18 @@ const suncalc = require('suncalc');
 const request = require('request');
 const isonline = require('is-online');
 const mongodb = require('mongodb').MongoClient;
-const dburl = 'mongodb://localhost:27017/hemmadb';
+const socket = require('socket.io-client')('http://raspberrypi.local:3000');
 
+// My consts
+const dburl = 'mongodb://localhost:27017/hemmadb';
 const port = 3001;
 
+// Consts for Google API
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 const TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) + '/.credentials/';
 const TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 
+// Create App
 var app = express(),
     server = require('http').createServer(app);
 
@@ -52,8 +56,15 @@ console.log(ts + 'Running on port ' + port);
 
 // Playing with DB
 createmongoDb();
-createGarageStatusCollection();
-insertGarageStatus({garage: 'test', since: new Date()});
+createCollections();
+
+// Waiting for socket io
+socket.on('connect', function () { console.log('socket.io connected'); });
+socket.on('event', function (data) {
+    // Todo, save new status in DB
+    insertGarageStatus({garage: 'socketio', since: new Date()});
+    console.log(data);
+});
 
 function createmongoDb() {
     mongodb.connect(dburl, function(err, db) {
@@ -63,12 +74,19 @@ function createmongoDb() {
     });
 }
 
-function createGarageStatusCollection() {
+function createCollections() {
     mongodb.connect(dburl, function(err, db) {
         if(err) throw err;
         db.createCollection('garagestatus', function(err, res) {
             if(err) throw err;
-            console.log('Collection created');
+            console.log('Garagestatus collection created');
+            db.close();
+        });
+    });
+    mongodb.connect(dburl, function(err, db) {
+        db.createCollection('device', function(err, res) {
+            if(err) throw err;
+            console.log('Device collection created');
             db.close();
         });
     });
@@ -80,7 +98,19 @@ function insertGarageStatus(status) {
 
         db.collection('garagestatus').insertOne(status, function(err, res) {
             if(err) throw err;
-            console.log('inserted ');
+            console.log('inserted garagestatus');
+            db.close();
+        });
+    });
+}
+
+function insertDevice(device) {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+
+        db.collection('device').update({id: device.id}, device, {upsert: true}, function(err, res) {
+            if(err) throw err;
+            console.log('inserted device');
             db.close();
         });
     });
@@ -92,7 +122,6 @@ async function getGarageStatusHistory() {
             if(err) reject('error');
             db.collection('garagestatus').find({}).toArray(function(err, res) {
                 if(err) throw err;
-                console.log(res);
                 resolve(res);
             });
         });
@@ -334,6 +363,7 @@ function listDevices() {
                         state: line[2]
                     };
                     devices.push(device);
+                    insertDevice(device);
                 }
             }
             resolve(devices);
