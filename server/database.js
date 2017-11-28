@@ -69,7 +69,7 @@ exports.insertCalendarEvent = function insertCalendarEvent(event) {
     mongodb.connect(dburl, function(err, db) {
         if(err) throw err;
 
-        db.collection('calendar').update({etag: event.etag}, event, {upsert: true}, function(err, res) {
+        db.collection('calendar').update({id: event.id}, event, {upsert: true}, function(err, res) {
             if(err) throw err;
             db.close();
         });
@@ -110,6 +110,9 @@ exports.getAllEvents = async function getAllEvents() {
         });
     });
 }
+
+//db.calendar.find({$and: [{start: { $gte:1511933300000}}, {end:{$lte:1511939700000}}] })
+
 
 exports.getEventForId = async function getEventForId(id) {
     return new Promise((resolve, reject) => {

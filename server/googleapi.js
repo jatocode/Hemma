@@ -69,6 +69,7 @@ function listEvents(auth) {
             var events = [];
             response.items.forEach(e => {
                 var event = {};
+                event.id = e.id;
                 event.etag = e.etag.replace(/"/g,'');
                 event.summary = e.summary;
                 const location = e.location.split(',').filter((e,i,a) => { return parseInt(e); });

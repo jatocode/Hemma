@@ -82,7 +82,6 @@ async function main() {
         // Save calendar events to DB
         var events = await googleapi.getEventsFromCalendar();
         events.forEach(e => { 
-            console.log(e);
             db.insertCalendarEvent(e) 
         });
 
@@ -99,16 +98,11 @@ async function main() {
 
     // Let's turn shit on. And off.
     try {
-        (await db.getAllEvents()).forEach(e => {
-            console.log(e);
-            var start = e.start;
-            var end = e.end;
+        var events = await db.getAllEvents();
+        events.forEach(e => {
             var now = Date.now();
-            console.log((new Date(start)).toISOString());
-            console.log((new Date(now)).toISOString());
-            console.log((new Date(end)).toISOString());
-            if(start <= now && e >= now ) {
-                //console.log(e);
+            if(now >= e.start && now <= e.end) {
+                console.log(e);
             }
         });
     } catch (err) {
