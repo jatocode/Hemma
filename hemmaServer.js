@@ -1,18 +1,20 @@
-const exec = require('child_process').exec;
 const express = require('express');
 const suncalc = require('suncalc');
-const request = require('request');
-const isonline = require('is-online');
 const socket = require('socket.io-client')('http://raspberrypi.local:3000');
+const isonline = require('is-online');
+
+// Homerolled
 const googleapi = require('./serverlogic/googleapi');
 const db = require('./serverlogic/database');
+const net = require('./serverlogic/internet');
+const telldus = require('./serverlogic/telldus');
+const garageapi = require('./serverlogic/garage.js');
 
 // My consts
 const port = 3001;
 const refreshTime = 5*60;
 
 // Global variables 
-var mainTimer;
 var lastCheck;
 var nextCheck;
 
@@ -26,7 +28,7 @@ app.all('/*', function (req, res, next) {
 });
 
 app.get('/device/', function (req, res) {
-    listDevices().then((data) => {
+    telldus.listDevices().then((data) => {
         res.send(data);
     });
 });
@@ -65,7 +67,7 @@ console.log(ts + 'Starting hemmaserver on port ' + port + '. Refreshing devices 
 
 // Start main loop
 main();
-mainTimer = setInterval(main, refreshTime * 1000);
+setInterval(main, refreshTime * 1000);
 
 function main() {
     var now = new Date();
@@ -80,7 +82,13 @@ function main() {
         data.forEach(e => {
             db.insertCalendarEvent(e);
         });
-    });
+    }).catch((err) => { console.log(err); });
+
+    telldus.listDevices().then((data) => {
+        data.forEach(device => {
+            db.insertDevice(device);
+        });
+    }).catch((err) => { console.log(err); });
 }
 
 async function getStatus() {
@@ -88,21 +96,21 @@ async function getStatus() {
     try {
         status.internet = {
                 online: (await isonline())?'ok':'no internet',
-                externalip: await getExternalIp()
+                externalip: await net.getExternalIp()
         };
         status.db = await db.getDBStatus();
         status.servers = {
-            nas : await pingServer('garagenas.local'),
-            garagepi: await pingServer('raspberrypi.local'),
-            gogs: await pingServer('gogs'),
+            nas : await net.pingServer('garagenas.local'),
+            garagepi: await net.pingServer('raspberrypi.local'),
+            gogs: await net.pingServer('gogs'),
         };
         status.googleapi = ((await googleapi.getGoogleApiAuth()).clientId_) != null?'OK':'Not auth';
-        const garage = JSON.parse(await getGarageStatus());
+        const garage = JSON.parse(await garageapi.getGarageStatus());
         status.garagedoor = garage.garage;
         status.innerdoor = garage.inner;
-        const devices = await listDevices();        
+        const devices = await telldus.listDevices();        
         status.nexa = {
-            tdtool : await getTellstickStatus(),
+            tdtool : await telldus.getTellstickStatus(),
             numDevice : devices.length,
             motorvarmare : await googleapi.findEventForId(await googleapi.getGoogleApiAuth(), 2),
             trappan : await googleapi.findEventForId(await googleapi.getGoogleApiAuth(), 19),
@@ -123,80 +131,7 @@ async function getStatus() {
     return status;
 }
 
-async function pingServer(server) {
-    return new Promise((resolve, reject) => {
-        exec('ping -c 1 -q ' + server, (err, stdout, stderr) => {
-            if (err) {
-                console.error(err);
-                reject(err);
-            }
-            var ip = stdout.match(/\((.*?)\)/);
-            resolve(ip[1]);
-        });
-    });
-}
-
-async function getTellstickStatus() {
-    return new Promise((resolve, reject) => {
-        exec('which tdtool', (err, stdout, stderr) => {
-            if (err) {
-                console.error(err);
-                reject(err);
-            }
-            resolve(stdout.trim());
-        });
-    });
-}
-
-async function getGarageStatus() {
-    return new Promise((resolve, reject) => {
-        request('http://raspberrypi.local:3000/status', (err, res, body) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(body);
-        });
-   });
-}
-
-async function getExternalIp() {
-    return new Promise((resolve, reject) => {
-        request('http://api.ipify.org?format=json', (err, res, body) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(JSON.parse(body).ip);
-        });
-   });
-}
-
 function getLightTimes() {
     var times = suncalc.getTimes(new Date(), 59.33, 13.50);
     return times;    
-}
-
-function listDevices() {
-    return new Promise((resolve, reject) => {
-        exec('tdtool --list', (err, stdout, stderr) => {
-            if (err) {
-                console.error(err);
-                reject(err);
-            }
-            var lines = stdout.split('\n');
-            var devices = [];
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i].split('\t');
-                if (line.length > 1) {
-                    var device = {
-                        id: line[0],
-                        name: line[1],
-                        state: line[2]
-                    };
-                    devices.push(device);
-                    db.insertDevice(device);
-                }
-            }
-            resolve(devices);
-        });
-    });
 }
