@@ -4,11 +4,11 @@ const socket = require('socket.io-client')('http://raspberrypi.local:3000');
 const isonline = require('is-online');
 
 // Homerolled
-const googleapi = require('./serverlogic/googleapi');
-const db = require('./serverlogic/database');
-const net = require('./serverlogic/internet');
-const telldus = require('./serverlogic/telldus');
-const garageapi = require('./serverlogic/garage.js');
+const googleapi = require('./server/googleapi');
+const db = require('./server/database');
+const net = require('./server/internet');
+const telldus = require('./server/telldus');
+const garageapi = require('./server/garage.js');
 
 // My consts
 const port = 3001;
