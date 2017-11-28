@@ -3,12 +3,11 @@ const express = require('express');
 const suncalc = require('suncalc');
 const request = require('request');
 const isonline = require('is-online');
-const mongodb = require('mongodb').MongoClient;
 const socket = require('socket.io-client')('http://raspberrypi.local:3000');
 const googleapi = require('./serverlogic/googleapi');
+const db = require('./serverlogic/database');
 
 // My consts
-const dburl = 'mongodb://localhost:27017/hemmadb';
 const port = 3001;
 const refreshTime = 5*60;
 
@@ -50,15 +49,14 @@ app.get('/status/', function (req, res) {
 
 server.listen(port);
 
-// Playing with DB
-createmongoDb();
-createCollections();
+// Setup DB
+db.createHemmaDB();
 
 // Waiting for socket io
 socket.on('connect', function () { console.log('socket.io connected'); });
 socket.on('event', function (data) {
     // Todo, save new status in DB
-    insertGarageStatus({garage: 'socketio', since: new Date()});
+    db.insertGarageStatus({garage: 'socketio', since: new Date()});
     console.log(data);
 });
 
@@ -80,93 +78,7 @@ function main() {
     // Save calendar events to DB
     googleapi.getEventsFromCalendar().then((data) => {
         data.forEach(e => {
-            insertCalendarEvent(e);
-        });
-    });
-}
-
-function createmongoDb() {
-    mongodb.connect(dburl, function(err, db) {
-        if(err) throw err;
-        db.close();
-    });
-}
-
-function createCollections() {
-    mongodb.connect(dburl, function(err, db) {
-        if(err) throw err;
-        db.createCollection('garagestatus', function(err, res) {
-            if(err) throw err;
-            db.close();
-        });
-    });
-    mongodb.connect(dburl, function(err, db) {
-        db.createCollection('device', function(err, res) {
-            if(err) throw err;
-            db.close();
-        });
-    });
-    mongodb.connect(dburl, function(err, db) {
-        db.createCollection('calendar', function(err, res) {
-            if(err) throw err;
-            db.close();
-        });
-    });
-}
-
-function insertGarageStatus(status) {
-    mongodb.connect(dburl, function(err, db) {
-        if(err) throw err;
-
-        db.collection('garagestatus').insertOne(status, function(err, res) {
-            if(err) throw err;
-            console.log('inserted garagestatus');
-            db.close();
-        });
-    });
-}
-
-function insertDevice(device) {
-    mongodb.connect(dburl, function(err, db) {
-        if(err) throw err;
-
-        db.collection('device').update({id: device.id}, device, {upsert: true}, function(err, res) {
-            if(err) throw err;
-            console.log('inserted device ' + device.id);
-            db.close();
-        });
-    });
-}
-
-function insertCalendarEvent(event) {
-    mongodb.connect(dburl, function(err, db) {
-        if(err) throw err;
-
-        db.collection('calendar').update({etag: event.etag}, event, {upsert: true}, function(err, res) {
-            if(err) throw err;
-            console.log('inserted event ' + event.etag);
-            db.close();
-        });
-    });
-}
-
-async function getGarageStatusHistory() {
-    return new Promise((resolve, reject) => {
-        mongodb.connect(dburl, function(err, db) {
-            if(err) reject('error');
-            db.collection('garagestatus').find({}).toArray(function(err, res) {
-                if(err) throw err;
-                resolve(res);
-            });
-        });
-    });
-}
-
-async function getDBStatus() {
-    return new Promise((resolve, reject) => {
-        mongodb.connect(dburl, function(err, db) {
-            if(err) reject('error');
-            resolve(db.s.databaseName);
+            db.insertCalendarEvent(e);
         });
     });
 }
@@ -178,7 +90,7 @@ async function getStatus() {
                 online: (await isonline())?'ok':'no internet',
                 externalip: await getExternalIp()
         };
-        status.db = await getDBStatus();
+        status.db = await db.getDBStatus();
         status.servers = {
             nas : await pingServer('garagenas.local'),
             garagepi: await pingServer('raspberrypi.local'),
@@ -202,7 +114,7 @@ async function getStatus() {
         var now = new Date();
         status.lastcheck = lastCheck.toISOString();
         status.nextcheck = nextCheck.toISOString();
-        status.dbtest = await getGarageStatusHistory();
+        status.dbtest = await db.getGarageStatusHistory();
     } catch (err) {
         console.log(err);
         status.err = err;
@@ -281,7 +193,7 @@ function listDevices() {
                         state: line[2]
                     };
                     devices.push(device);
-                    insertDevice(device);
+                    db.insertDevice(device);
                 }
             }
             resolve(devices);
