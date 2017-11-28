@@ -13,14 +13,20 @@ const socket = require('socket.io-client')('http://raspberrypi.local:3000');
 // My consts
 const dburl = 'mongodb://localhost:27017/hemmadb';
 const port = 3001;
+const refreshTime = 5*60;
 
 // Consts for Google API
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 const TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) + '/.credentials/';
 const TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 
+// Global variables 
+var mainTimer;
+var lastCheck;
+var nextCheck;
+
 // Create App
-var app = express(),
+const app = express(),
     server = require('http').createServer(app);
 
 app.all('/*', function (req, res, next) {
@@ -51,8 +57,6 @@ app.get('/status/', function (req, res) {
 });
 
 server.listen(port);
-var ts = (new Date()).toLocaleString() + "  ";
-console.log(ts + 'Running on port ' + port);
 
 // Playing with DB
 createmongoDb();
@@ -66,10 +70,25 @@ socket.on('event', function (data) {
     console.log(data);
 });
 
+var ts = (new Date()).toLocaleString() + "  ";
+console.log(ts + 'Starting hemmaserver on port ' + port + '. Refreshing devices every ' + refreshTime + ' seconds');
+
+// Start main loop
+main();
+mainTimer = setInterval(main, refreshTime * 1000);
+
+function main() {
+    var now = new Date();
+    var ts = (new Date()).toLocaleString() + "  ";
+    console.log(ts + 'In the future: Turn on/off all devices based on sun and/or calendar');
+    lastCheck = now;
+    nextCheck = new Date(lastCheck.getTime() + refreshTime * 1000);
+    console.log('Checking next time: ' + nextCheck);
+}
+
 function createmongoDb() {
     mongodb.connect(dburl, function(err, db) {
         if(err) throw err;
-        console.log('DB created');
         db.close();
     });
 }
@@ -79,21 +98,18 @@ function createCollections() {
         if(err) throw err;
         db.createCollection('garagestatus', function(err, res) {
             if(err) throw err;
-            console.log('Garagestatus collection created');
             db.close();
         });
     });
     mongodb.connect(dburl, function(err, db) {
         db.createCollection('device', function(err, res) {
             if(err) throw err;
-            console.log('Device collection created');
             db.close();
         });
     });
     mongodb.connect(dburl, function(err, db) {
         db.createCollection('calendar', function(err, res) {
             if(err) throw err;
-            console.log('Calendar collection created');
             db.close();
         });
     });
@@ -185,8 +201,8 @@ async function getStatus() {
         status.sunrise = getLightTimes().sunrise;
         status.sunset = getLightTimes().sunset;
         var now = new Date();
-        status.lastrun = 'not implemented';
-        status.nextcheck = new Date(now.setMinutes(now.getMinutes() + 5)).toUTCString();
+        status.lastcheck = lastCheck.toISOString();
+        status.nextcheck = nextCheck.toISOString();
         status.dbtest = await getGarageStatusHistory();
     } catch (err) {
         console.log(err);
@@ -218,7 +234,6 @@ async function pingServer(server) {
                 console.error(err);
                 reject(err);
             }
-            console.log(stdout);
             var ip = stdout.match(/\((.*?)\)/);
             resolve(ip[1]);
         });
