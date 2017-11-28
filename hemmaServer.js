@@ -90,6 +90,13 @@ function createCollections() {
             db.close();
         });
     });
+    mongodb.connect(dburl, function(err, db) {
+        db.createCollection('calendar', function(err, res) {
+            if(err) throw err;
+            console.log('Calendar collection created');
+            db.close();
+        });
+    });
 }
 
 function insertGarageStatus(status) {
@@ -110,7 +117,19 @@ function insertDevice(device) {
 
         db.collection('device').update({id: device.id}, device, {upsert: true}, function(err, res) {
             if(err) throw err;
-            console.log('inserted device');
+            console.log('inserted device ' + device.id);
+            db.close();
+        });
+    });
+}
+
+function insertCalendarEvent(event) {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+
+        db.collection('calendar').update({etag: event.etag}, event, {upsert: true}, function(err, res) {
+            if(err) throw err;
+            console.log('inserted event ' + event.etag);
             db.close();
         });
     });
@@ -290,12 +309,14 @@ function listEvents(auth) {
             var events = [];
             response.items.forEach(e => {
                 var event = {};
+                event.etag = e.etag.replace(/"/g,'');
                 event.summary = e.summary;
                 const location = e.location.split(',').filter((e,i,a) => { return parseInt(e); });
                 event.location = location;
                 event.start = new Date(Date.parse(e.start.dateTime)).toUTCString();
                 event.end = new Date(Date.parse(e.end.dateTime)).toUTCString();
                 events.push(event);
+                insertCalendarEvent(event);
             });
             if (events.length == 0) {
                 console.log('No upcoming events found.');
