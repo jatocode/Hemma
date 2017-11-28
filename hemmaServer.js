@@ -8,7 +8,8 @@ const googleapi = require('./server/googleapi');
 const db = require('./server/database');
 const net = require('./server/internet');
 const telldus = require('./server/telldus');
-const garageapi = require('./server/garage.js');
+const garageapi = require('./server/garage');
+const config = require('./server/config');
 
 // My consts
 const port = 3001;
@@ -65,6 +66,7 @@ socket.on('event', function (data) {
 var ts = (new Date()).toLocaleString() + "  ";
 console.log(ts + 'Starting hemmaserver on port ' + port + '. Refreshing devices every ' + refreshTime + ' seconds');
 
+
 // Start main loop
 main();
 setInterval(main, refreshTime * 1000);
@@ -89,6 +91,10 @@ function main() {
             db.insertDevice(device);
         });
     }).catch((err) => { console.log(err); });
+
+    config.readConfig().then((data) => {
+        console.log(data);
+    }).catch((err) => {console.log('error');} );
 }
 
 async function getStatus() {
