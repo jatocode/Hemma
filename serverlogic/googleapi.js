@@ -76,7 +76,6 @@ function listEvents(auth) {
                 event.start = new Date(Date.parse(e.start.dateTime)).toUTCString();
                 event.end = new Date(Date.parse(e.end.dateTime)).toUTCString();
                 events.push(event);
-                insertCalendarEvent(event);
             });
             if (events.length == 0) {
                 console.log('No upcoming events found.');
@@ -88,7 +87,7 @@ function listEvents(auth) {
     });
 }
 
-function findEventForId(auth, id) {
+exports.findEventForId = function findEventForId(auth, id) {
     return new Promise((resolve, reject) => {
         var calendar = google.calendar('v3');
         var timemin = new Date();

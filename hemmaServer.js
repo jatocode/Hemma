@@ -76,6 +76,13 @@ function main() {
     lastCheck = now;
     nextCheck = new Date(lastCheck.getTime() + refreshTime * 1000);
     console.log('Checking next time: ' + nextCheck);
+
+    // Save calendar events to DB
+    googleapi.getEventsFromCalendar().then((data) => {
+        data.forEach(e => {
+            insertCalendarEvent(e);
+        });
+    });
 }
 
 function createmongoDb() {
@@ -185,8 +192,8 @@ async function getStatus() {
         status.nexa = {
             tdtool : await getTellstickStatus(),
             numDevice : devices.length,
-            motorvarmare : await findEventForId(await getGoogleApiAuth(), 2),
-            trappan : await findEventForId(await getGoogleApiAuth(), 19),
+            motorvarmare : await googleapi.findEventForId(await googleapi.getGoogleApiAuth(), 2),
+            trappan : await googleapi.findEventForId(await googleapi.getGoogleApiAuth(), 19),
             devicesOn : devices.filter(function(device,i,array) { return device.state == 'ON'; }),
             devicesUnkown : devices.filter(function(device,i,array) { return device.state != 'OFF' && device.state != 'ON'; })
         };
