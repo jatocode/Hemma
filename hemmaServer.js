@@ -59,7 +59,7 @@ db.createHemmaDB();
 socket.on('connect', function () { console.log('socket.io connected'); });
 socket.on('status', function (data) {
     // Todo, save new status in DB
-    db.insertGarageStatus({ garage: 'socketio', since: new Date() });
+    db.insertGarageStatus(data.status.garage);
     console.log(data);
 });
 
@@ -102,18 +102,29 @@ async function main() {
     }
 
     // Let's turn shit on. And off.
+    var devicesToOn = [];
     try {
-        var events = await db.getActiveEvents();
-        events.forEach(e => {
-            e.location.forEach(l => {
-                db.getDevice(l).then((data) => {
-                    console.log(data.id + ', ' + data.name);
-                    // telldus.deviceOn(data.id);
-                });
-            });
-        });
+        const events = await db.getActiveEvents();
+        for(let event of events) {
+            // TODO. Use Promise.All and get all at once
+            for(let id of event.location) {
+                try {
+                    const device = await db.getDevice(id);
+                    if(devicesToOn.indexOf(device.id) == -1) {
+                        devicesToOn.push(device.id);
+                    }
+                } catch (err) {
+                    console.log('No device found for id: ' + id);
+                }
+            }
+        }
 
-//var notActive = deviceId.filter((e) => { e.indexOf});
+        // And turn of everything else
+        const devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
+        console.log(devicesToOn);
+        console.log(devicesToOff);
+        // telldus.deviceOn( ... );
+        // telldus.deviceOff( ... );
         
     } catch (err) {
         console.log(err);

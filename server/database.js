@@ -46,9 +46,9 @@ exports.insertGarageStatus = function insertGarageStatus(status) {
     mongodb.connect(dburl, function(err, db) {
         if(err) throw err;
 
-        db.collection('garagestatus').insertOne(status, function(err, res) {
+        db.collection('garagestatus').update({garage:status}, {garage:status, timestamp: Date.now()}, {upsert:true}, function(err, res) {
             if(err) throw err;
-            console.log('inserted garagestatus');
+            console.log('updated garagestatus');
             db.close();
         });
     });
