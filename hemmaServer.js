@@ -95,7 +95,8 @@ async function main() {
         });
 
         // And get config
-        db.insertConfig(await config.readConfig());
+        var conf = await config.readConfig();
+        db.insertConfig(conf);
 
     } catch (err) {
         console.log(err);
@@ -104,6 +105,7 @@ async function main() {
     // Let's turn shit on. And off.
     var devicesToOn = [];
     try {
+        // Calendar events
         const events = await db.getActiveEvents();
         for(let event of events) {
             // TODO. Use Promise.All and get all at once
@@ -119,15 +121,26 @@ async function main() {
             }
         }
 
-        // And turn of everything else
+        // By sun
+        const light = getLightTimes();
+        const now = Date.now();
+        if(now > light.sunset && light.sunrise < now) {
+            console.log('Sun is setting on: ' + conf.light);
+            devicesToOn.concat(conf.light);
+        }
+
+        // And turn off everything else
         const devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
-        console.log(devicesToOn);
-        console.log(devicesToOff);
+
+        // TODO Save these to DB for easy status lookups
+        console.log('Turning on: ' + devicesToOn);
+        console.log('Turning off: ' + devicesToOff);
+
         // telldus.deviceOn( ... );
         // telldus.deviceOff( ... );
         
     } catch (err) {
-        console.log(err);
+        console.log('I had a problem: ' + err);
     }
 }
 
