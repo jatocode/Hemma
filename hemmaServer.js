@@ -126,18 +126,33 @@ async function main() {
         const now = Date.now();
         if(now > light.sunset && light.sunrise < now) {
             console.log('Sun is setting on: ' + conf.light);
-            devicesToOn.concat(conf.light);
+            devicesToOn = devicesToOn.concat(conf.light);
         }
 
+        var devicesOn = devices.filter(function (device, i, array) { return device.state == 'ON'; }).map(d => { return d.id });
+        var devicesOff = devices.filter(function (device, i, array) { return device.state == 'OFF'; }).map(d => { return d.id });
+        
         // And turn off everything else
-        const devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
+        var devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
 
+        devicesOn = devicesOn.sort((a,b) => { return parseInt(b) < parseInt(a) });        
+        devicesOff = devicesOff.sort((a,b) => { return parseInt(b) < parseInt(a) });        
+        devicesToOn = devicesToOn.sort((a,b) => { return parseInt(b) < parseInt(a) });
+        devicesToOff = devicesToOff.sort((a,b) => { return parseInt(b) < parseInt(a) });
+        
+        const on = devicesToOn.filter((d) => { return !devicesOn.includes(d)});
+        const off = devicesToOff.filter((d) => { return !devicesOff.includes(d)});
+        
         // TODO Save these to DB for easy status lookups
-        console.log('Turning on: ' + devicesToOn);
-        console.log('Turning off: ' + devicesToOff);
-
-        // telldus.deviceOn( ... );
-        // telldus.deviceOff( ... );
+        console.log('Already on:    ' + devicesOn);
+        console.log('Should be on:  ' + devicesToOn);
+        console.log('Ch ch changes: ' + on);
+        console.log('Already off:   ' + devicesOff);
+        console.log('Should be off: ' + devicesToOff);
+        console.log('Ch ch changes: ' + off);
+        
+        telldus.turnOnDevices(on);
+        telldus.turnOffDevices(off); 
         
     } catch (err) {
         console.log('I had a problem: ' + err);

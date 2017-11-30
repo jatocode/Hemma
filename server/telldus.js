@@ -1,6 +1,18 @@
 const request = require('request');
 const exec = require('child_process').exec;
 
+exports.turnOnDevices = async function turnOnDevices(ids) {
+    for(let id of ids) {
+        await this.deviceOn(id);
+    }
+}
+
+exports.turnOffDevices = async function turnOffDevices(ids) {
+    for(let id of ids) {
+        await this.deviceOff(id);
+    }
+}
+
 exports.deviceOn = async function deviceOn(id) {
     return new Promise((resolve, reject) => {
         exec('tdtool --on ' + id, (err, stdout, stderr) => {
