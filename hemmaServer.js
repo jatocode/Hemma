@@ -34,6 +34,15 @@ app.get('/device/', function (req, res) {
     });
 });
 
+app.get('/device/off/:deviceId', function (req, res) {
+    var id = req.params.deviceId;
+    telldus.deviceOff(id).then(() => { res.send({off:id}) });
+});
+app.get('/device/on/:deviceId', function (req, res) {
+    var id = req.params.deviceId;
+    telldus.deviceOn(id).then(() => { res.send({on:id}) });
+});
+
 app.get('/calendar/', function (req, res) {
     googleapi.getEventsFromCalendar().then((data) => {
         res.send(data);
