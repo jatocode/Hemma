@@ -14,10 +14,12 @@ const config = require('./server/config');
 // My consts
 const port = 3001;
 const refreshTime = 5 * 60;
+const restartTimer = 8; // Hours
 
 // Global variables 
 var lastCheck;
 var nextCheck;
+var timer;
 
 // Create App
 const app = express(),
@@ -65,6 +67,18 @@ app.get('/run/', function (req, res) {
     });
 });
 
+app.get('/timer/off', function (req, res) {
+    const restart = restartTimer * 60 * 60 * 1000;
+    nextCheck = new Date((new Date()).getTime() + restart); 
+    setTimeout(startTimer, restart);
+    clearInterval(timer);
+    res.send({nextCheck:nextCheck, restart: 'yes'});
+});
+app.get('/timer/on', function (req, res) {
+    startTimer();
+    res.send({nextCheck:nextCheck});
+});
+
 server.listen(port);
 
 // Setup DB
@@ -83,7 +97,12 @@ console.log(ts + 'Starting hemmaserver on port ' + port + '. Refreshing devices 
 
 // Start main loop
 main();
-setInterval(main, refreshTime * 1000);
+startTimer();
+
+function startTimer() {
+    timer = setInterval(main, refreshTime * 1000);    
+    nextCheck = new Date((new Date()).getTime() + refreshTime * 1000);    
+}
 
 async function main() {
     var now = new Date();
@@ -212,6 +231,8 @@ async function getStatus() {
         var now = new Date();
         status.lastCheck = lastCheck.toISOString();
         status.nextCheck = nextCheck.toISOString();
+        status.refreshTime = refreshTime;
+        status.restartTimer = restartTimer;
         status.garageHistory = await db.getGarageStatusHistory();
     } catch (err) {
         console.log(err);
