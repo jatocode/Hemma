@@ -50,6 +50,12 @@ app.get('/status/', function (req, res) {
     });
 });
 
+app.get('/run/', function (req, res) {
+    main().then((data) => {
+        res.send(data);
+    });
+});
+
 server.listen(port);
 
 // Setup DB
@@ -104,6 +110,9 @@ async function main() {
 
     // Let's turn shit on. And off.
     var devicesToOn = [];
+    var devicesToOff = [];
+    var on = [];
+    var off = [];
     try {
         // Calendar events
         const events = await db.getActiveEvents();
@@ -129,27 +138,25 @@ async function main() {
             devicesToOn = devicesToOn.concat(conf.light);
         }
 
-        var devicesOn = devices.filter(function (device, i, array) { return device.state == 'ON'; }).map(d => { return d.id });
-        var devicesOff = devices.filter(function (device, i, array) { return device.state == 'OFF'; }).map(d => { return d.id });
+        devicesOn = devices.filter(function (device, i, array) { return device.state == 'ON'; }).map(d => { return d.id });
+        devicesOff = devices.filter(function (device, i, array) { return device.state == 'OFF'; }).map(d => { return d.id });
         
         // And turn off everything else
-        var devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
+        devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
 
-        devicesOn = devicesOn.sort((a,b) => { return parseInt(b) < parseInt(a) });        
-        devicesOff = devicesOff.sort((a,b) => { return parseInt(b) < parseInt(a) });        
-        devicesToOn = devicesToOn.sort((a,b) => { return parseInt(b) < parseInt(a) });
-        devicesToOff = devicesToOff.sort((a,b) => { return parseInt(b) < parseInt(a) });
-        
-        const on = devicesToOn.filter((d) => { return !devicesOn.includes(d)});
-        const off = devicesToOff.filter((d) => { return !devicesOff.includes(d)});
-        
+        // Sort to make it pretty
         // TODO Save these to DB for easy status lookups
-        console.log('Already on:    ' + devicesOn);
-        console.log('Should be on:  ' + devicesToOn);
-        console.log('Ch ch changes: ' + on);
-        console.log('Already off:   ' + devicesOff);
-        console.log('Should be off: ' + devicesToOff);
-        console.log('Ch ch changes: ' + off);
+        devicesOn = devicesOn.sort(compare);        
+        devicesOff = devicesOff.sort(compare);        
+        devicesToOn = devicesToOn.sort(compare);
+        devicesToOff = devicesToOff.sort(compare);
+        
+        // Actual stuff to change
+        on = devicesToOn.filter((d) => { return !devicesOn.includes(d)});
+        off = devicesToOff.filter((d) => { return !devicesOff.includes(d)});
+
+        console.log('Turning on: ' + on);
+        console.log('Turning off: ' + off);
         
         telldus.turnOnDevices(on);
         telldus.turnOffDevices(off); 
@@ -157,6 +164,12 @@ async function main() {
     } catch (err) {
         console.log('I had a problem: ' + err);
     }
+
+    return {nextCheck: nextCheck,
+            turnedOn: on,
+            turnedOff: off,
+            devicesOn: devicesOn,
+            devicesOff: devicesOff};
 }
 
 async function getStatus() {
@@ -202,4 +215,8 @@ async function getStatus() {
 function getLightTimes() {
     var times = suncalc.getTimes(new Date(), 59.33, 13.50);
     return times;
+}
+
+function compare(a,b) {
+    return a - b;
 }

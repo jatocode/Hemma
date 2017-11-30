@@ -40,6 +40,12 @@ function createCollections() {
             db.close();
         });
     });
+    mongodb.connect(dburl, function(err, db) {
+        db.createCollection('devicestate', function(err, res) {
+            if(err) throw err;
+            db.close();
+        });
+    });
 }
 
 exports.insertGarageStatus = function insertGarageStatus(status) {
@@ -62,6 +68,14 @@ exports.insertDevice = function insertDevice(device) {
             if(err) throw err;
             db.close();
         });
+    });
+}
+
+exports.insertDevice = function insertDeviceState(state, devices) {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+        // TODO 
+        // Save devices that should be on/off
     });
 }
 
