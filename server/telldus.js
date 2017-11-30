@@ -1,14 +1,15 @@
 const request = require('request');
 const exec = require('child_process').exec;
+const fs = require('fs');
 
 exports.turnOnDevices = async function turnOnDevices(ids) {
-    for(let id of ids) {
+    for (let id of ids) {
         await this.deviceOn(id);
     }
 }
 
 exports.turnOffDevices = async function turnOffDevices(ids) {
-    for(let id of ids) {
+    for (let id of ids) {
         await this.deviceOff(id);
     }
 }
@@ -70,6 +71,20 @@ exports.listDevices = async function listDevices() {
                 }
             }
             resolve(devices);
+        });
+    });
+}
+
+exports.watchTdTool = async function watchTdTool() {
+    return new Promise((resolve, reject) => {
+        // Load client secrets from a local file.    
+        fs.watch('/var/state/telldus-core.conf', (eventType, filename) => {
+            console.log(`event type is: ${eventType}`);
+            if (filename) {
+                console.log(`filename provided: ${filename}`);
+            } else {
+                console.log('filename not provided');
+            }
         });
     });
 }
