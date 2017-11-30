@@ -107,7 +107,6 @@ function startTimer() {
 async function main() {
     var now = new Date();
     var ts = (new Date()).toLocaleString() + "  ";
-    console.log(ts + 'In the future: Turn on/off all devices based on sun and/or calendar');
     lastCheck = now;
     nextCheck = new Date(lastCheck.getTime() + refreshTime * 1000);
     console.log('Checking next time: ' + nextCheck);
