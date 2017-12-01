@@ -90,6 +90,17 @@ exports.insertCalendarEvent = function insertCalendarEvent(event) {
     });
 }
 
+exports.clearCalendarEvents = function clearCalendarEvents() {
+    mongodb.connect(dburl, function(err, db) {
+        if(err) throw err;
+
+        db.collection('calendar').remove({}, function(err, res) {
+            if(err) throw err;
+            db.close();
+        });
+    });
+}
+
 exports.insertConfig = function insertConfig(config) {
     mongodb.connect(dburl, function(err, db) {
         if(err) throw err;

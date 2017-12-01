@@ -2,6 +2,7 @@ const express = require('express');
 const suncalc = require('suncalc');
 const socket = require('socket.io-client')('http://raspberrypi.local:3000');
 const isonline = require('is-online');
+const moment = require('moment');
 
 // Homerolled
 const googleapi = require('./server/googleapi');
@@ -41,7 +42,7 @@ app.get('/device/off/:deviceId', function (req, res) {
     telldus.deviceOff(id).then(() => { res.send({off:id}) });
 });
 app.get('/device/on/:deviceId', function (req, res) {
-    var id = req.params.deviceId;
+    var id = req.params.deviceIdiceId;
     telldus.deviceOn(id).then(() => { res.send({on:id}) });
 });
 
@@ -116,6 +117,7 @@ async function main() {
     try {
         // Save calendar events to DB
         var events = await googleapi.getEventsFromCalendar();
+        await db.clearCalendarEvents(); // TODO. How to handle changed events
         events.forEach(e => { 
             db.insertCalendarEvent(e) 
         });
@@ -159,9 +161,15 @@ async function main() {
 
         // By sun
         const light = getLightTimes();
-        const now = Date.now();
-        if(now > light.sunset && light.sunrise < now) {
-            console.log('Sun is setting on: ' + conf.light);
+        const sunset = moment(light.sunset).format('HH:mm');
+        const sunrise= moment(light.sunrise).format('HH:mm');
+        const now    = moment().format('HH:mm');
+        const midnight = '00:00';
+        console.log(sunset+', ' + now + ', ' + sunrise);
+
+        // Efter solned eller mellan midnatt och soluppgång? Varför är det här så svårt?
+        if((now > sunset ) || (now > midnight && now < sunrise )) {
+            console.log('It is fucking dark: ' + conf.light);
             devicesToOn = devicesToOn.concat(conf.light);
         }
 
