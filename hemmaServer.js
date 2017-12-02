@@ -57,6 +57,7 @@ app.get('/light/', function (req, res) {
 });
 
 app.get('/status/', function (req, res) {
+    console.log('status');
     getStatus().then((data) => {
         res.send(data);
     });
@@ -140,6 +141,8 @@ async function main() {
     // Let's turn shit on. And off.
     var devicesToOn = [];
     var devicesToOff = [];
+    var devicesOn = [];
+    var devicesOff = [];
     var on = [];
     var off = [];
     try {

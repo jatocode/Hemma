@@ -37,6 +37,9 @@ exports.getEventsFromCalendar = function getEventsFromCalendar() {
             authorize(JSON.parse(content)).then((auth) => {
                 listEvents(auth).then((data) => {
                     resolve(data);
+                }).catch((err) => {
+                    console.log('Unable to list events');
+                    reject(err);
                 });
             });
         });
@@ -53,7 +56,7 @@ function listEvents(auth) {
         var calendar = google.calendar('v3');
         var timemin = new Date();
         var timemax = new Date();
-        timemax.setHours(timemax.getHours() + 48);
+        timemax.setHours(timemax.getHours() + 72); // Prepping!
         calendar.events.list({
             auth: auth,
             calendarId: '8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com',
@@ -67,6 +70,7 @@ function listEvents(auth) {
                 reject(err);
             }
             var events = [];
+            try {
             response.items.forEach(e => {
                 var event = {};
                 event.id = e.id;
@@ -83,6 +87,10 @@ function listEvents(auth) {
                 resolve([]);
             } else {
                 resolve(events);
+            }
+            } catch (err) {
+                console.log('Error when reading events ' + err);
+                reject(err);
             }
         });
     });
