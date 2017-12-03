@@ -56,7 +56,7 @@ function listEvents(auth) {
         var calendar = google.calendar('v3');
         var timemin = new Date();
         var timemax = new Date();
-        timemax.setHours(timemax.getHours() + 72); // Prepping!
+        timemax.setHours(timemax.getHours() + 48); // Prepping!
         calendar.events.list({
             auth: auth,
             calendarId: '8d9vj753tdtto51s74ddbvlg3o@group.calendar.google.com',

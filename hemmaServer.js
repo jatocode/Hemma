@@ -21,6 +21,7 @@ const restartTimer = 8; // Hours
 var lastCheck;
 var nextCheck;
 var timer;
+var force = false;
 
 // Create App
 const app = express(),
@@ -57,7 +58,6 @@ app.get('/light/', function (req, res) {
 });
 
 app.get('/status/', function (req, res) {
-    console.log('status');
     getStatus().then((data) => {
         res.send(data);
     });
@@ -68,6 +68,14 @@ app.get('/run/', function (req, res) {
         res.send(data);
     });
 });
+
+app.get('/run/force', function (req, res) {
+    force = true;
+    main().then((data) => {
+        res.send(data);
+    });
+});
+
 
 app.get('/timer/off', function (req, res) {
     const restart = restartTimer * 60 * 60 * 1000;
@@ -175,9 +183,15 @@ async function main() {
             console.log('It is fucking dark: ' + conf.light);
             devicesToOn = devicesToOn.concat(conf.light);
         }
-
-        devicesOn = devices.filter(function (device, i, array) { return device.state == 'ON'; }).map(d => { return d.id });
+        
+        if(force == true) {
+            devicesOn = [];
+        } else {
+            devicesOn = devices.filter(function (device, i, array) { return device.state == 'ON'; }).map(d => { return d.id });
+        }
         devicesOff = devices.filter(function (device, i, array) { return device.state == 'OFF'; }).map(d => { return d.id });
+       
+        console.log(devicesToOn);
         
         // And turn off everything else
         devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
@@ -204,6 +218,7 @@ async function main() {
     }
 
     return {nextCheck: nextCheck,
+            force:force,
             turnedOn: on,
             turnedOff: off,
             devicesOn: devicesOn,
@@ -230,6 +245,7 @@ async function getStatus() {
         const devices = await db.getAllDevices();
         status.nexa = {
             tdtool: await telldus.getTellstickStatus(),
+            force: force,
             numDevice: devices.length,
             motorvarmare: await db.getEventForId(2),
             trappan: await db.getEventForId(19),
