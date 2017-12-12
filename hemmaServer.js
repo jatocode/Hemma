@@ -126,7 +126,7 @@ async function main() {
     try {
         // Save calendar events to DB
         var events = await googleapi.getEventsFromCalendar();
-        await db.clearCalendarEvents(); // TODO. How to handle changed events
+        //await db.clearCalendarEvents(); // TODO. How to handle changed events
         events.forEach(e => { 
             db.insertCalendarEvent(e) 
         });
@@ -143,7 +143,7 @@ async function main() {
         db.insertConfig(conf);
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
     }
 
     // Let's turn shit on. And off.
@@ -156,6 +156,7 @@ async function main() {
     try {
         // Calendar events
         const events = await db.getActiveEvents();
+        console.log('Number of events from db: ' + events.length);
         for(let event of events) {
             // TODO. Use Promise.All and get all at once
             for(let id of event.location) {
@@ -165,9 +166,10 @@ async function main() {
                         devicesToOn.push(device.id);
                     }
                 } catch (err) {
-                    console.log('No device found for id: ' + id);
+                    console.error('No device found for id: ' + id);
                 }
             }
+            console.log('Devices from cal: ' + JSON.stringify(devicesToOn));
         }
 
         // By sun
@@ -185,13 +187,13 @@ async function main() {
         }
         
         if(force == true) {
+            console.log('Someone\'s forcing me!');
             devicesOn = [];
         } else {
             devicesOn = devices.filter(function (device, i, array) { return device.state == 'ON'; }).map(d => { return d.id });
         }
         devicesOff = devices.filter(function (device, i, array) { return device.state == 'OFF'; }).map(d => { return d.id });
        
-        console.log(devicesToOn);
         
         // And turn off everything else
         devicesToOff = devices.filter((d) => { return !devicesToOn.includes(d.id); }).map(d => { return d.id });
@@ -202,6 +204,9 @@ async function main() {
         devicesOff = devicesOff.sort(compare);        
         devicesToOn = devicesToOn.sort(compare);
         devicesToOff = devicesToOff.sort(compare);
+
+        console.log('I want these to be on: ' + JSON.stringify(devicesToOn));
+        console.log('I believe these are on: ' + JSON.stringify(devicesOn));
         
         // Actual stuff to change
         on = devicesToOn.filter((d) => { return !devicesOn.includes(d)});
@@ -212,9 +217,8 @@ async function main() {
         
         telldus.turnOnDevices(on);
         telldus.turnOffDevices(off); 
-        
     } catch (err) {
-        console.log('I had a problem: ' + err);
+        console.error('I had a problem: ' + err);
     }
 
     return {nextCheck: nextCheck,
@@ -261,7 +265,7 @@ async function getStatus() {
         status.restartTimer = restartTimer;
         status.garageHistory = await db.getGarageStatusHistory();
     } catch (err) {
-        console.log(err);
+        console.error(err);
         status.err = err;
     }
 
