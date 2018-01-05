@@ -64,6 +64,7 @@ app.get('/status/', function (req, res) {
 });
 
 app.get('/run/', function (req, res) {
+    force = false;
     main().then((data) => {
         res.send(data);
     });
