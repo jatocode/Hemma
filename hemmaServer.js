@@ -43,7 +43,8 @@ app.get('/device/off/:deviceId', function (req, res) {
     telldus.deviceOff(id).then(() => { res.send({off:id}) });
 });
 app.get('/device/on/:deviceId', function (req, res) {
-    var id = req.params.deviceIdiceId;
+    var id = req.params.deviceId;
+    console.log(id);
     telldus.deviceOn(id).then(() => { res.send({on:id}) });
 });
 
