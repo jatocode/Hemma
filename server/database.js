@@ -54,7 +54,7 @@ exports.insertGarageStatus = function insertGarageStatus(status) {
 
         db.collection('garagestatus').update({garage:status}, {garage:status, timestamp: Date.now()}, {upsert:true}, function(err, res) {
             if(err) throw err;
-            console.log('updated garagestatus');
+            //console.log('updated garagestatus');
             db.close();
         });
     });

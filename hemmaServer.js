@@ -22,6 +22,7 @@ var lastCheck;
 var nextCheck;
 var timer;
 var force = false;
+let waitingForRestart = false;
 
 // Create App
 const app = express(),
@@ -40,12 +41,14 @@ app.get('/device/', function (req, res) {
 
 app.get('/device/off/:deviceId', function (req, res) {
     var id = req.params.deviceId;
-    telldus.deviceOff(id).then(() => { res.send({off:id}) });
+    telldus.deviceOff(id);
+    res.send({off:id});
 });
+
 app.get('/device/on/:deviceId', function (req, res) {
     var id = req.params.deviceId;
-    console.log(id);
-    telldus.deviceOn(id).then(() => { res.send({on:id}) });
+    telldus.deviceOn(id)
+    res.send({on:id});
 });
 
 app.get('/calendar/', function (req, res) {
@@ -84,11 +87,13 @@ app.get('/timer/off', function (req, res) {
     nextCheck = new Date((new Date()).getTime() + restart); 
     setTimeout(startTimer, restart);
     clearInterval(timer);
-    res.send({nextCheck:nextCheck, restart: 'yes'});
+    waitingForRestart = true;
+    res.send({nextCheck:nextCheck, restart: 'yes', waitingForRestart: waitingForRestart});
 });
 app.get('/timer/on', function (req, res) {
     startTimer();
-    res.send({nextCheck:nextCheck});
+    waitingForRestart = false;
+    res.send({nextCheck:nextCheck, waitingForRestart: waitingForRestart});
 });
 
 server.listen(port);
@@ -101,7 +106,7 @@ socket.on('connect', function () { console.log('socket.io connected'); });
 socket.on('status', function (data) {
     // Todo, save new status in DB
     db.insertGarageStatus(data.status.garage);
-    console.log(data);
+    //console.log(data);
 });
 
 var ts = (new Date()).toLocaleString() + "  ";
@@ -122,6 +127,7 @@ async function main() {
     lastCheck = now;
     nextCheck = new Date(lastCheck.getTime() + refreshTime * 1000);
     console.log('Checking next time: ' + nextCheck);
+    console.log('Restarttimer:'  + restartTimer);
 
     var deviceId = [];
     
@@ -266,6 +272,7 @@ async function getStatus() {
         status.refreshTime = refreshTime;
         status.restartTimer = restartTimer;
         status.garageHistory = await db.getGarageStatusHistory();
+        status.waitingForRestart = waitingForRestart;
     } catch (err) {
         console.error(err);
         status.err = err;
