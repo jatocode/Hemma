@@ -141,6 +141,7 @@ async function main() {
 
         // Save devices to DB
         var devices = await telldus.listDevices();
+	console.table(devices);
         devices.forEach(device => { 
             deviceId.push(parseInt(device.id));
             db.insertDevice(device);

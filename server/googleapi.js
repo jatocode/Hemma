@@ -8,6 +8,7 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 const TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) + '/.credentials/';
 const TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 
+
 exports.getGoogleApiAuth = async function getGoogleApiAuth() {
     return new Promise((resolve, reject) => {
         // Load client secrets from a local file.
@@ -38,6 +39,7 @@ exports.getEventsFromCalendar = function getEventsFromCalendar() {
                 listEvents(auth).then((data) => {
                     resolve(data);
                 }).catch((err) => {
+                    console.log(err);
                     console.log('Unable to list events');
                     reject(err);
                 });
@@ -165,16 +167,24 @@ function authorize2(credentials, callback) {
     var auth = new googleAuth();
     var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
+    console.log('auth2');
+
+    console.log(TOKEN_PATH);
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, function (err, token) {
+    fs.readFile(TOKEN_PATH, (err, token) => {
+        console.log('fs.ReadFile');
+        console.log(err);
         if (err) {
+            console.log('Getting new token');
             getNewToken(oauth2Client, callback);
             return;
         } else {
+            console.log('Found old token');
             oauth2Client.credentials = JSON.parse(token);
             return callback(oauth2Client);
         }
     });
+    console.log('After fs.ReadFile');
 }
 
 /**
@@ -225,3 +235,10 @@ function storeToken(token) {
     fs.writeFile(TOKEN_PATH, JSON.stringify(token));
     console.log('Token stored to ' + TOKEN_PATH);
 }
+
+// Load client secrets from a local file.
+// fs.readFile('client_secret.json', (err, content) => {
+//   if (err) return console.log('Error loading client secret file:', err);
+//   // Authorize a client with credentials, then call the Google Calendar API.
+//   authorize2(JSON.parse(content), listEvents);
+// });
